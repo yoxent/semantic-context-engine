@@ -1,17 +1,19 @@
-import { mkdtemp, rm, cp, writeFile, unlink } from "node:fs/promises";
+import { mkdtemp, cp, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
 import { MarkdownChunker } from "@sce/parsing";
 import { SqliteStorage } from "@sce/storage";
+import { rmWithRetry } from "../../../../test/rmWithRetry.js";
 import { IndexingService } from "../Indexer.js";
 
 describe("IndexingService", () => {
   it("indexes markdown vault chunks and refreshes changed files", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-index-"));
+    let storage: SqliteStorage | undefined;
     try {
       await cp("fixtures/sample-vault", dir, { recursive: true });
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const service = new IndexingService({
         chunker: new MarkdownChunker(),
         metadataStore: storage,
@@ -24,17 +26,18 @@ describe("IndexingService", () => {
 
       const hits = await storage.search({ text: "SQLite FTS5", limit: 5 });
       expect(hits[0]?.path).toBe("Architecture.md");
-      storage.close();
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 
   it("re-indexes changed files with updated searchable content", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-index-"));
+    let storage: SqliteStorage | undefined;
     try {
       await cp("fixtures/sample-vault", dir, { recursive: true });
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const service = new IndexingService({
         chunker: new MarkdownChunker(),
         metadataStore: storage,
@@ -67,18 +70,18 @@ describe("IndexingService", () => {
 
       const staleHits = await storage.search({ text: "SQLite FTS5", limit: 5 });
       expect(staleHits.some((hit) => hit.path === "Architecture.md")).toBe(false);
-
-      storage.close();
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 
   it("prunes deleted files on re-index", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-index-"));
+    let storage: SqliteStorage | undefined;
     try {
       await cp("fixtures/sample-vault", dir, { recursive: true });
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const service = new IndexingService({
         chunker: new MarkdownChunker(),
         metadataStore: storage,
@@ -101,10 +104,9 @@ describe("IndexingService", () => {
 
       const file = await storage.getFile(first.repositoryId, "Architecture.md");
       expect(file).toBeUndefined();
-
-      storage.close();
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 });

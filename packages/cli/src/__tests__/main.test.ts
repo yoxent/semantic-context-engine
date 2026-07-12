@@ -1,8 +1,9 @@
-import { mkdtemp, rm, cp } from "node:fs/promises";
+import { mkdtemp, cp } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { rmWithRetry } from "../../../../test/rmWithRetry.js";
 import { run } from "../main.js";
 
 const repoRoot = fileURLToPath(new URL("../../../../", import.meta.url));
@@ -20,7 +21,7 @@ describe("CLI run", () => {
       await run(["index", dir, "--type", "vault"]);
       expect(log).toHaveBeenCalledWith(expect.stringMatching(/Indexed 3 files and \d+ chunks/));
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      await rmWithRetry(dir);
     }
   });
 });

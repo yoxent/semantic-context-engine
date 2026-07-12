@@ -1,8 +1,9 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import Database from "better-sqlite3";
 import { describe, expect, it } from "vitest";
+import { rmWithRetry } from "../../../../test/rmWithRetry.js";
 import { SqliteStorage } from "../SqliteStorage.js";
 import type { Chunk } from "@sce/core";
 
@@ -39,8 +40,9 @@ function makeChunk(overrides: Partial<Chunk> = {}): Chunk {
 describe("SqliteStorage", () => {
   it("persists chunks and searches through FTS", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
     try {
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const chunk = makeChunk();
 
       await storage.saveChunks([chunk]);
@@ -52,16 +54,17 @@ describe("SqliteStorage", () => {
       expect(hits[0]?.chunkId).toBe("chunk-1");
       expect(hits[0]?.path).toBe("Architecture.md");
       expect(hits[0]?.snippet).toContain("SQLite");
-      storage.close();
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 
   it("deleteRepository removes chunk_links for repository chunks", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
     try {
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const chunk = makeChunk({ wikiLinks: ["Storage", "Schema"] });
 
       await storage.saveRepository({
@@ -73,47 +76,61 @@ describe("SqliteStorage", () => {
       await storage.saveChunks([chunk]);
 
       const db = openRawDb(dir);
-      expect(getChunkLinks(db, chunk.id)).toEqual(["Schema", "Storage"]);
-      db.close();
+      try {
+        expect(getChunkLinks(db, chunk.id)).toEqual(["Schema", "Storage"]);
+      } finally {
+        db.close();
+      }
 
       await storage.deleteRepository("repo");
 
       const dbAfter = openRawDb(dir);
-      expect(countChunkLinks(dbAfter)).toBe(0);
-      dbAfter.close();
-      storage.close();
+      try {
+        expect(countChunkLinks(dbAfter)).toBe(0);
+      } finally {
+        dbAfter.close();
+      }
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 
   it("re-saving chunk with different wikiLinks replaces links", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
     try {
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const chunk = makeChunk({ wikiLinks: ["Alpha", "Beta"] });
 
       await storage.saveChunks([chunk]);
 
       const db = openRawDb(dir);
-      expect(getChunkLinks(db, chunk.id)).toEqual(["Alpha", "Beta"]);
-      db.close();
+      try {
+        expect(getChunkLinks(db, chunk.id)).toEqual(["Alpha", "Beta"]);
+      } finally {
+        db.close();
+      }
 
       await storage.saveChunks([makeChunk({ wikiLinks: ["Gamma"] })]);
 
       const dbAfter = openRawDb(dir);
-      expect(getChunkLinks(dbAfter, chunk.id)).toEqual(["Gamma"]);
-      dbAfter.close();
-      storage.close();
+      try {
+        expect(getChunkLinks(dbAfter, chunk.id)).toEqual(["Gamma"]);
+      } finally {
+        dbAfter.close();
+      }
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 
   it("returns empty results for malformed FTS queries without throwing", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
     try {
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const chunk = makeChunk();
 
       await storage.saveChunks([chunk]);
@@ -121,16 +138,17 @@ describe("SqliteStorage", () => {
 
       await expect(storage.search({ text: 'foo"bar', limit: 5 })).resolves.toEqual([]);
       await expect(storage.search({ text: '""" OR NOT', limit: 5 })).resolves.toEqual([]);
-      storage.close();
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 
   it("double indexChunks does not duplicate search hits", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
     try {
-      const storage = await SqliteStorage.open(dir);
+      storage = await SqliteStorage.open(dir);
       const chunk = makeChunk();
 
       await storage.saveChunks([chunk]);
@@ -141,9 +159,9 @@ describe("SqliteStorage", () => {
 
       expect(hits).toHaveLength(1);
       expect(hits[0]?.chunkId).toBe("chunk-1");
-      storage.close();
     } finally {
-      await rm(dir, { recursive: true, force: true });
+      storage?.close();
+      await rmWithRetry(dir);
     }
   });
 });
