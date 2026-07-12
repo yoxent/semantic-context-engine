@@ -1,4 +1,7 @@
 export * from "./api/SemanticContextEngine.js";
+export * from "./config/defaults.js";
+export * from "./config/loadConfig.js";
+export * from "./config/schema.js";
 export * from "./interfaces/Chunker.js";
 export * from "./interfaces/Embedding.js";
 export * from "./interfaces/Ranker.js";
