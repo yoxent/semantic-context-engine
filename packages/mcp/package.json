@@ -2,12 +2,19 @@
   "name": "@sce/mcp",
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/src/server.js",
+  "types": "dist/src/server.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@sce/core": "0.0.0"
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@sce/core": "0.0.0",
+    "@sce/indexing": "0.0.0",
+    "@sce/parsing": "0.0.0",
+    "@sce/ranking": "0.0.0",
+    "@sce/retrieval": "0.0.0",
+    "@sce/storage": "0.0.0",
+    "zod": "^4.4.3"
   }
 }

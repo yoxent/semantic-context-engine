@@ -42,4 +42,64 @@ describe("SemanticContextEngine", () => {
       "Search mode semantic is not implemented in v1"
     );
   });
+
+  it("delegates indexRepository and getChunk when configured", async () => {
+    const keyword: IRetrievalStrategy = {
+      name: "keyword",
+      search: async () => ({ hits: [] })
+    };
+    const engine = new SemanticContextEngine({
+      keywordStrategy: keyword,
+      indexingService: {
+        indexRepository: async () => ({
+          repositoryId: "repo-1",
+          filesIndexed: 2,
+          chunksIndexed: 4
+        })
+      },
+      metadataStore: {
+        saveRepository: async () => undefined,
+        getRepository: async () => undefined,
+        deleteRepository: async () => undefined,
+        saveFile: async () => undefined,
+        getFile: async () => undefined,
+        listFiles: async () => [],
+        deleteFile: async () => undefined,
+        saveChunks: async () => undefined,
+        getChunk: async (id) =>
+          id === "chunk-1"
+            ? {
+                id: "chunk-1",
+                repositoryId: "repo-1",
+                relativePath: "README.md",
+                startLine: 1,
+                endLine: 2,
+                text: "hello",
+                language: "markdown",
+                fileHash: "abc",
+                timestamp: new Date("2026-01-01T00:00:00.000Z")
+              }
+            : undefined,
+        deleteChunksForFile: async () => undefined
+      }
+    });
+
+    await expect(engine.indexRepository({ rootPath: "/vault", type: "vault" })).resolves.toMatchObject({
+      repositoryId: "repo-1",
+      filesIndexed: 2,
+      chunksIndexed: 4
+    });
+    await expect(engine.getChunk("chunk-1")).resolves.toMatchObject({ text: "hello" });
+    await expect(engine.getChunk("missing")).rejects.toThrow("Chunk not found: missing");
+  });
+
+  it("requires indexing and metadata deps for write/read helpers", async () => {
+    const engine = new SemanticContextEngine({
+      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) }
+    });
+    await expect(engine.indexRepository({ rootPath: "/vault", type: "vault" })).rejects.toThrow(
+      "Indexing service is not configured"
+    );
+    await expect(engine.getChunk("chunk-1")).rejects.toThrow("Metadata store is not configured");
+  });
 });

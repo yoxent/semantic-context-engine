@@ -2,12 +2,21 @@
   "name": "@sce/cli",
   "version": "0.0.0",
   "type": "module",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/src/main.js",
+  "types": "dist/src/main.d.ts",
+  "bin": {
+    "sce": "dist/src/main.js"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@sce/core": "0.0.0"
+    "@sce/core": "0.0.0",
+    "@sce/indexing": "0.0.0",
+    "@sce/parsing": "0.0.0",
+    "@sce/ranking": "0.0.0",
+    "@sce/retrieval": "0.0.0",
+    "@sce/storage": "0.0.0",
+    "commander": "^15.0.0"
   }
 }
