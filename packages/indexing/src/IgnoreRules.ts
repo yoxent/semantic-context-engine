@@ -15,6 +15,7 @@ export function createIgnoreMatcher(input: IgnoreRuleInput): (relativePath: stri
     if (ignored.ignores(normalized)) {
       return false;
     }
+    // included.ignores() acts as a positive include match
     return included.ignores(normalized);
   };
 }
