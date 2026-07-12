@@ -37,9 +37,13 @@ First interface-first vertical is implemented on **`develop`**, plus a small ops
 
 ## Known follow-ups
 
-- Better vault ranking (heading-path boosts, etc.)
 - Semantic / AST / hybrid strategies (new planned slice)
 - Human UI on obscure Cloudflare subdomain
+
+## Recently shipped (ranking slice)
+
+- `SearchHit.headingPath` populated from SQLite
+- `SimpleRanker` basename + heading-path + phrase/identifier boosts with stable tie-break
 
 ## For the next agent
 
