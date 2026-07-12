@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@sce/core": "0.0.0"
+    "@sce/core": "0.0.0",
+    "better-sqlite3": "^12.11.1"
   }
 }
