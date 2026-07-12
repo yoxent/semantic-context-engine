@@ -1,6 +1,6 @@
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
-import Database from "better-sqlite3";
+import Database, { SqliteError } from "better-sqlite3";
 import type { Chunk, FileRecord, IKeywordIndex, IMetadataStore, Repository, SearchHit, SearchQuery } from "@sce/core";
 import { createSchemaSql } from "./schema.js";
 
@@ -39,10 +39,16 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
   }
 
   async deleteRepository(id: string): Promise<void> {
-    this.db.prepare("DELETE FROM repositories WHERE id = ?").run(id);
-    this.db.prepare("DELETE FROM files WHERE repository_id = ?").run(id);
-    this.db.prepare("DELETE FROM chunks WHERE repository_id = ?").run(id);
-    this.db.prepare("DELETE FROM chunks_fts WHERE repository_id = ?").run(id);
+    const tx = this.db.transaction(() => {
+      this.db.prepare(
+        "DELETE FROM chunk_links WHERE source_chunk_id IN (SELECT id FROM chunks WHERE repository_id = ?)"
+      ).run(id);
+      this.db.prepare("DELETE FROM repositories WHERE id = ?").run(id);
+      this.db.prepare("DELETE FROM files WHERE repository_id = ?").run(id);
+      this.db.prepare("DELETE FROM chunks WHERE repository_id = ?").run(id);
+      this.db.prepare("DELETE FROM chunks_fts WHERE repository_id = ?").run(id);
+    });
+    tx();
   }
 
   async saveFile(record: FileRecord): Promise<void> {
@@ -74,10 +80,12 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
        (id, repository_id, relative_path, language, start_line, end_line, text, file_hash, timestamp, heading_path_json, wiki_links_json)
        VALUES (@id, @repositoryId, @relativePath, @language, @startLine, @endLine, @text, @fileHash, @timestamp, @headingPathJson, @wikiLinksJson)`
     );
+    const deleteLinks = this.db.prepare("DELETE FROM chunk_links WHERE source_chunk_id = ?");
     const insertLink = this.db.prepare("INSERT OR IGNORE INTO chunk_links (source_chunk_id, target) VALUES (?, ?)");
     const tx = this.db.transaction((items: Chunk[]) => {
       for (const chunk of items) {
         insertChunk.run(toChunkRow(chunk));
+        deleteLinks.run(chunk.id);
         for (const link of chunk.wikiLinks ?? []) insertLink.run(chunk.id, link);
       }
     });
@@ -99,12 +107,14 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
   }
 
   async indexChunks(chunks: Chunk[]): Promise<void> {
+    const removeFts = this.db.prepare("DELETE FROM chunks_fts WHERE chunk_id = ?");
     const insert = this.db.prepare(
       `INSERT INTO chunks_fts (chunk_id, repository_id, relative_path, heading_path, text)
        VALUES (@id, @repositoryId, @relativePath, @headingPath, @text)`
     );
     const tx = this.db.transaction((items: Chunk[]) => {
       for (const chunk of items) {
+        removeFts.run(chunk.id);
         insert.run({ ...chunk, headingPath: (chunk.headingPath ?? []).join(" / ") });
       }
     });
@@ -117,27 +127,41 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
 
   async search(query: SearchQuery): Promise<SearchHit[]> {
     const limit = query.limit ?? 10;
-    const rows = this.db.prepare(
-      `SELECT chunk_id, relative_path, snippet(chunks_fts, 4, '', '', ' ... ', 16) AS snippet, bm25(chunks_fts) AS rank
-       FROM chunks_fts
-       WHERE chunks_fts MATCH ?
-       ORDER BY rank
-       LIMIT ?`
-    ).all(query.text, limit) as any[];
+    const ftsQuery = buildFtsQuery(query.text);
+    if (!ftsQuery) return [];
 
-    return rows.map((row) => {
-      const chunk = this.db.prepare("SELECT start_line, end_line FROM chunks WHERE id = ?").get(row.chunk_id) as any;
-      return {
-        chunkId: row.chunk_id,
-        score: Math.abs(Number(row.rank)),
-        strategy: "keyword",
-        snippet: row.snippet,
-        path: row.relative_path,
-        startLine: chunk?.start_line ?? 1,
-        endLine: chunk?.end_line ?? 1
-      };
-    });
+    try {
+      const rows = this.db.prepare(
+        `SELECT chunk_id, relative_path, snippet(chunks_fts, 4, '', '', ' ... ', 16) AS snippet, bm25(chunks_fts) AS rank
+         FROM chunks_fts
+         WHERE chunks_fts MATCH ?
+         ORDER BY rank
+         LIMIT ?`
+      ).all(ftsQuery, limit) as any[];
+
+      return rows.map((row) => {
+        const chunk = this.db.prepare("SELECT start_line, end_line FROM chunks WHERE id = ?").get(row.chunk_id) as any;
+        return {
+          chunkId: row.chunk_id,
+          score: Math.abs(Number(row.rank)),
+          strategy: "keyword",
+          snippet: row.snippet,
+          path: row.relative_path,
+          startLine: chunk?.start_line ?? 1,
+          endLine: chunk?.end_line ?? 1
+        };
+      });
+    } catch (err) {
+      if (err instanceof SqliteError) return [];
+      throw err;
+    }
   }
+}
+
+function buildFtsQuery(text: string): string | null {
+  const terms = text.match(/[\p{L}\p{N}_]+/gu);
+  if (!terms || terms.length === 0) return null;
+  return terms.map((term) => `"${term.replace(/"/g, '""')}"`).join(" ");
 }
 
 function toChunkRow(chunk: Chunk): Record<string, unknown> {
