@@ -2,7 +2,7 @@
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
-import { createEngine } from "./createEngine.js";
+import { createEngine } from "@sce/runtime";
 
 export async function run(argv: string[]): Promise<void> {
   const program = new Command();
@@ -13,9 +13,9 @@ export async function run(argv: string[]): Promise<void> {
     .argument("<path>")
     .option("--type <type>", "repository type", "vault")
     .action(async (path, options) => {
-      const { engine, close } = await createEngine(path);
+      const { engine, close, rootPath } = await createEngine(path);
       try {
-        const result = await engine.indexRepository({ rootPath: path, type: options.type });
+        const result = await engine.indexRepository({ rootPath, type: options.type });
         console.log(`Indexed ${result.filesIndexed} files and ${result.chunksIndexed} chunks`);
       } finally {
         close();
@@ -26,9 +26,9 @@ export async function run(argv: string[]): Promise<void> {
     .command("update")
     .argument("<path>")
     .action(async (path) => {
-      const { engine, close } = await createEngine(path);
+      const { engine, close, rootPath } = await createEngine(path);
       try {
-        const result = await engine.updateRepository({ rootPath: path, type: "vault" });
+        const result = await engine.updateRepository({ rootPath, type: "vault" });
         console.log(`Updated ${result.filesIndexed} files and ${result.chunksIndexed} chunks`);
       } finally {
         close();
@@ -39,16 +39,22 @@ export async function run(argv: string[]): Promise<void> {
     .command("search")
     .argument("<query>")
     .requiredOption("--path <path>")
-    .option("--limit <limit>", "maximum hit count", "10")
+    .option("--limit <limit>", "maximum hit count")
     .option("--json", "print JSON")
     .action(async (query, options) => {
-      const { engine, close } = await createEngine(options.path);
+      const { engine, close, config } = await createEngine(options.path);
       try {
-        const result = await engine.search({ text: query, limit: Number(options.limit) });
+        const limit = options.limit !== undefined ? Number(options.limit) : config.search.defaultLimit;
+        const result = await engine.search({ text: query, limit });
+        const hits = result.hits.map((hit) => ({
+          ...hit,
+          snippet: truncate(hit.snippet, config.search.maxSnippetChars)
+        }));
+
         if (options.json) {
-          console.log(JSON.stringify(result, null, 2));
+          console.log(JSON.stringify({ ...result, hits }, null, 2));
         } else {
-          for (const hit of result.hits) {
+          for (const hit of hits) {
             console.log(`${hit.path}:${hit.startLine}-${hit.endLine} score=${hit.score}`);
             console.log(hit.snippet);
           }
@@ -73,6 +79,11 @@ export async function run(argv: string[]): Promise<void> {
     });
 
   await program.parseAsync(argv, { from: "user" });
+}
+
+function truncate(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+  return `${text.slice(0, Math.max(0, maxChars - 3))}...`;
 }
 
 function isExecutedAsMain(): boolean {

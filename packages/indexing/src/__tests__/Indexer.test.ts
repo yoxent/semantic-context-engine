@@ -109,4 +109,36 @@ describe("IndexingService", () => {
       await rmWithRetry(dir);
     }
   });
+
+  it("honors indexing include patterns from config", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      await cp("fixtures/sample-vault", dir, { recursive: true });
+      storage = await SqliteStorage.open(dir);
+      const service = new IndexingService({
+        chunker: new MarkdownChunker(),
+        metadataStore: storage,
+        keywordIndex: storage,
+        config: {
+          indexing: {
+            include: ["Architecture.md"],
+            ignore: [".git/**", ".sce/**"]
+          }
+        }
+      });
+
+      const result = await service.indexRepository({ rootPath: dir, type: "vault" });
+      expect(result.filesIndexed).toBe(1);
+
+      const architectureHits = await storage.search({ text: "SQLite FTS5", limit: 5 });
+      expect(architectureHits[0]?.path).toBe("Architecture.md");
+
+      const agentHits = await storage.search({ text: "concise snippets", limit: 5 });
+      expect(agentHits).toHaveLength(0);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
 });

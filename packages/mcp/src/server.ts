@@ -26,8 +26,12 @@ server.tool(
   })
 );
 
-server.tool("sce_get_chunk", { path: z.string(), chunkId: z.string() }, async (input) => ({
-  content: [{ type: "text", text: JSON.stringify(await sceGetChunk(input), null, 2) }]
-}));
+server.tool(
+  "sce_get_chunk",
+  { path: z.string(), chunkId: z.string(), maxChars: z.number().optional() },
+  async (input) => ({
+    content: [{ type: "text", text: JSON.stringify(await sceGetChunk(input), null, 2) }]
+  })
+);
 
 await server.connect(new StdioServerTransport());

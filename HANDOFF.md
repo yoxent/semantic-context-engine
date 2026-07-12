@@ -1,124 +1,49 @@
-# Handoff: Semantic Context Engine (SCE) — continue design & first slice
+# Handoff: Semantic Context Engine (SCE)
 
-You are continuing a brainstorming/design session. Read and follow the brainstorming skill before any implementation. Do NOT write code until a design is approved, written to a spec, reviewed, and then planned via writing-plans.
+## Current state (2026-07-12)
 
-## Project root
+First interface-first vertical is implemented on **`develop`**.
 
-`E:\Projects\Indie\semantic-context-engine`
+- Branch: `develop` (tracks `origin/develop`)
+- `main` is production-only — do not land feature work there yet
+- Tip at handoff time: keyword vault indexing + CLI/MCP via `@sce/runtime`
 
-## Canonical docs (read first)
+## Canonical docs
 
-- `GOAL.md` — full product vision (retrieval framework for AI agents; NOT "just a vector DB")
-- `README.md` — short original positioning (SCE as local-first semantic retrieval for agents)
-- Current repo state: essentially greenfield (`GOAL.md`, `README.md`, `LICENSE`, this handoff only)
+- `README.md` — how to run the shipped vertical
+- `GOAL.md` — long-term vision (still ahead of v1)
+- `docs/superpowers/specs/2026-07-12-sce-interface-first-vertical-design.md` — approved design
+- `docs/superpowers/plans/2026-07-12-sce-interface-first-vertical.md` — plan that was executed
 
-## Product intent (locked)
+## Locked product decisions
 
-SCE is the product. Primary consumer = **AI coding agents** (token economy: retrieve only relevant local context instead of dumping repos / web searching). Secondary consumer = **humans** (presentation, CV/resume showcase) — humans care more about how it's presented than curating content.
+- SCE is the product; primary consumer = AI coding agents; secondary = human presentation later
+- Pasttime is unrelated in code (DNS/subdomain borrowing only, later)
+- Approach: interface-first thin vertical
+- First agent surface: vault + CLI/MCP on one public API
+- Human Obsidian-like UI later inside SCE, not Pasttime
 
-Pasttime (`E:\Projects\Web\pasttime`) is **unrelated as an application**. Keep Pasttime 100% game-focused. SCE and Pasttime must **not know each other exist** in code (no shared packages, no imports, no Pasttime routes, no links from Pasttime nav/sitemap).
+## Shipped in v1
 
-### Domain borrowing (infra only)
+- Monorepo packages under `packages/`
+- Core API + plugin interfaces
+- Markdown vault indexing with heading chunks and wiki-link metadata
+- SQLite FTS5 keyword search in `.sce/metadata.sqlite`
+- Incremental update + deleted-file prune
+- `sce.config.json` loaded at runtime
+- CLI + MCP adapters sharing `@sce/runtime`
 
-- Pasttime is hosted on **Cloudflare**.
-- SCE's public human UI (later) will use a **subdomain** of the same apex domain (obscure name preferred, not `kb`/`wiki`).
-- Same Cloudflare **account/DNS** for convenience; **separate Cloudflare Pages/Workers project** (not Pasttime's app).
-- Discoverability: no links from Pasttime; `noindex`; URL only if you type it.
-- Path-based hosting under Pasttime (`/knowledge`) was **rejected** (couples Pasttime config to SCE).
+## Known follow-ups
 
-## Approach (locked): #3 — Interface-first thin vertical
+- CLI `--verbose` / structured logging
+- Honor or document unused `SearchQuery` filters (`repositoryIds`, `pathFilter`, `language`)
+- `statistics()` / `sce stats`
+- Semantic / AST / hybrid strategies
+- Human UI on obscure Cloudflare subdomain
 
-Build the stable skeleton from `GOAL.md`, ship one real retrieval path, leave the rest as replaceable plugins. Optimize for **stability and minimal future refactoring** — "better version from the get-go," not a throwaway prototype.
+## For the next agent
 
-| Ship in first slice | Interfaces / later |
-|---|---|
-| Core public API aligned with GOAL (`IndexRepository`, `UpdateRepository`, `Search`, chunk/metadata model, config, DI boundaries) | Semantic search, AST search, hybrid merge |
-| Keyword / exact search as the first real strategy | Embedding providers, vector stores, rerankers |
-| Knowledge vault (markdown + wiki-links) indexed as a normal repository type | Fancy ranking weights / cross-encoder |
-| Local **CLI + MCP** that call the **same** public API | Obsidian-like graph/map/canvas UI |
-| Package/module layout matching GOAL (Core, Indexing, Parsing, Retrieval, Embedding, Storage, Ranking, Agent API) | Incremental indexing sophistication beyond what's needed for vault + keyword |
-| Tests for the shipped vertical | Full multimodal / cross-repo futures |
-
-First agent surface choice (locked earlier as "C"):  
-**Vault as source of truth for curated knowledge + thin local CLI/MCP that searches via SCE API.**  
-Public Obsidian-like UI ships later for human/CV consumption of the same vault — still inside SCE, not Pasttime.
-
-## Architecture sketch (approved direction)
-
-```
-Agent (Cursor / Claude / Codex / …)
-        │
-   CLI or MCP  ──►  SCE Public API  ──►  Keyword strategy (implemented)
-        │                  │
-        │                  ├── Index / chunks / metadata (local store)
-        │                  └── Semantic / AST / Hybrid (interfaces only for now)
-        │
-   Knowledge vault (markdown + [[wiki-links]]) indexed as a repository
-```
-
-Later:
-
-```
-Human browser ──► Cloudflare Pages (SCE web UI, obscure subdomain)
-                      │
-                      └── same vault / graph metadata (presentation layer)
-```
-
-## Language / stack guidance
-
-Prefer **TypeScript/Node monorepo** for the first vertical (MCP ecosystem, agent tooling, Cloudflare Pages later). Design interfaces so a future core engine language change is possible, but do **not** polyglot on day one unless the approved design requires it. Follow GOAL principles: SOLID, clean architecture, interface-first, plugin architecture, DI, testability, local-first, no required cloud services for agent use.
-
-Reuse proven libraries for low-level pieces (GOAL: don't reinvent ripgrep/tree-sitter/etc. from scratch).
-
-## Explicit non-goals for the first slice
-
-- No Pasttime monorepo integration
-- No embeddings/vector DB required to ship v1 agent usefulness
-- No full Obsidian UI required in v1
-- No building the entire GOAL roadmap before agents can search the vault
-- No coupling agent API to UI framework
-
-## Relationship to GOAL.md phases
-
-GOAL asks for phased architecture work (review → architecture → folders → interfaces → storage → retrieval → chunking → ranking → incremental → roadmap). Honor that discipline: **design before implementation**. The first implementation milestone should be the thin vertical above, with folder/interface choices that won't force a rewrite when semantic/AST/hybrid land.
-
-## What to do next in the SCE workspace
-
-1. Read `GOAL.md` + `README.md` + this file + brainstorming skill.
-2. Continue design sections with user approval after each:
-   - Package/folder structure
-   - Core interfaces & data model (chunks, repos, search results)
-   - Storage choice for v1 (keep swappable)
-   - Keyword retrieval + vault indexing behavior
-   - CLI + MCP tool surface
-   - Config, ignore rules, logging
-   - Later: web UI / Cloudflare subdomain (out of first impl plan unless user expands scope)
-   - Testing strategy for the vertical
-3. Write approved design to something like:
-   `docs/superpowers/specs/YYYY-MM-DD-sce-interface-first-vertical-design.md`
-   (create `docs/superpowers/specs/` if needed). Commit the spec in the **SCE** repo when asked / per brainstorming flow.
-4. User reviews spec → then invoke **writing-plans** for the first implementation plan.
-5. Only then implement.
-
-## Success criteria for "done" design
-
-- Clear module boundaries matching GOAL
-- One implemented retrieval strategy + plugin slots for others
-- Agents can index a vault/repo and retrieve concise context locally via CLI/MCP
-- Path to public graph UI without changing the public API
-- Pasttime remains untouched except optional future DNS notes (docs only, not Pasttime code)
-
-## Conversation decisions summary
-
-- Hidden/not-discoverable human site: yes (obscure subdomain, noindex, no Pasttime links)
-- Host human UI in SCE project: yes
-- Borrow Pasttime domain: DNS/subdomain only
-- Hosting: Cloudflare, separate project from Pasttime
-- Agent-first, human presentation second: yes
-- First slice shape: C (vault + CLI/MCP; UI later)
-- Approach: 3 (interface-first thin vertical)
-- Work location: **SCE repo only**
-
-## Begin
-
-Confirm you've read `GOAL.md`, `README.md`, and this handoff. Then present the next design section (package/folder structure) for approval. Do not scaffold or implement yet.
+1. Read `README.md` and the design spec.
+2. Work on `develop`, not `main`.
+3. Prefer small plans for the next capability slice (config polish, ranking, embeddings, or UI).
+4. Keep Pasttime untouched.

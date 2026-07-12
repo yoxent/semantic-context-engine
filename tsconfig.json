@@ -7,6 +7,7 @@
     { "path": "./packages/storage" },
     { "path": "./packages/ranking" },
     { "path": "./packages/retrieval" },
+    { "path": "./packages/runtime" },
     { "path": "./packages/cli" },
     { "path": "./packages/mcp" },
     { "path": "./packages/embedding" }

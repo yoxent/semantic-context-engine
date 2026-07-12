@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
-import { join } from "node:path";
-import type { IChunker, IKeywordIndex, IMetadataStore, RepositoryType } from "@sce/core";
+import { join, resolve } from "node:path";
+import type { IChunker, IKeywordIndex, IMetadataStore, RepositoryType, SceConfig } from "@sce/core";
 import { defaultConfig } from "@sce/core";
 import { discoverFiles } from "./FileDiscovery.js";
 
@@ -21,29 +21,33 @@ export interface IndexingServiceDeps {
   chunker: IChunker;
   metadataStore: IMetadataStore;
   keywordIndex: IKeywordIndex;
+  config?: Pick<SceConfig, "indexing">;
 }
 
 export class IndexingService {
   constructor(private readonly deps: IndexingServiceDeps) {}
 
   async indexRepository(options: IndexRepositoryOptions): Promise<IndexRepositoryResult> {
-    const repositoryId = options.repositoryId ?? createRepositoryId(options.rootPath);
+    const rootPath = resolve(options.rootPath);
+    const repositoryId = options.repositoryId ?? createRepositoryId(rootPath);
+    const indexing = this.deps.config?.indexing ?? defaultConfig.indexing;
+
     await this.deps.metadataStore.saveRepository({
       id: repositoryId,
-      rootPath: options.rootPath,
+      rootPath,
       type: options.type,
       indexedAt: new Date()
     });
 
     const files = await discoverFiles({
-      rootPath: options.rootPath,
-      include: defaultConfig.indexing.include,
-      ignore: defaultConfig.indexing.ignore
+      rootPath,
+      include: indexing.include,
+      ignore: indexing.ignore
     });
 
     let chunksIndexed = 0;
     for (const relativePath of files) {
-      const absolutePath = join(options.rootPath, relativePath);
+      const absolutePath = join(rootPath, relativePath);
       const text = await readFile(absolutePath, "utf8");
       const fileHash = sha256(text);
       const existing = await this.deps.metadataStore.getFile(repositoryId, relativePath);
@@ -86,7 +90,7 @@ export class IndexingService {
 }
 
 function createRepositoryId(rootPath: string): string {
-  return sha256(rootPath).slice(0, 16);
+  return sha256(resolve(rootPath)).slice(0, 16);
 }
 
 function sha256(text: string): string {
