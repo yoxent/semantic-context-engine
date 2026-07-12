@@ -164,4 +164,114 @@ describe("SqliteStorage", () => {
       await rmWithRetry(dir);
     }
   });
+
+  it("reports index statistics", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      storage = await SqliteStorage.open(dir);
+      const chunk = makeChunk({ wikiLinks: ["Storage"] });
+      await storage.saveRepository({
+        id: "repo",
+        rootPath: dir,
+        type: "vault",
+        indexedAt: new Date("2026-07-12T00:00:00.000Z")
+      });
+      await storage.saveFile({
+        repositoryId: "repo",
+        relativePath: chunk.relativePath,
+        language: "markdown",
+        fileHash: "hash",
+        indexedAt: new Date("2026-07-12T00:00:00.000Z")
+      });
+      await storage.saveChunks([chunk]);
+
+      const stats = await storage.getStatistics();
+      expect(stats).toMatchObject({
+        repositoryCount: 1,
+        fileCount: 1,
+        chunkCount: 1,
+        linkCount: 1,
+        lastIndexedAt: "2026-07-12T00:00:00.000Z"
+      });
+      expect(stats.repositories[0]).toMatchObject({
+        id: "repo",
+        fileCount: 1,
+        chunkCount: 1
+      });
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("honors repositoryIds, pathFilter, and language filters", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      storage = await SqliteStorage.open(dir);
+      const keep = makeChunk({
+        id: "keep",
+        repositoryId: "repo-a",
+        relativePath: "notes/Architecture.md",
+        language: "markdown",
+        text: "SQLite stores metadata for vault notes."
+      });
+      const otherRepo = makeChunk({
+        id: "other-repo",
+        repositoryId: "repo-b",
+        relativePath: "notes/Architecture.md",
+        language: "markdown",
+        text: "SQLite stores metadata for vault notes."
+      });
+      const otherPath = makeChunk({
+        id: "other-path",
+        repositoryId: "repo-a",
+        relativePath: "README.md",
+        language: "markdown",
+        text: "SQLite stores metadata for vault notes."
+      });
+      const otherLang = makeChunk({
+        id: "other-lang",
+        repositoryId: "repo-a",
+        relativePath: "notes/code.ts",
+        language: "typescript",
+        text: "SQLite stores metadata for vault notes."
+      });
+
+      for (const chunk of [keep, otherRepo, otherPath, otherLang]) {
+        await storage.saveChunks([chunk]);
+        await storage.indexChunks([chunk]);
+      }
+
+      const byRepo = await storage.search({ text: "SQLite metadata", repositoryIds: ["repo-a"], limit: 10 });
+      expect(byRepo.map((h) => h.chunkId).sort()).toEqual(["keep", "other-lang", "other-path"]);
+
+      const byPathPrefix = await storage.search({
+        text: "SQLite metadata",
+        repositoryIds: ["repo-a"],
+        pathFilter: "notes",
+        limit: 10
+      });
+      expect(byPathPrefix.map((h) => h.chunkId).sort()).toEqual(["keep", "other-lang"]);
+
+      const byGlob = await storage.search({
+        text: "SQLite metadata",
+        pathFilter: "notes/*.md",
+        limit: 10
+      });
+      expect(byGlob.map((h) => h.chunkId).sort()).toEqual(["keep", "other-repo"]);
+
+      const byLanguage = await storage.search({
+        text: "SQLite metadata",
+        repositoryIds: ["repo-a"],
+        language: "markdown",
+        limit: 10
+      });
+      expect(byLanguage.map((h) => h.chunkId).sort()).toEqual(["keep", "other-path"]);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
 });

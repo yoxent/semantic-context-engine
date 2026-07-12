@@ -8,6 +8,8 @@ export * from "./interfaces/Ranker.js";
 export * from "./interfaces/RetrievalStrategy.js";
 export * from "./interfaces/Storage.js";
 export * from "./interfaces/VectorStore.js";
+export * from "./logging/Logger.js";
 export * from "./models/Chunk.js";
 export * from "./models/Repository.js";
 export * from "./models/Search.js";
+export * from "./models/Statistics.js";

@@ -1,6 +1,7 @@
 import type { Chunk } from "../models/Chunk.js";
 import type { Repository } from "../models/Repository.js";
 import type { SearchHit, SearchQuery } from "../models/Search.js";
+import type { EngineStatistics } from "../models/Statistics.js";
 
 export interface FileRecord {
   repositoryId: string;
@@ -21,6 +22,7 @@ export interface IMetadataStore {
   saveChunks(chunks: Chunk[]): Promise<void>;
   getChunk(id: string): Promise<Chunk | undefined>;
   deleteChunksForFile(repositoryId: string, relativePath: string): Promise<void>;
+  getStatistics(): Promise<EngineStatistics>;
 }
 
 export interface IKeywordIndex {

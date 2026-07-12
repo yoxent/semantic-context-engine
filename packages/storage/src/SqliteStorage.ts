@@ -1,7 +1,7 @@
 import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import Database, { SqliteError } from "better-sqlite3";
-import type { Chunk, FileRecord, IKeywordIndex, IMetadataStore, Repository, SearchHit, SearchQuery } from "@sce/core";
+import type { Chunk, FileRecord, IKeywordIndex, IMetadataStore, Repository, SearchHit, SearchQuery, EngineStatistics } from "@sce/core";
 import { createSchemaSql } from "./schema.js";
 
 export class SqliteStorage implements IMetadataStore, IKeywordIndex {
@@ -136,26 +136,94 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
     this.db.prepare("DELETE FROM chunks_fts WHERE repository_id = ? AND relative_path = ?").run(repositoryId, relativePath);
   }
 
+  async getStatistics(): Promise<EngineStatistics> {
+    const repos = this.db.prepare("SELECT id, root_path, type, indexed_at FROM repositories ORDER BY indexed_at DESC").all() as Array<{
+      id: string;
+      root_path: string;
+      type: string;
+      indexed_at: string;
+    }>;
+
+    const repositories = repos.map((repo) => {
+      const fileCount = (
+        this.db.prepare("SELECT COUNT(*) AS count FROM files WHERE repository_id = ?").get(repo.id) as { count: number }
+      ).count;
+      const chunkCount = (
+        this.db.prepare("SELECT COUNT(*) AS count FROM chunks WHERE repository_id = ?").get(repo.id) as { count: number }
+      ).count;
+      return {
+        id: repo.id,
+        rootPath: repo.root_path,
+        type: repo.type,
+        indexedAt: repo.indexed_at,
+        fileCount,
+        chunkCount
+      };
+    });
+
+    const fileCount = (this.db.prepare("SELECT COUNT(*) AS count FROM files").get() as { count: number }).count;
+    const chunkCount = (this.db.prepare("SELECT COUNT(*) AS count FROM chunks").get() as { count: number }).count;
+    const linkCount = (this.db.prepare("SELECT COUNT(*) AS count FROM chunk_links").get() as { count: number }).count;
+
+    return {
+      repositoryCount: repositories.length,
+      fileCount,
+      chunkCount,
+      linkCount,
+      lastIndexedAt: repositories[0]?.indexedAt,
+      repositories
+    };
+  }
+
   async search(query: SearchQuery): Promise<SearchHit[]> {
     const limit = query.limit ?? 10;
     const ftsQuery = buildFtsQuery(query.text);
     if (!ftsQuery) return [];
 
+    const where: string[] = ["chunks_fts MATCH ?"];
+    const params: unknown[] = [ftsQuery];
+
+    if (query.repositoryIds && query.repositoryIds.length > 0) {
+      where.push(`chunks_fts.repository_id IN (${query.repositoryIds.map(() => "?").join(", ")})`);
+      params.push(...query.repositoryIds);
+    }
+
+    const pathClause = buildPathFilterClause(query.pathFilter);
+    if (pathClause) {
+      where.push(pathClause.sql);
+      params.push(...pathClause.params);
+    }
+
+    const needsJoin = Boolean(query.language);
+    if (query.language) {
+      where.push("chunks.language = ?");
+      params.push(query.language);
+    }
+
+    params.push(limit);
+
+    const from = needsJoin
+      ? "chunks_fts INNER JOIN chunks ON chunks.id = chunks_fts.chunk_id"
+      : "chunks_fts";
+
     try {
       const rows = this.db.prepare(
-        `SELECT chunk_id, relative_path, snippet(chunks_fts, 4, '', '', ' ... ', 16) AS snippet, bm25(chunks_fts) AS rank
-         FROM chunks_fts
-         WHERE chunks_fts MATCH ?
+        `SELECT chunks_fts.chunk_id AS chunk_id,
+                chunks_fts.relative_path AS relative_path,
+                snippet(chunks_fts, 4, '', '', ' ... ', 16) AS snippet,
+                bm25(chunks_fts) AS rank
+         FROM ${from}
+         WHERE ${where.join(" AND ")}
          ORDER BY rank
          LIMIT ?`
-      ).all(ftsQuery, limit) as any[];
+      ).all(...params) as any[];
 
       return rows.map((row) => {
         const chunk = this.db.prepare("SELECT start_line, end_line FROM chunks WHERE id = ?").get(row.chunk_id) as any;
         return {
           chunkId: row.chunk_id,
           score: Math.abs(Number(row.rank)),
-          strategy: "keyword",
+          strategy: "keyword" as const,
           snippet: row.snippet,
           path: row.relative_path,
           startLine: chunk?.start_line ?? 1,
@@ -167,6 +235,21 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
       throw err;
     }
   }
+}
+
+function buildPathFilterClause(pathFilter?: string): { sql: string; params: unknown[] } | undefined {
+  if (!pathFilter) return undefined;
+  if (/[*?]/.test(pathFilter)) {
+    return { sql: "chunks_fts.relative_path GLOB ?", params: [pathFilter] };
+  }
+  return {
+    sql: "(chunks_fts.relative_path = ? OR chunks_fts.relative_path LIKE ? ESCAPE '\\')",
+    params: [pathFilter, `${escapeLike(pathFilter)}/%`]
+  };
+}
+
+function escapeLike(value: string): string {
+  return value.replace(/[\\%_]/g, (ch) => `\\${ch}`);
 }
 
 function buildFtsQuery(text: string): string | null {

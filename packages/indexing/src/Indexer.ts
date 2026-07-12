@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import type { IChunker, IKeywordIndex, IMetadataStore, RepositoryType, SceConfig } from "@sce/core";
+import type { IChunker, IKeywordIndex, IMetadataStore, Logger, RepositoryType, SceConfig } from "@sce/core";
 import { defaultConfig } from "@sce/core";
 import { discoverFiles } from "./FileDiscovery.js";
 
@@ -22,6 +22,7 @@ export interface IndexingServiceDeps {
   metadataStore: IMetadataStore;
   keywordIndex: IKeywordIndex;
   config?: Pick<SceConfig, "indexing">;
+  logger?: Logger;
 }
 
 export class IndexingService {
@@ -31,6 +32,9 @@ export class IndexingService {
     const rootPath = resolve(options.rootPath);
     const repositoryId = options.repositoryId ?? createRepositoryId(rootPath);
     const indexing = this.deps.config?.indexing ?? defaultConfig.indexing;
+    const start = performance.now();
+
+    this.deps.logger?.debug("index.start", { rootPath, repositoryId, type: options.type });
 
     await this.deps.metadataStore.saveRepository({
       id: repositoryId,
@@ -44,6 +48,7 @@ export class IndexingService {
       include: indexing.include,
       ignore: indexing.ignore
     });
+    this.deps.logger?.debug("index.discovered", { files: files.length });
 
     let chunksIndexed = 0;
     for (const relativePath of files) {
@@ -51,7 +56,10 @@ export class IndexingService {
       const text = await readFile(absolutePath, "utf8");
       const fileHash = sha256(text);
       const existing = await this.deps.metadataStore.getFile(repositoryId, relativePath);
-      if (existing?.fileHash === fileHash) continue;
+      if (existing?.fileHash === fileHash) {
+        this.deps.logger?.debug("index.skipUnchanged", { relativePath });
+        continue;
+      }
 
       await this.deps.metadataStore.deleteChunksForFile(repositoryId, relativePath);
       await this.deps.keywordIndex.removeChunksForFile(repositoryId, relativePath);
@@ -74,6 +82,7 @@ export class IndexingService {
       await this.deps.metadataStore.saveChunks(chunks);
       await this.deps.keywordIndex.indexChunks(chunks);
       chunksIndexed += chunks.length;
+      this.deps.logger?.debug("index.file", { relativePath, chunks: chunks.length });
     }
 
     const discovered = new Set(files);
@@ -83,7 +92,15 @@ export class IndexingService {
       await this.deps.metadataStore.deleteChunksForFile(repositoryId, record.relativePath);
       await this.deps.keywordIndex.removeChunksForFile(repositoryId, record.relativePath);
       await this.deps.metadataStore.deleteFile(repositoryId, record.relativePath);
+      this.deps.logger?.debug("index.pruned", { relativePath: record.relativePath });
     }
+
+    this.deps.logger?.debug("index.done", {
+      repositoryId,
+      filesIndexed: files.length,
+      chunksIndexed,
+      elapsedMs: Math.round(performance.now() - start)
+    });
 
     return { repositoryId, filesIndexed: files.length, chunksIndexed };
   }

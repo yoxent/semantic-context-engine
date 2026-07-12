@@ -1,5 +1,12 @@
 export type SearchMode = "keyword" | "semantic" | "ast" | "hybrid";
 
+/**
+ * Search request. Keyword strategy honors optional filters:
+ * - `repositoryIds`: restrict to these repository ids
+ * - `pathFilter`: exact path, directory prefix (`notes` → `notes` + `notes/...`),
+ *   or SQL GLOB (`*.md`, `notes/*`)
+ * - `language`: exact language match (e.g. `markdown`)
+ */
 export interface SearchQuery {
   text: string;
   repositoryIds?: string[];

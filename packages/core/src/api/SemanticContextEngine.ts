@@ -1,7 +1,9 @@
 import type { IMetadataStore } from "../interfaces/Storage.js";
 import type { IRetrievalStrategy } from "../interfaces/RetrievalStrategy.js";
+import type { Logger } from "../logging/Logger.js";
 import type { RepositoryType } from "../models/Repository.js";
 import type { SearchMode, SearchQuery, SearchResult } from "../models/Search.js";
+import type { EngineStatistics } from "../models/Statistics.js";
 import type { Chunk } from "../models/Chunk.js";
 
 export interface IndexRepositoryInput {
@@ -23,6 +25,7 @@ export interface SemanticContextEngineDeps {
   keywordStrategy: IRetrievalStrategy;
   indexingService?: IIndexingService;
   metadataStore?: IMetadataStore;
+  logger?: Logger;
 }
 
 export class SemanticContextEngine {
@@ -30,7 +33,14 @@ export class SemanticContextEngine {
 
   async indexRepository(input: IndexRepositoryInput): Promise<IndexRepositoryOutput> {
     if (!this.deps.indexingService) throw new Error("Indexing service is not configured");
-    return this.deps.indexingService.indexRepository(input);
+    this.deps.logger?.debug("indexRepository.start", { rootPath: input.rootPath, type: input.type });
+    const result = await this.deps.indexingService.indexRepository(input);
+    this.deps.logger?.debug("indexRepository.done", {
+      repositoryId: result.repositoryId,
+      filesIndexed: result.filesIndexed,
+      chunksIndexed: result.chunksIndexed
+    });
+    return result;
   }
 
   async updateRepository(input: IndexRepositoryInput): Promise<IndexRepositoryOutput> {
@@ -53,7 +63,16 @@ export class SemanticContextEngine {
   }
 
   async keywordSearch(query: SearchQuery): Promise<SearchResult> {
-    return this.deps.keywordStrategy.search({ ...query, mode: "keyword" });
+    const result = await this.deps.keywordStrategy.search({ ...query, mode: "keyword" });
+    this.deps.logger?.debug("search.done", {
+      text: query.text,
+      hits: result.hits.length,
+      elapsedMs: result.diagnostics?.elapsedMs,
+      repositoryIds: query.repositoryIds,
+      pathFilter: query.pathFilter,
+      language: query.language
+    });
+    return result;
   }
 
   async semanticSearch(query: SearchQuery): Promise<SearchResult> {
@@ -66,6 +85,11 @@ export class SemanticContextEngine {
 
   async hybridSearch(query: SearchQuery): Promise<SearchResult> {
     return this.unsupported("hybrid", query);
+  }
+
+  async statistics(): Promise<EngineStatistics> {
+    if (!this.deps.metadataStore) throw new Error("Metadata store is not configured");
+    return this.deps.metadataStore.getStatistics();
   }
 
   private unsupported(mode: SearchMode, _query: SearchQuery): never {

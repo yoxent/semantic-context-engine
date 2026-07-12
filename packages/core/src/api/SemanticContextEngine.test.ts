@@ -80,7 +80,24 @@ describe("SemanticContextEngine", () => {
                 timestamp: new Date("2026-01-01T00:00:00.000Z")
               }
             : undefined,
-        deleteChunksForFile: async () => undefined
+        deleteChunksForFile: async () => undefined,
+        getStatistics: async () => ({
+          repositoryCount: 1,
+          fileCount: 2,
+          chunkCount: 4,
+          linkCount: 0,
+          lastIndexedAt: "2026-01-01T00:00:00.000Z",
+          repositories: [
+            {
+              id: "repo-1",
+              rootPath: "/vault",
+              type: "vault",
+              indexedAt: "2026-01-01T00:00:00.000Z",
+              fileCount: 2,
+              chunkCount: 4
+            }
+          ]
+        })
       }
     });
 
@@ -91,6 +108,11 @@ describe("SemanticContextEngine", () => {
     });
     await expect(engine.getChunk("chunk-1")).resolves.toMatchObject({ text: "hello" });
     await expect(engine.getChunk("missing")).rejects.toThrow("Chunk not found: missing");
+    await expect(engine.statistics()).resolves.toMatchObject({
+      repositoryCount: 1,
+      fileCount: 2,
+      chunkCount: 4
+    });
   });
 
   it("requires indexing and metadata deps for write/read helpers", async () => {
@@ -101,5 +123,6 @@ describe("SemanticContextEngine", () => {
       "Indexing service is not configured"
     );
     await expect(engine.getChunk("chunk-1")).rejects.toThrow("Metadata store is not configured");
+    await expect(engine.statistics()).rejects.toThrow("Metadata store is not configured");
   });
 });

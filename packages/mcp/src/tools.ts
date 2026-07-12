@@ -18,12 +18,23 @@ export async function sceUpdateRepository(input: { path: string; type?: "code" |
   }
 }
 
-export async function sceSearch(input: { path: string; query: string; limit?: number; includeText?: boolean }) {
+export async function sceSearch(input: {
+  path: string;
+  query: string;
+  limit?: number;
+  includeText?: boolean;
+  pathFilter?: string;
+  language?: string;
+  repositoryIds?: string[];
+}) {
   const { engine, close, config } = await createEngine(input.path);
   try {
     const result = await engine.search({
       text: input.query,
-      limit: input.limit ?? config.search.defaultLimit
+      limit: input.limit ?? config.search.defaultLimit,
+      pathFilter: input.pathFilter,
+      language: input.language,
+      repositoryIds: input.repositoryIds
     });
     const hits = await Promise.all(
       result.hits.map(async (hit) => {
@@ -54,6 +65,15 @@ export async function sceGetChunk(input: { path: string; chunkId: string; maxCha
       ...chunk,
       text: truncate(chunk.text, input.maxChars)
     };
+  } finally {
+    close();
+  }
+}
+
+export async function sceStats(input: { path: string }) {
+  const { engine, close } = await createEngine(input.path);
+  try {
+    return await engine.statistics();
   } finally {
     close();
   }

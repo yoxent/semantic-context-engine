@@ -1,21 +1,42 @@
 import { resolve } from "node:path";
-import { loadConfig, SemanticContextEngine, type SceConfig } from "@sce/core";
+import {
+  createLogger,
+  effectiveLogLevel,
+  loadConfig,
+  SemanticContextEngine,
+  type Logger,
+  type LogLevel,
+  type SceConfig
+} from "@sce/core";
 import { IndexingService } from "@sce/indexing";
 import { MarkdownChunker } from "@sce/parsing";
 import { SimpleRanker } from "@sce/ranking";
 import { KeywordRetrievalStrategy } from "@sce/retrieval";
 import { SqliteStorage } from "@sce/storage";
 
+export interface CreateEngineOptions {
+  /** When true, raises effective log level to at least `debug`. */
+  verbose?: boolean;
+  /** Override config logging level after load. */
+  logLevel?: LogLevel;
+  logger?: Logger;
+}
+
 export interface CreateEngineResult {
   engine: SemanticContextEngine;
   config: SceConfig;
   rootPath: string;
+  logger: Logger;
   close: () => void;
 }
 
-export async function createEngine(rootPath: string): Promise<CreateEngineResult> {
+export async function createEngine(rootPath: string, options: CreateEngineOptions = {}): Promise<CreateEngineResult> {
   const resolvedRoot = resolve(rootPath);
   const config = await loadConfig(resolvedRoot);
+  const level =
+    options.logLevel ??
+    effectiveLogLevel(config.logging.level, Boolean(options.verbose));
+  const logger = options.logger ?? createLogger({ level });
   const storage = await SqliteStorage.open(resolvedRoot);
   const ranker = new SimpleRanker();
   const keywordStrategy = new KeywordRetrievalStrategy({ keywordIndex: storage, ranker });
@@ -23,17 +44,20 @@ export async function createEngine(rootPath: string): Promise<CreateEngineResult
     chunker: new MarkdownChunker(),
     metadataStore: storage,
     keywordIndex: storage,
-    config
+    config,
+    logger: logger.child({ component: "indexing" })
   });
 
   return {
     engine: new SemanticContextEngine({
       keywordStrategy,
       indexingService,
-      metadataStore: storage
+      metadataStore: storage,
+      logger: logger.child({ component: "engine" })
     }),
     config,
     rootPath: resolvedRoot,
+    logger,
     close: () => storage.close()
   };
 }

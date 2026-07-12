@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { rmWithRetry } from "../../../../test/rmWithRetry.js";
-import { sceIndexRepository, sceSearch } from "../tools.js";
+import { sceIndexRepository, sceSearch, sceStats } from "../tools.js";
 
 const repoRoot = fileURLToPath(new URL("../../../../", import.meta.url));
 
@@ -18,6 +18,10 @@ describe("MCP tool handlers", () => {
 
       const result = await sceSearch({ path: dir, query: "concise snippets", limit: 5 });
       expect(result.hits[0]?.path).toBe("Agent-Context.md");
+
+      const stats = await sceStats({ path: dir });
+      expect(stats.fileCount).toBe(3);
+      expect(stats.repositoryCount).toBe(1);
     } finally {
       await rmWithRetry(dir);
     }
