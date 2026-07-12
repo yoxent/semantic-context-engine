@@ -53,6 +53,7 @@ describe("SqliteStorage", () => {
       expect(hits).toHaveLength(1);
       expect(hits[0]?.chunkId).toBe("chunk-1");
       expect(hits[0]?.path).toBe("Architecture.md");
+      expect(hits[0]?.headingPath).toEqual(["Architecture"]);
       expect(hits[0]?.snippet).toContain("SQLite");
     } finally {
       storage?.close();

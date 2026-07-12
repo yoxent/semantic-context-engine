@@ -219,7 +219,10 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
       ).all(...params) as any[];
 
       return rows.map((row) => {
-        const chunk = this.db.prepare("SELECT start_line, end_line FROM chunks WHERE id = ?").get(row.chunk_id) as any;
+        const chunk = this.db
+          .prepare("SELECT start_line, end_line, heading_path_json FROM chunks WHERE id = ?")
+          .get(row.chunk_id) as { start_line: number; end_line: number; heading_path_json: string } | undefined;
+        const headingPath = parseHeadingPath(chunk?.heading_path_json);
         return {
           chunkId: row.chunk_id,
           score: Math.abs(Number(row.rank)),
@@ -227,7 +230,8 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
           snippet: row.snippet,
           path: row.relative_path,
           startLine: chunk?.start_line ?? 1,
-          endLine: chunk?.end_line ?? 1
+          endLine: chunk?.end_line ?? 1,
+          ...(headingPath ? { headingPath } : {})
         };
       });
     } catch (err) {
@@ -256,6 +260,17 @@ function buildFtsQuery(text: string): string | null {
   const terms = text.match(/[\p{L}\p{N}_]+/gu);
   if (!terms || terms.length === 0) return null;
   return terms.map((term) => `"${term.replace(/"/g, '""')}"`).join(" ");
+}
+
+function parseHeadingPath(json?: string): string[] | undefined {
+  if (!json) return undefined;
+  try {
+    const parsed = JSON.parse(json) as unknown;
+    if (!Array.isArray(parsed) || parsed.length === 0) return undefined;
+    return parsed.filter((part): part is string => typeof part === "string");
+  } catch {
+    return undefined;
+  }
 }
 
 function toChunkRow(chunk: Chunk): Record<string, unknown> {

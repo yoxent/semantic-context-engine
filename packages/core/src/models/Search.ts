@@ -24,6 +24,8 @@ export interface SearchHit {
   path: string;
   startLine: number;
   endLine: number;
+  /** Vault heading ancestry when available (e.g. `["Storage", "SQLite"]`). */
+  headingPath?: string[];
 }
 
 export interface SearchDiagnostics {
