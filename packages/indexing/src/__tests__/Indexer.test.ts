@@ -1,4 +1,4 @@
-import { mkdtemp, rm, cp } from "node:fs/promises";
+import { mkdtemp, rm, cp, writeFile, unlink } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it } from "vitest";
@@ -24,6 +24,84 @@ describe("IndexingService", () => {
 
       const hits = await storage.search({ text: "SQLite FTS5", limit: 5 });
       expect(hits[0]?.path).toBe("Architecture.md");
+      storage.close();
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("re-indexes changed files with updated searchable content", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-"));
+    try {
+      await cp("fixtures/sample-vault", dir, { recursive: true });
+      const storage = await SqliteStorage.open(dir);
+      const service = new IndexingService({
+        chunker: new MarkdownChunker(),
+        metadataStore: storage,
+        keywordIndex: storage
+      });
+
+      const first = await service.indexRepository({ rootPath: dir, type: "vault" });
+      const unchanged = await service.indexRepository({
+        rootPath: dir,
+        type: "vault",
+        repositoryId: first.repositoryId
+      });
+      expect(unchanged.chunksIndexed).toBe(0);
+
+      await writeFile(
+        join(dir, "Architecture.md"),
+        "# Architecture\n\nUpdated vector retrieval design.\n",
+        "utf8"
+      );
+
+      const refresh = await service.indexRepository({
+        rootPath: dir,
+        type: "vault",
+        repositoryId: first.repositoryId
+      });
+      expect(refresh.chunksIndexed).toBeGreaterThan(0);
+
+      const updatedHits = await storage.search({ text: "vector retrieval", limit: 5 });
+      expect(updatedHits.some((hit) => hit.path === "Architecture.md")).toBe(true);
+
+      const staleHits = await storage.search({ text: "SQLite FTS5", limit: 5 });
+      expect(staleHits.some((hit) => hit.path === "Architecture.md")).toBe(false);
+
+      storage.close();
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("prunes deleted files on re-index", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-"));
+    try {
+      await cp("fixtures/sample-vault", dir, { recursive: true });
+      const storage = await SqliteStorage.open(dir);
+      const service = new IndexingService({
+        chunker: new MarkdownChunker(),
+        metadataStore: storage,
+        keywordIndex: storage
+      });
+
+      const first = await service.indexRepository({ rootPath: dir, type: "vault" });
+      let hits = await storage.search({ text: "SQLite FTS5", limit: 5 });
+      expect(hits.some((hit) => hit.path === "Architecture.md")).toBe(true);
+
+      await unlink(join(dir, "Architecture.md"));
+      await service.indexRepository({
+        rootPath: dir,
+        type: "vault",
+        repositoryId: first.repositoryId
+      });
+
+      hits = await storage.search({ text: "SQLite FTS5", limit: 5 });
+      expect(hits.some((hit) => hit.path === "Architecture.md")).toBe(false);
+
+      const file = await storage.getFile(first.repositoryId, "Architecture.md");
+      expect(file).toBeUndefined();
+
       storage.close();
     } finally {
       await rm(dir, { recursive: true, force: true });

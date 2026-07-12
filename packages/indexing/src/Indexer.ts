@@ -72,6 +72,15 @@ export class IndexingService {
       chunksIndexed += chunks.length;
     }
 
+    const discovered = new Set(files);
+    const storedFiles = await this.deps.metadataStore.listFiles(repositoryId);
+    for (const record of storedFiles) {
+      if (discovered.has(record.relativePath)) continue;
+      await this.deps.metadataStore.deleteChunksForFile(repositoryId, record.relativePath);
+      await this.deps.keywordIndex.removeChunksForFile(repositoryId, record.relativePath);
+      await this.deps.metadataStore.deleteFile(repositoryId, record.relativePath);
+    }
+
     return { repositoryId, filesIndexed: files.length, chunksIndexed };
   }
 }

@@ -16,6 +16,7 @@ export interface IMetadataStore {
   deleteRepository(id: string): Promise<void>;
   saveFile(record: FileRecord): Promise<void>;
   getFile(repositoryId: string, relativePath: string): Promise<FileRecord | undefined>;
+  listFiles(repositoryId: string): Promise<FileRecord[]>;
   deleteFile(repositoryId: string, relativePath: string): Promise<void>;
   saveChunks(chunks: Chunk[]): Promise<void>;
   getChunk(id: string): Promise<Chunk | undefined>;

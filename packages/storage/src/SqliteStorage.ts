@@ -70,6 +70,17 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
     };
   }
 
+  async listFiles(repositoryId: string): Promise<FileRecord[]> {
+    const rows = this.db.prepare("SELECT * FROM files WHERE repository_id = ?").all(repositoryId) as any[];
+    return rows.map((row) => ({
+      repositoryId: row.repository_id,
+      relativePath: row.relative_path,
+      language: row.language,
+      fileHash: row.file_hash,
+      indexedAt: new Date(row.indexed_at)
+    }));
+  }
+
   async deleteFile(repositoryId: string, relativePath: string): Promise<void> {
     this.db.prepare("DELETE FROM files WHERE repository_id = ? AND relative_path = ?").run(repositoryId, relativePath);
   }
