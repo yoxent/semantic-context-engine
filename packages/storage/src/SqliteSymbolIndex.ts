@@ -1,4 +1,4 @@
-import type { Database } from "better-sqlite3";
+import Database from "better-sqlite3";
 import type { Chunk, ISymbolIndex, SymbolHit, SymbolSearchQuery } from "@sce/core";
 import { buildPathFilterClause } from "./pathFilter.js";
 

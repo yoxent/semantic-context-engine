@@ -220,3 +220,47 @@ describe("createEngine code indexing", () => {
     }
   });
 });
+
+describe("createEngine ast wiring", () => {
+  it("always wires astStrategy (no config gate); astSearch on a code repo returns the symbol", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-runtime-ast-"));
+    let close: (() => void) | undefined;
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await mkdir(join(dir, "src"), { recursive: true });
+      await writeFile(
+        join(dir, "src/widget.ts"),
+        "export class Widget {\n  render(): string {\n    return 'widget';\n  }\n}\n"
+      );
+      await writeFile(
+        join(dir, "sce.config.json"),
+        JSON.stringify({ indexing: { include: ["**/*.md", "**/*.ts"] } })
+      );
+      const created = await createEngine(dir);
+      close = created.close;
+      await created.engine.indexRepository({ rootPath: created.rootPath, type: "vault" });
+      const result = await created.engine.astSearch({ text: "Widget" });
+      expect(result.hits.some((h) => h.path.endsWith("src/widget.ts") && h.symbolKind === "class" && h.headingPath?.[0] === "Widget")).toBe(true);
+    } finally {
+      close?.();
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("astSearch on a Markdown-only repo returns empty results (not an error)", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-runtime-ast-"));
+    let close: (() => void) | undefined;
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      const created = await createEngine(dir);
+      close = created.close;
+      await created.engine.indexRepository({ rootPath: created.rootPath, type: "vault" });
+      const result = await created.engine.astSearch({ text: "anything" });
+      expect(result.hits).toEqual([]);
+      expect(result.diagnostics?.strategy).toBe("ast");
+    } finally {
+      close?.();
+      await rmWithRetry(dir);
+    }
+  });
+});

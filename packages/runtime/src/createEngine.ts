@@ -12,8 +12,8 @@ import { createEmbeddingProvider } from "@sce/embedding";
 import { IndexingService } from "@sce/indexing";
 import { MarkdownChunker, LanguageChunkerRegistry, TreeSitterCodeChunker } from "@sce/parsing";
 import { SimpleRanker } from "@sce/ranking";
-import { HybridRetrievalStrategy, KeywordRetrievalStrategy, SemanticRetrievalStrategy } from "@sce/retrieval";
-import { SqliteStorage, SqliteVectorStore } from "@sce/storage";
+import { AstRetrievalStrategy, HybridRetrievalStrategy, KeywordRetrievalStrategy, SemanticRetrievalStrategy } from "@sce/retrieval";
+import { SqliteStorage, SqliteSymbolIndex, SqliteVectorStore } from "@sce/storage";
 
 export interface CreateEngineOptions {
   /** When true, raises effective log level to at least `debug`. */
@@ -75,10 +75,19 @@ export async function createEngine(rootPath: string, options: CreateEngineOption
     chunkers: { markdown: markdownChunker, typescript: typescriptChunker, javascript: javascriptChunker }
   });
 
+  const symbolIndex = SqliteSymbolIndex.attach(storage.getDatabase());
+  const astStrategy = new AstRetrievalStrategy({
+    symbolIndex,
+    metadataStore: storage,
+    defaultLimit: config.search.defaultLimit,
+    maxSnippetChars: config.search.maxSnippetChars
+  });
+
   const indexingService = new IndexingService({
     chunker,
     metadataStore: storage,
     keywordIndex: storage,
+    symbolIndex,
     ...(embeddingProvider ? { embeddingProvider } : {}),
     ...(vectorStore ? { vectorStore } : {}),
     ...(embeddingConfig ? { embeddingConfig } : {}),
@@ -89,6 +98,7 @@ export async function createEngine(rootPath: string, options: CreateEngineOption
   return {
     engine: new SemanticContextEngine({
       keywordStrategy,
+      astStrategy,
       ...(semanticStrategy ? { semanticStrategy } : {}),
       ...(hybridStrategy ? { hybridStrategy } : {}),
       indexingService,
