@@ -2,6 +2,7 @@ import { mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import Database, { SqliteError } from "better-sqlite3";
 import type { Chunk, FileRecord, IKeywordIndex, IMetadataStore, Repository, SearchHit, SearchQuery, EngineStatistics } from "@sce/core";
+import { buildPathFilterClause } from "./pathFilter.js";
 import { createSchemaSql } from "./schema.js";
 
 export class SqliteStorage implements IMetadataStore, IKeywordIndex {
@@ -202,7 +203,7 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
       params.push(...query.repositoryIds);
     }
 
-    const pathClause = buildPathFilterClause(query.pathFilter);
+    const pathClause = buildPathFilterClause(query.pathFilter, "chunks_fts.relative_path");
     if (pathClause) {
       where.push(pathClause.sql);
       params.push(...pathClause.params);
@@ -253,21 +254,6 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
       throw err;
     }
   }
-}
-
-function buildPathFilterClause(pathFilter?: string): { sql: string; params: unknown[] } | undefined {
-  if (!pathFilter) return undefined;
-  if (/[*?]/.test(pathFilter)) {
-    return { sql: "chunks_fts.relative_path GLOB ?", params: [pathFilter] };
-  }
-  return {
-    sql: "(chunks_fts.relative_path = ? OR chunks_fts.relative_path LIKE ? ESCAPE '\\')",
-    params: [pathFilter, `${escapeLike(pathFilter)}/%`]
-  };
-}
-
-function escapeLike(value: string): string {
-  return value.replace(/[\\%_]/g, (ch) => `\\${ch}`);
 }
 
 function buildFtsQuery(text: string): string | null {
