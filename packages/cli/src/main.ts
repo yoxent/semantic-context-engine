@@ -52,7 +52,8 @@ export async function run(argv: string[]): Promise<void> {
       const { engine, close, config } = await createEngine(options.path, { verbose: verboseFrom(command) });
       try {
         const limit = options.limit !== undefined ? Number(options.limit) : config.search.defaultLimit;
-        const mode = options.mode === "semantic" ? "semantic" : "keyword";
+        const mode: "keyword" | "semantic" | "hybrid" =
+          options.mode === "semantic" || options.mode === "hybrid" ? options.mode : "keyword";
         const result = await engine.search({
           text: query,
           mode,

@@ -69,4 +69,17 @@ describe("CLI run", () => {
       await rmWithRetry(dir);
     }
   });
+
+  it("surfaces a clear error for --mode hybrid when embedding is not configured", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-cli-hyb-"));
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const err = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await run(["search", "vectors", "--path", dir, "--mode", "hybrid"]);
+      expect(err).toHaveBeenCalledWith(expect.stringMatching(/Hybrid search is not configured/));
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
 });
