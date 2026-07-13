@@ -1,4 +1,4 @@
-import { mkdtemp, cp } from "node:fs/promises";
+import { mkdtemp, cp, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -46,6 +46,27 @@ describe("MCP tool handlers", () => {
       await expect(sceSearch({ path: dir, query: "vectors", mode: "hybrid" })).rejects.toThrow(
         /Hybrid search is not configured/
       );
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("returns a symbol hit for mode=ast", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-mcp-ast-"));
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await mkdir(join(dir, "src"), { recursive: true });
+      await writeFile(
+        join(dir, "src/widget.ts"),
+        "export class Widget {\n  render(): string {\n    return 'widget';\n  }\n}\n"
+      );
+      await writeFile(
+        join(dir, "sce.config.json"),
+        JSON.stringify({ indexing: { include: ["**/*.md", "**/*.ts"] } })
+      );
+      await sceIndexRepository({ path: dir, type: "vault" });
+      const result = await sceSearch({ path: dir, query: "Widget", mode: "ast", symbolKind: "class" });
+      expect(result.hits.some((h) => h.path.endsWith("src/widget.ts") && h.symbolKind === "class")).toBe(true);
     } finally {
       await rmWithRetry(dir);
     }

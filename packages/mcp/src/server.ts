@@ -18,7 +18,8 @@ server.tool(
   {
     path: z.string(),
     query: z.string(),
-    mode: z.enum(["keyword", "semantic", "hybrid"]).optional(),
+    mode: z.enum(["keyword", "semantic", "hybrid", "ast"]).optional(),
+    symbolKind: z.enum(["function", "method", "arrow", "function-expr", "class", "interface", "type", "enum", "namespace"]).optional(),
     limit: z.number().optional(),
     includeText: z.boolean().optional(),
     pathFilter: z.string().optional(),

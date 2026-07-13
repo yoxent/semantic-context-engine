@@ -21,7 +21,8 @@ export async function sceUpdateRepository(input: { path: string; type?: "code" |
 export async function sceSearch(input: {
   path: string;
   query: string;
-  mode?: "keyword" | "semantic" | "hybrid";
+  mode?: "keyword" | "semantic" | "hybrid" | "ast";
+  symbolKind?: "function" | "method" | "arrow" | "function-expr" | "class" | "interface" | "type" | "enum" | "namespace";
   limit?: number;
   includeText?: boolean;
   pathFilter?: string;
@@ -36,7 +37,8 @@ export async function sceSearch(input: {
       limit: input.limit ?? config.search.defaultLimit,
       pathFilter: input.pathFilter,
       language: input.language,
-      repositoryIds: input.repositoryIds
+      repositoryIds: input.repositoryIds,
+      ...(input.symbolKind ? { symbolKind: input.symbolKind } : {})
     });
     const hits = await Promise.all(
       result.hits.map(async (hit) => {
