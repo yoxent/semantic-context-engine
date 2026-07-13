@@ -11,7 +11,7 @@ import type {
   RepositoryType,
   SceConfig
 } from "@sce/core";
-import { defaultConfig } from "@sce/core";
+import { defaultConfig, detectLanguage } from "@sce/core";
 import { discoverFiles } from "./FileDiscovery.js";
 
 export interface IndexRepositoryOptions {
@@ -82,6 +82,17 @@ export class IndexingService {
 
     let chunksIndexed = 0;
     for (const relativePath of files) {
+      const language = detectLanguage(relativePath);
+      if (language === "text") {
+        this.deps.logger?.debug("index.skipUnsupportedLanguage", { relativePath });
+        // Clean up any pre-existing record so narrowing a previously-broader include doesn't leave orphans.
+        await this.deps.metadataStore.deleteChunksForFile(repositoryId, relativePath);
+        await this.deps.keywordIndex.removeChunksForFile(repositoryId, relativePath);
+        if (this.deps.vectorStore) await this.deps.vectorStore.deleteByFile(repositoryId, relativePath);
+        const existing = await this.deps.metadataStore.getFile(repositoryId, relativePath);
+        if (existing) await this.deps.metadataStore.deleteFile(repositoryId, relativePath);
+        continue;
+      }
       const absolutePath = join(rootPath, relativePath);
       const text = await readFile(absolutePath, "utf8");
       const fileHash = sha256(text);
@@ -98,7 +109,7 @@ export class IndexingService {
       const chunks = this.deps.chunker.chunk({
         repositoryId,
         relativePath,
-        language: languageFor(relativePath),
+        language,
         fileHash,
         text
       });
@@ -106,7 +117,7 @@ export class IndexingService {
       await this.deps.metadataStore.saveFile({
         repositoryId,
         relativePath,
-        language: languageFor(relativePath),
+        language,
         fileHash,
         indexedAt: new Date()
       });
@@ -164,8 +175,4 @@ function createRepositoryId(rootPath: string): string {
 
 function sha256(text: string): string {
   return createHash("sha256").update(text).digest("hex");
-}
-
-function languageFor(relativePath: string): string {
-  return relativePath.endsWith(".md") ? "markdown" : "text";
 }

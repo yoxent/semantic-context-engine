@@ -1,8 +1,10 @@
+import { createHash } from "node:crypto";
 import { mkdtemp, cp, writeFile, unlink } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it, vi } from "vitest";
-import { MarkdownChunker } from "@sce/parsing";
+import { detectLanguage } from "@sce/core";
+import { LanguageChunkerRegistry, MarkdownChunker, TreeSitterCodeChunker } from "@sce/parsing";
 import { SqliteStorage, SqliteVectorStore } from "@sce/storage";
 import type { IEmbeddingProvider, IVectorStore } from "@sce/core";
 import { rmWithRetry } from "../../../../test/rmWithRetry.js";
@@ -274,6 +276,119 @@ describe("IndexingService semantic embedding", () => {
       await expect(
         service2.indexRepository({ rootPath: dir, type: "vault", repositoryId: first.repositoryId })
       ).rejects.toThrow(/rebuild/i);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+});
+
+describe("IndexingService language handling", () => {
+  it("skips text-language files before reading them and cleans up any pre-existing record", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-lang-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      await writeFile(join(dir, "data.json"), JSON.stringify({ hello: "world" }), "utf8");
+      storage = await SqliteStorage.open(dir);
+      const repositoryId = createHash("sha256").update(resolve(dir)).digest("hex").slice(0, 16);
+
+      // Sanity: detectLanguage classifies .json as text (the skip condition).
+      expect(detectLanguage("data.json")).toBe("text");
+
+      // Pre-seed a file record + chunk for data.json as if a prior, broader index had recorded it.
+      const fileHash = "preexisting-hash";
+      const chunkId = createHash("sha256")
+        .update(`${repositoryId}:data.json:1:1:text:${fileHash}`)
+        .digest("hex");
+      await storage.saveFile({
+        repositoryId,
+        relativePath: "data.json",
+        language: "text",
+        fileHash,
+        indexedAt: new Date()
+      });
+      await storage.saveChunks([
+        {
+          id: chunkId,
+          repositoryId,
+          relativePath: "data.json",
+          language: "text",
+          startLine: 1,
+          endLine: 1,
+          text: '{"hello":"world"}',
+          fileHash,
+          timestamp: new Date(),
+          headingPath: []
+        }
+      ]);
+      expect(await storage.getFile(repositoryId, "data.json")).toBeDefined();
+      expect(await storage.getChunk(chunkId)).toBeDefined();
+
+      const service = new IndexingService({
+        chunker: new MarkdownChunker(),
+        metadataStore: storage,
+        keywordIndex: storage,
+        config: {
+          indexing: {
+            include: ["**/*.json"],
+            ignore: [".git/**", ".sce/**"]
+          }
+        }
+      });
+
+      const result = await service.indexRepository({ rootPath: dir, type: "vault" });
+      // The file was discovered but skipped — no chunks produced.
+      expect(result.filesIndexed).toBe(1);
+      expect(result.chunksIndexed).toBe(0);
+
+      // Pre-existing record + chunk are cleaned up by the skip guard.
+      expect(await storage.getFile(repositoryId, "data.json")).toBeUndefined();
+      expect(await storage.getChunk(chunkId)).toBeUndefined();
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("chunks .ts files with symbol-aware TreeSitterCodeChunker via the registry", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-lang-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      await writeFile(
+        join(dir, "greet.ts"),
+        'export function greet(name: string): string {\n  return `Hello, ${name}!`;\n}\n',
+        "utf8"
+      );
+      storage = await SqliteStorage.open(dir);
+
+      const registry = new LanguageChunkerRegistry({
+        chunkers: {
+          markdown: new MarkdownChunker(),
+          typescript: await TreeSitterCodeChunker.create("typescript"),
+          javascript: await TreeSitterCodeChunker.create("javascript")
+        }
+      });
+      const chunkSpy = vi.spyOn(registry, "chunk");
+
+      const service = new IndexingService({
+        chunker: registry,
+        metadataStore: storage,
+        keywordIndex: storage,
+        config: {
+          indexing: {
+            include: ["**/*.ts"],
+            ignore: [".git/**", ".sce/**"]
+          }
+        }
+      });
+
+      const result = await service.indexRepository({ rootPath: dir, type: "vault" });
+      expect(result.filesIndexed).toBe(1);
+      expect(result.chunksIndexed).toBeGreaterThan(0);
+
+      const chunks = chunkSpy.mock.results.map((r) => r.value).flat();
+      expect(chunks.length).toBeGreaterThan(0);
+      expect(chunks.every((c: { symbolKind?: string }) => c.symbolKind !== undefined)).toBe(true);
     } finally {
       storage?.close();
       await rmWithRetry(dir);

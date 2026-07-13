@@ -10,7 +10,7 @@ import {
 } from "@sce/core";
 import { createEmbeddingProvider } from "@sce/embedding";
 import { IndexingService } from "@sce/indexing";
-import { MarkdownChunker } from "@sce/parsing";
+import { MarkdownChunker, LanguageChunkerRegistry, TreeSitterCodeChunker } from "@sce/parsing";
 import { SimpleRanker } from "@sce/ranking";
 import { HybridRetrievalStrategy, KeywordRetrievalStrategy, SemanticRetrievalStrategy } from "@sce/retrieval";
 import { SqliteStorage, SqliteVectorStore } from "@sce/storage";
@@ -68,8 +68,15 @@ export async function createEngine(rootPath: string, options: CreateEngineOption
         })
       : undefined;
 
+  const markdownChunker = new MarkdownChunker();
+  const typescriptChunker = await TreeSitterCodeChunker.create("typescript");
+  const javascriptChunker = await TreeSitterCodeChunker.create("javascript");
+  const chunker = new LanguageChunkerRegistry({
+    chunkers: { markdown: markdownChunker, typescript: typescriptChunker, javascript: javascriptChunker }
+  });
+
   const indexingService = new IndexingService({
-    chunker: new MarkdownChunker(),
+    chunker,
     metadataStore: storage,
     keywordIndex: storage,
     ...(embeddingProvider ? { embeddingProvider } : {}),
