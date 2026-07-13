@@ -38,4 +38,16 @@ describe("MCP tool handlers", () => {
       await rmWithRetry(dir);
     }
   });
+
+  it("surfaces hybrid-not-configured when mode=hybrid and embedding is absent", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-mcp-hyb-"));
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await expect(sceSearch({ path: dir, query: "vectors", mode: "hybrid" })).rejects.toThrow(
+        /Hybrid search is not configured/
+      );
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
 });

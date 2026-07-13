@@ -21,7 +21,7 @@ export async function sceUpdateRepository(input: { path: string; type?: "code" |
 export async function sceSearch(input: {
   path: string;
   query: string;
-  mode?: "keyword" | "semantic";
+  mode?: "keyword" | "semantic" | "hybrid";
   limit?: number;
   includeText?: boolean;
   pathFilter?: string;
