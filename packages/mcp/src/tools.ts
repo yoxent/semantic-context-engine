@@ -21,6 +21,7 @@ export async function sceUpdateRepository(input: { path: string; type?: "code" |
 export async function sceSearch(input: {
   path: string;
   query: string;
+  mode?: "keyword" | "semantic";
   limit?: number;
   includeText?: boolean;
   pathFilter?: string;
@@ -31,6 +32,7 @@ export async function sceSearch(input: {
   try {
     const result = await engine.search({
       text: input.query,
+      mode: input.mode ?? "keyword",
       limit: input.limit ?? config.search.defaultLimit,
       pathFilter: input.pathFilter,
       language: input.language,

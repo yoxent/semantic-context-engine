@@ -18,6 +18,7 @@ server.tool(
   {
     path: z.string(),
     query: z.string(),
+    mode: z.enum(["keyword", "semantic"]).optional(),
     limit: z.number().optional(),
     includeText: z.boolean().optional(),
     pathFilter: z.string().optional(),

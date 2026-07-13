@@ -26,4 +26,16 @@ describe("MCP tool handlers", () => {
       await rmWithRetry(dir);
     }
   });
+
+  it("surfaces semantic-not-configured when mode=semantic and embedding is absent", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-mcp-sem-"));
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await expect(sceSearch({ path: dir, query: "vectors", mode: "semantic" })).rejects.toThrow(
+        /Semantic search is not configured/
+      );
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
 });
