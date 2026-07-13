@@ -1,3 +1,5 @@
+import type { SymbolKind } from "./SymbolKind.js";
+
 export interface Chunk {
   id: string;
   repositoryId: string;
@@ -12,6 +14,7 @@ export interface Chunk {
   className?: string;
   methodName?: string;
   headingPath?: string[];
+  symbolKind?: SymbolKind;
   gitCommitHash?: string;
   wikiLinks?: string[];
 }
