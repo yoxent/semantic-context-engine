@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
 import { Parser, Language } from "web-tree-sitter";
-import type { Chunk, ChunkInput, IChunker, SymbolKind } from "@sce/core";
+import type { Chunk, ChunkInput, IChunker, Logger, SymbolKind } from "@sce/core";
 import { getTreeSitterLanguage } from "./treeSitterLoader.js";
 
 export interface TreeSitterCodeChunkerOptions {
   language: "typescript" | "javascript";
   grammar: Language;
+  logger?: Logger;
 }
 
 interface ExtractedSymbol {
@@ -34,15 +35,17 @@ const ANCESTOR_TYPES = new Set(["class_declaration", "class", "module_declaratio
 
 export class TreeSitterCodeChunker implements IChunker {
   private readonly parser: Parser;
+  private readonly logger?: Logger;
 
   constructor(options: TreeSitterCodeChunkerOptions) {
     this.parser = new Parser();
     this.parser.setLanguage(options.grammar);
+    this.logger = options.logger;
   }
 
-  static async create(language: "typescript" | "javascript"): Promise<TreeSitterCodeChunker> {
+  static async create(language: "typescript" | "javascript", logger?: Logger): Promise<TreeSitterCodeChunker> {
     const grammar = await getTreeSitterLanguage(language);
-    return new TreeSitterCodeChunker({ language, grammar });
+    return new TreeSitterCodeChunker({ language, grammar, logger });
   }
 
   chunk(input: ChunkInput): Chunk[] {
@@ -53,6 +56,9 @@ export class TreeSitterCodeChunker implements IChunker {
     const root = tree.rootNode;
     // Best-effort on syntax errors: tree-sitter recovers and produces a partial tree.
     // Traverse normally; never throw. (hasError is informational only.)
+    if (root.hasError) {
+      this.logger?.debug("parse.hasError", { relativePath: input.relativePath });
+    }
     const symbols: ExtractedSymbol[] = [];
     traverse(root, [], symbols);
 
@@ -132,15 +138,15 @@ function traverse(node: SyntaxNode, ancestry: string[], out: ExtractedSymbol[]):
     const value = childByFieldType(node, "value");
     if (name && value) {
       if (value.type === "arrow_function") {
-        out.push(extract(value, name, "arrow", ancestry));
+        out.push(extract(node, name, "arrow", ancestry));
         return; // don't double-count the arrow itself
       }
       if (value.type === "function_expression") {
-        out.push(extract(value, name, "function-expr", ancestry));
+        out.push(extract(node, name, "function-expr", ancestry));
         return;
       }
       if (value.type === "class") {
-        out.push(extract(value, name, "class", ancestry));
+        out.push(extract(node, name, "class", ancestry));
         // descend into the class body so its methods get chunked with `name` as className ancestry
         descendChildren(value, [...ancestry, name], out);
         return;
@@ -229,10 +235,13 @@ function codeChunkId(
 
 function lineCount(text: string): number {
   // Count newlines; a trailing newline does not add a line.
-  // "a\n" → 1 line, "a\nb" → 2 lines, "a\nb\n" → 2 lines.
-  const newlines = text.split("").filter((c) => c === "\n").length;
+  // "" → 1, "a" → 1, "a\n" → 1, "a\nb" → 2, "a\nb\n" → 2.
   if (text.length === 0) return 1;
-  return text.endsWith("\n") ? newlines : newlines + 1;
+  let count = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === "\n") count++;
+  }
+  return text.endsWith("\n") ? count : count + 1;
 }
 
 // Minimal SyntaxNode typing for web-tree-sitter (avoid importing the full type surface).

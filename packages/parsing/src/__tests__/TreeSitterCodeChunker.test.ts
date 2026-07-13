@@ -58,6 +58,7 @@ describe("TreeSitterCodeChunker — declaration kinds", () => {
     const arrow = findChunk(chunks, "arrow", "f");
     expect(arrow).toBeDefined();
     expect(arrow?.symbolKind).toBe("arrow");
+    expect(arrow?.text).toContain("f"); // binding name is in the chunk text (Fix 2)
   });
 
   it("chunks a const-bound function expression as function-expr", async () => {
@@ -111,6 +112,17 @@ describe("TreeSitterCodeChunker — declaration kinds", () => {
     expect(chunks.filter((c) => c.symbolKind === "function")).toEqual([]);
   });
 
+  it("chunks named export declarations (export function / export const)", async () => {
+    const chunker = await tsChunker();
+    const chunks = chunker.chunk({
+      ...baseInput,
+      language: "typescript",
+      text: "export function exported() { return 1; }\nexport const arrow = () => 2;\n"
+    });
+    expect(findChunk(chunks, "function", "exported")).toBeDefined();
+    expect(findChunk(chunks, "arrow", "arrow")).toBeDefined();
+  });
+
   it("does not collide ids for one-line class with one-line method", async () => {
     const chunker = await tsChunker();
     const chunks = chunker.chunk({ ...baseInput, language: "typescript", text: "class Foo { bar() {} }\n" });
@@ -132,12 +144,25 @@ describe("TreeSitterCodeChunker — fallback and errors", () => {
     expect(chunks[0]?.startLine).toBe(1);
   });
 
-  it("best-effort chunks a file with a syntax error and hasError is true on the root", async () => {
-    const chunker = await tsChunker();
+  it("best-effort chunks a file with a syntax error, recovers valid declarations, and logs hasError", async () => {
+    const calls: { message: string; relativePath: string }[] = [];
+    const logger = {
+      level: "debug" as const,
+      debug: (message: string, meta?: Record<string, unknown>) =>
+        calls.push({ message, relativePath: (meta?.relativePath as string) ?? "" }),
+      info: () => undefined,
+      warn: () => undefined,
+      error: () => undefined,
+      child: () => logger
+    } as any;
+    const chunker = await TreeSitterCodeChunker.create("typescript", logger);
     const text = "function foo() {\n  return\nfunction good() { return 1; }\n"; // unbalanced
     const chunks = chunker.chunk({ ...baseInput, language: "typescript", text });
-    // Should not throw; should still extract `good` if recoverable.
     expect(Array.isArray(chunks)).toBe(true);
+    // `good` is a valid declaration that tree-sitter recovers
+    expect(chunks.some((c) => c.symbolKind === "function" && c.headingPath?.at(-1) === "good")).toBe(true);
+    // the hasError debug log fired
+    expect(calls.some((c) => c.message === "parse.hasError")).toBe(true);
   });
 });
 

@@ -128,6 +128,8 @@ Code files are chunked at AST declaration nodes via `tree-sitter` (WASM). Each c
 
 A `const`/`export const` binding an arrow function, function expression, or class expression is chunked under `arrow` / `function-expr` / `class` respectively (name taken from the binding). Plain data `const` declarations and unnamed declarations are not chunked. A code file with zero declarations (e.g. only `import`s) produces one whole-file chunk so it stays keyword-searchable.
 
+Code with syntax errors is parsed best-effort: valid declarations are still chunked, and a debug log (`parse.hasError`) is emitted.
+
 Markdown default behavior is unchanged: if `indexing.include` stays `["**/*.md"]`, no code files are indexed. Files whose extension maps to an unsupported language (e.g. `.json`, `.yaml`) are skipped. Semantic and hybrid search cover code chunks too when `embedding` is configured.
 
 AST symbol lookup (`mode: "ast"`), call hierarchy, references, and inheritance are future slices — this one ships indexing + keyword/semantic/hybrid search over code.

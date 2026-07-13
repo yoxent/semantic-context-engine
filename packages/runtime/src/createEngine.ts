@@ -69,8 +69,8 @@ export async function createEngine(rootPath: string, options: CreateEngineOption
       : undefined;
 
   const markdownChunker = new MarkdownChunker();
-  const typescriptChunker = await TreeSitterCodeChunker.create("typescript");
-  const javascriptChunker = await TreeSitterCodeChunker.create("javascript");
+  const typescriptChunker = await TreeSitterCodeChunker.create("typescript", logger.child({ component: "parsing" }));
+  const javascriptChunker = await TreeSitterCodeChunker.create("javascript", logger.child({ component: "parsing" }));
   const chunker = new LanguageChunkerRegistry({
     chunkers: { markdown: markdownChunker, typescript: typescriptChunker, javascript: javascriptChunker }
   });
