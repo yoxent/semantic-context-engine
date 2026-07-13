@@ -2,7 +2,7 @@
 
 ## Current state (2026-07-13)
 
-First interface-first vertical, ops polish, ranking, the opt-in semantic search slice, and the opt-in hybrid search slice are implemented on **`develop`**.
+First interface-first vertical, ops polish, ranking, the opt-in semantic search slice, the opt-in hybrid search slice, and opt-in TS/JS code indexing (AST chunking) are implemented on **`develop`**.
 
 - Branch: `develop` (tracks `origin/develop`)
 - `main` is production-only — do not land feature work there yet
@@ -17,6 +17,8 @@ First interface-first vertical, ops polish, ranking, the opt-in semantic search 
 - `docs/superpowers/plans/2026-07-13-sce-semantic-search-slice.md` — semantic slice implementation plan
 - `docs/superpowers/specs/2026-07-13-sce-hybrid-search-slice-design.md` — approved hybrid slice design
 - `docs/superpowers/plans/2026-07-13-sce-hybrid-search-slice.md` — hybrid slice implementation plan
+- `docs/superpowers/specs/2026-07-13-sce-code-indexing-slice-design.md` — approved code indexing slice design
+- `docs/superpowers/plans/2026-07-13-sce-code-indexing-slice.md` — code indexing slice implementation plan
 
 ## Locked product decisions
 
@@ -72,6 +74,17 @@ First interface-first vertical, ops polish, ranking, the opt-in semantic search 
 - CLI `--mode hybrid`; MCP `sce_search` `mode: "hybrid"`
 - Hybrid honors `repositoryIds`; rejects `pathFilter` / `language` with the same unsupported-filter errors as semantic
 - No new `sce.config.json` keys; AST fusion, configurable RRF `k`, and post-filtering remain follow-ups
+
+### Shipped (code indexing slice, 2026-07-13)
+
+- `@sce/core` `Language` type, `SymbolKind` type, `detectLanguage(relativePath)` helper, and optional `Chunk.symbolKind`
+- `@sce/parsing` `TreeSitterCodeChunker` — `web-tree-sitter` (WASM) with vendored TS/TSX/JS grammar `.wasm` files; AST cursor traversal chunks 9 declaration kinds (`function`, `method`, `arrow`, `function-expr`, `class`, `interface`, `type`, `enum`, `namespace`) + const-bound arrow/function-expr/class; skips unnamed + plain data `const`; whole-file fallback chunk for zero-declaration files; best-effort on syntax errors
+- `@sce/parsing` `LanguageChunkerRegistry` — dispatches chunking by `input.language` (markdown/typescript/javascript); `IChunker` interface unchanged
+- `@sce/indexing` uses `detectLanguage`; skips `text`-language files before read and cleans up any pre-existing record/chunks/FTS/vectors for them
+- `@sce/runtime` builds the registry (markdown + TS + JS chunkers) and injects it as the single `chunker`
+- Code chunks embed uniformly when `embedding` is configured; no new config keys; default `indexing.include` stays `["**/*.md"]` (code is opt-in)
+- Keyword, semantic, and hybrid search now cover code chunks; Markdown behavior unchanged
+- Follow-ups: AST symbol lookup (`mode: "ast"`), call hierarchy, references, inheritance, JSON/YAML, second language family (Python/Go), overlapping-chunk dedup
 
 ## For the next agent
 

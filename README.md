@@ -1,8 +1,8 @@
 # Semantic Context Engine
 
-Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault (or later a code repo), then returns concise keyword, opt-in semantic, and opt-in hybrid hits through a shared core API exposed as CLI and MCP.
+Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault and (opt-in) TypeScript/JavaScript code, then returns concise keyword, opt-in semantic, and opt-in hybrid hits through a shared core API exposed as CLI and MCP.
 
-SCE is **not** a vector database. Keyword, opt-in semantic, and opt-in hybrid search ship on `develop`; AST, binary vectors, and ANN indexing stay behind interfaces for later slices.
+SCE is **not** a vector database. Keyword, opt-in semantic, and opt-in hybrid search ship on `develop` over Markdown and (opt-in) TS/JS code; AST symbol lookup, binary vectors, and ANN indexing stay behind interfaces for later slices.
 
 ## Status
 
@@ -103,6 +103,35 @@ Defaults always keep ignores such as `.git/**`, `.sce/**`, and `node_modules/**`
 | `pathFilter` | Exact path, directory prefix (`notes` → `notes` and `notes/...`), or SQL GLOB (`*.md`, `notes/*`) |
 | `language` | Exact language match (e.g. `markdown`) |
 
+## Code indexing (opt-in)
+
+SCE indexes Markdown by default. To index TypeScript/JavaScript code too, extend `indexing.include` in `sce.config.json`:
+
+```json
+{
+  "indexing": {
+    "include": ["**/*.md", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs", "**/*.mts", "**/*.cts"]
+  }
+}
+```
+
+Supported code languages and extensions:
+
+| Language | Extensions | Chunked at |
+|---|---|---|
+| `typescript` | `.ts` `.tsx` `.mts` `.cts` | AST declaration nodes |
+| `javascript` | `.js` `.jsx` `.mjs` `.cjs` | AST declaration nodes |
+
+Code files are chunked at AST declaration nodes via `tree-sitter` (WASM). Each chunk carries a `symbolKind`:
+
+`function` · `method` · `arrow` · `function-expr` · `class` · `interface` · `type` · `enum` · `namespace`
+
+A `const`/`export const` binding an arrow function, function expression, or class expression is chunked under `arrow` / `function-expr` / `class` respectively (name taken from the binding). Plain data `const` declarations and unnamed declarations are not chunked. A code file with zero declarations (e.g. only `import`s) produces one whole-file chunk so it stays keyword-searchable.
+
+Markdown default behavior is unchanged: if `indexing.include` stays `["**/*.md"]`, no code files are indexed. Files whose extension maps to an unsupported language (e.g. `.json`, `.yaml`) are skipped. Semantic and hybrid search cover code chunks too when `embedding` is configured.
+
+AST symbol lookup (`mode: "ast"`), call hierarchy, references, and inheritance are future slices — this one ships indexing + keyword/semantic/hybrid search over code.
+
 ## Semantic search (opt-in)
 
 Keyword search remains the default. Enable semantic (embedding-based) search by adding an `embedding` block to `sce.config.json`:
@@ -167,7 +196,7 @@ Behavior:
 |---|---|
 | `@sce/core` | Public API, models, interfaces, config, logging |
 | `@sce/indexing` | Discovery, ignore rules, index/update |
-| `@sce/parsing` | Markdown chunking + wiki-links |
+| `@sce/parsing` | Markdown chunking, wiki-links, and tree-sitter TS/JS AST chunking |
 | `@sce/storage` | SQLite metadata + FTS |
 | `@sce/ranking` | Simple keyword ranker |
 | `@sce/retrieval` | Keyword, semantic, and hybrid retrieval strategies |
@@ -184,6 +213,8 @@ Behavior:
 - `docs/superpowers/plans/2026-07-13-sce-semantic-search-slice.md` — semantic slice implementation plan
 - `docs/superpowers/specs/2026-07-13-sce-hybrid-search-slice-design.md` — approved hybrid slice design
 - `docs/superpowers/plans/2026-07-13-sce-hybrid-search-slice.md` — hybrid slice implementation plan
+- `docs/superpowers/specs/2026-07-13-sce-code-indexing-slice-design.md` — approved code indexing slice design
+- `docs/superpowers/plans/2026-07-13-sce-code-indexing-slice.md` — code indexing slice implementation plan
 
 ## Explicit non-goals (v1)
 
