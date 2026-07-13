@@ -46,20 +46,22 @@ export async function run(argv: string[]): Promise<void> {
     .option("--limit <limit>", "maximum hit count")
     .option("--path-filter <glob>", "restrict hits by path (exact, prefix, or GLOB)")
     .option("--language <language>", "restrict hits by language")
-    .option("--mode <mode>", "search mode: keyword (default), semantic, or hybrid", "keyword")
+    .option("--mode <mode>", "search mode: keyword (default), semantic, hybrid, or ast", "keyword")
+    .option("--symbol-kind <kind>", "restrict to a symbol kind (ast mode only)")
     .option("--json", "print JSON")
     .action(async (query, options, command) => {
       const { engine, close, config } = await createEngine(options.path, { verbose: verboseFrom(command) });
       try {
         const limit = options.limit !== undefined ? Number(options.limit) : config.search.defaultLimit;
-        const mode: "keyword" | "semantic" | "hybrid" =
-          options.mode === "semantic" || options.mode === "hybrid" ? options.mode : "keyword";
+        const mode: "keyword" | "semantic" | "hybrid" | "ast" =
+          options.mode === "semantic" || options.mode === "hybrid" || options.mode === "ast" ? options.mode : "keyword";
         const result = await engine.search({
           text: query,
           mode,
           limit,
           pathFilter: options.pathFilter,
-          language: options.language
+          language: options.language,
+          ...(options.symbolKind ? { symbolKind: options.symbolKind } : {})
         });
         const hits = result.hits.map((hit) => ({
           ...hit,

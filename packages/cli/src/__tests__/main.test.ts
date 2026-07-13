@@ -1,4 +1,4 @@
-import { mkdtemp, cp } from "node:fs/promises";
+import { mkdtemp, cp, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -78,6 +78,41 @@ describe("CLI run", () => {
       await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
       await run(["search", "vectors", "--path", dir, "--mode", "hybrid"]);
       expect(err).toHaveBeenCalledWith(expect.stringMatching(/Hybrid search is not configured/));
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("runs ast search and prints a symbol hit", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-cli-ast-"));
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await mkdir(join(dir, "src"), { recursive: true });
+      await writeFile(
+        join(dir, "src/widget.ts"),
+        "export class Widget {\n  render(): string {\n    return 'widget';\n  }\n}\n"
+      );
+      await writeFile(
+        join(dir, "sce.config.json"),
+        JSON.stringify({ indexing: { include: ["**/*.md", "**/*.ts"] } })
+      );
+      await run(["index", dir, "--type", "vault"]);
+      log.mockClear();
+      await run(["search", "Widget", "--path", dir, "--mode", "ast"]);
+      expect(log).toHaveBeenCalledWith(expect.stringMatching(/widget\.ts.*score=/));
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("surfaces a clear error for --symbol-kind with --mode keyword", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-cli-ast-"));
+    const err = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await run(["search", "x", "--path", dir, "--mode", "keyword", "--symbol-kind", "class"]);
+      expect(err).toHaveBeenCalledWith(expect.stringMatching(/symbolKind.*keyword|keyword.*symbolKind/i));
     } finally {
       await rmWithRetry(dir);
     }
