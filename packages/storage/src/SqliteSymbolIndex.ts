@@ -45,8 +45,72 @@ export class SqliteSymbolIndex implements ISymbolIndex {
   }
 
   async searchSymbols(query: SymbolSearchQuery): Promise<SymbolHit[]> {
-    // Implemented in Task 5.
-    return [];
+    if (!query.name || query.name.trim().length === 0) return [];
+    const limit = query.limit;
+
+    const exact = this.runTier(query, "exact", limit);
+    if (exact.length > 0) return exact.slice(0, limit);
+    const prefix = this.runTier(query, "prefix", limit);
+    return prefix.slice(0, limit);
+  }
+
+  private runTier(query: SymbolSearchQuery, matchType: "exact" | "prefix", limit: number): SymbolHit[] {
+    const where: string[] = [];
+    const params: unknown[] = [];
+
+    if (matchType === "exact") {
+      where.push("name = ? COLLATE NOCASE");
+      params.push(query.name);
+    } else {
+      where.push("name LIKE ? COLLATE NOCASE");
+      params.push(`${query.name}%`);
+    }
+
+    if (query.symbolKind) {
+      where.push("symbol_kind = ?");
+      params.push(query.symbolKind);
+    }
+    if (query.language) {
+      where.push("language = ?");
+      params.push(query.language);
+    }
+    if (query.repositoryIds && query.repositoryIds.length > 0) {
+      where.push(`repository_id IN (${query.repositoryIds.map(() => "?").join(", ")})`);
+      params.push(...query.repositoryIds);
+    }
+    const pathClause = buildPathFilterClause(query.pathFilter, "symbols.relative_path");
+    if (pathClause) {
+      where.push(pathClause.sql);
+      params.push(...pathClause.params);
+    }
+
+    const sql = `
+      SELECT chunk_id, symbol_kind, name, qualified_name, relative_path
+      FROM symbols
+      WHERE ${where.join(" AND ")}
+      ORDER BY
+        length(qualified_name) ASC,
+        CASE symbol_kind
+          WHEN 'class' THEN 0 WHEN 'interface' THEN 0 WHEN 'type' THEN 0 WHEN 'enum' THEN 0 WHEN 'namespace' THEN 0
+          WHEN 'function' THEN 1 WHEN 'arrow' THEN 1 WHEN 'function-expr' THEN 1
+          WHEN 'method' THEN 2
+          ELSE 3
+        END,
+        name ASC,
+        chunk_id ASC
+      LIMIT ?
+    `;
+    params.push(limit);
+
+    const rows = this.db.prepare(sql).all(...params) as SymbolRow[];
+    return rows.map((row) => ({
+      chunkId: row.chunk_id,
+      symbolKind: row.symbol_kind as SymbolHit["symbolKind"],
+      name: row.name,
+      qualifiedName: row.qualified_name,
+      relativePath: row.relative_path,
+      matchType
+    }));
   }
 }
 
