@@ -6,7 +6,9 @@ import { createEngine } from "@sce/runtime";
 
 export async function run(argv: string[]): Promise<void> {
   const program = new Command();
-  program.name("sce").option("--verbose", "emit structured debug logs to stderr");
+  program.name("sce");
+  program.exitOverride();
+  program.option("--verbose", "emit structured debug logs to stderr");
 
   const verboseFrom = (command: Command): boolean => Boolean(command.optsWithGlobals().verbose);
 
@@ -44,13 +46,16 @@ export async function run(argv: string[]): Promise<void> {
     .option("--limit <limit>", "maximum hit count")
     .option("--path-filter <glob>", "restrict hits by path (exact, prefix, or GLOB)")
     .option("--language <language>", "restrict hits by language")
+    .option("--mode <mode>", "search mode: keyword (default) or semantic", "keyword")
     .option("--json", "print JSON")
     .action(async (query, options, command) => {
       const { engine, close, config } = await createEngine(options.path, { verbose: verboseFrom(command) });
       try {
         const limit = options.limit !== undefined ? Number(options.limit) : config.search.defaultLimit;
+        const mode = options.mode === "semantic" ? "semantic" : "keyword";
         const result = await engine.search({
           text: query,
+          mode,
           limit,
           pathFilter: options.pathFilter,
           language: options.language
@@ -115,7 +120,12 @@ export async function run(argv: string[]): Promise<void> {
       }
     });
 
-  await program.parseAsync(argv, { from: "user" });
+  try {
+    await program.parseAsync(argv, { from: "user" });
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  }
 }
 
 function truncate(text: string, maxChars: number): string {

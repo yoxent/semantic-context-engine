@@ -56,4 +56,17 @@ describe("CLI run", () => {
       await rmWithRetry(dir);
     }
   });
+
+  it("surfaces a clear error for --mode semantic when embedding is not configured", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-cli-sem-"));
+    const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const err = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await run(["search", "vectors", "--path", dir, "--mode", "semantic"]);
+      expect(err).toHaveBeenCalledWith(expect.stringMatching(/Semantic search is not configured/));
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
 });
