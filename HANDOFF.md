@@ -2,7 +2,7 @@
 
 ## Current state (2026-07-13)
 
-First interface-first vertical, ops polish, ranking, the opt-in semantic search slice, the opt-in hybrid search slice, and opt-in TS/JS code indexing (AST chunking) are implemented on **`develop`**.
+First interface-first vertical, ops polish, ranking, the opt-in semantic search slice, the opt-in hybrid search slice, opt-in TS/JS code indexing (AST chunking), and AST symbol lookup are implemented on **`develop`**.
 
 - Branch: `develop` (tracks `origin/develop`)
 - `main` is production-only — do not land feature work there yet
@@ -19,6 +19,8 @@ First interface-first vertical, ops polish, ranking, the opt-in semantic search 
 - `docs/superpowers/plans/2026-07-13-sce-hybrid-search-slice.md` — hybrid slice implementation plan
 - `docs/superpowers/specs/2026-07-13-sce-code-indexing-slice-design.md` — approved code indexing slice design
 - `docs/superpowers/plans/2026-07-13-sce-code-indexing-slice.md` — code indexing slice implementation plan
+- `docs/superpowers/specs/2026-07-13-sce-ast-symbol-lookup-slice-design.md` — approved AST symbol lookup slice design
+- `docs/superpowers/plans/2026-07-13-sce-ast-symbol-lookup-slice.md` — AST symbol lookup slice implementation plan
 
 ## Locked product decisions
 
@@ -43,7 +45,8 @@ First interface-first vertical, ops polish, ranking, the opt-in semantic search 
 
 ## Known follow-ups
 
-- AST search strategies
+- AST call hierarchy, references, inheritance
+- AST in hybrid (third RRF list)
 - Binary vector layout / ANN index (`.sce/semantic/` layout)
 - Cloud-only embedding providers
 - Human UI on obscure Cloudflare subdomain
@@ -84,7 +87,21 @@ First interface-first vertical, ops polish, ranking, the opt-in semantic search 
 - `@sce/runtime` builds the registry (markdown + TS + JS chunkers) and injects it as the single `chunker`
 - Code chunks embed uniformly when `embedding` is configured; no new config keys; default `indexing.include` stays `["**/*.md"]` (code is opt-in)
 - Keyword, semantic, and hybrid search now cover code chunks; Markdown behavior unchanged
-- Follow-ups: AST symbol lookup (`mode: "ast"`), call hierarchy, references, inheritance, JSON/YAML, second language family (Python/Go), overlapping-chunk dedup
+- Follow-ups: call hierarchy, references, inheritance, JSON/YAML, second language family (Python/Go), overlapping-chunk dedup
+
+### Shipped (AST symbol lookup slice, 2026-07-13)
+
+- `@sce/core` `ISymbolIndex` interface, `SymbolSearchQuery`, `SymbolHit` (with `matchType: "exact" | "prefix"`), and optional `symbolKind` on `SearchQuery`/`SearchHit`
+- `@sce/storage` `SqliteSymbolIndex` — tiered exact-then-prefix search over `symbols` table; SQL-level `repositoryIds`/`pathFilter`/`language`/`symbolKind` filters; ranking by `qualified_name` length + `symbol_kind_priority` + name + chunk_id
+- `@sce/storage` `symbols` table — write-aside (no `chunks` migration); indexed by `(repository_id, name)`, `(repository_id, symbol_kind, name)`, `(repository_id, relative_path)`
+- `@sce/storage` shared `pathFilter` helper — extracted from `SqliteStorage`, parameterized by column expression; both keyword and AST use it
+- `@sce/retrieval` `AstRetrievalStrategy` — direct scoring from `matchType` (`exact` → 1.0, `prefix` → 0.5 + matchedLength/nameLength); no `SimpleRanker`; rejects empty `text` with clear error
+- `@sce/retrieval` `symbolKind` rejection on keyword/semantic/hybrid modes — clear unsupported-filter error
+- `@sce/core` routes `search({ mode: "ast" })` / `astSearch()` to injected `astStrategy`; clear `AST search is not configured` error when absent
+- `@sce/indexing` writes/prunes symbols alongside chunks (after `indexChunks`, before embedding); `text`-skip path does NOT touch symbols
+- `@sce/runtime` always wires `AstRetrievalStrategy` + `SqliteSymbolIndex` (no config gate)
+- CLI `--mode ast` + `--symbol-kind`; MCP `sce_search` accepts `mode: "ast"` + `symbolKind`
+- AST is always wired (no `embedding` gate); empty results on Markdown-only vaults (not an error)
 
 ## For the next agent
 

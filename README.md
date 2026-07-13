@@ -1,8 +1,8 @@
 # Semantic Context Engine
 
-Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault and (opt-in) TypeScript/JavaScript code, then returns concise keyword, opt-in semantic, and opt-in hybrid hits through a shared core API exposed as CLI and MCP.
+Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault and (opt-in) TypeScript/JavaScript code, then returns concise keyword, opt-in semantic, opt-in hybrid, and AST symbol lookup hits through a shared core API exposed as CLI and MCP.
 
-SCE is **not** a vector database. Keyword, opt-in semantic, and opt-in hybrid search ship on `develop` over Markdown and (opt-in) TS/JS code; AST symbol lookup, binary vectors, and ANN indexing stay behind interfaces for later slices.
+SCE is **not** a vector database. Keyword, opt-in semantic, opt-in hybrid search, and AST symbol lookup ship on `develop` over Markdown and (opt-in) TS/JS code; binary vectors and ANN indexing stay behind interfaces for later slices.
 
 ## Status
 
@@ -65,7 +65,7 @@ Server entry: `packages/mcp/dist/src/server.js`
 |---|---|
 | `sce_index_repository` | Index a vault/repo path |
 | `sce_update_repository` | Incremental refresh (incl. deleted-file prune) |
-| `sce_search` | Keyword, semantic, or hybrid search (`mode`, `limit`, `includeText`, `pathFilter`, `language`, `repositoryIds`) |
+| `sce_search` | Keyword, semantic, hybrid, or AST search (`mode`, `symbolKind`, `limit`, `includeText`, `pathFilter`, `language`, `repositoryIds`) |
 | `sce_get_chunk` | Fetch chunk text (`maxChars` optional) |
 | `sce_stats` | Index statistics (files, chunks, links, last indexed) |
 
@@ -132,7 +132,7 @@ Code with syntax errors is parsed best-effort: valid declarations are still chun
 
 Markdown default behavior is unchanged: if `indexing.include` stays `["**/*.md"]`, no code files are indexed. Files whose extension maps to an unsupported language (e.g. `.json`, `.yaml`) are skipped. Semantic and hybrid search cover code chunks too when `embedding` is configured.
 
-AST symbol lookup (`mode: "ast"`), call hierarchy, references, and inheritance are future slices — this one ships indexing + keyword/semantic/hybrid search over code.
+Call hierarchy, references, and inheritance are future slices.
 
 ## Semantic search (opt-in)
 
@@ -172,6 +172,26 @@ Semantic mode honors `repositoryIds`. `pathFilter` and `language` remain keyword
 
 The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector.index`) behind the same `IVectorStore` interface, plus AST, ANN indexing, and cloud-only providers as later slices.
 
+## AST symbol lookup
+
+AST search finds code symbols by name, with an optional `symbolKind` filter. It is always available (no `embedding` config required) whenever code files are indexed.
+
+```bash
+sce search "Widget" --path ./repo --mode ast
+sce search "render" --path ./repo --mode ast --symbol-kind method
+```
+
+MCP `sce_search` accepts `mode: "ast"` and `symbolKind`.
+
+Behavior:
+
+- **Tiered matching:** exact name match first (case-insensitive); if no exact match, prefix match (`rend` → `render`, `renderView`). Exact match scores `1.0`; prefix match scores `0.5 + (queryLength / nameLength)`.
+- **`symbolKind` filter:** one of `function` · `method` · `arrow` · `function-expr` · `class` · `interface` · `type` · `enum` · `namespace`. Narrows both match tiers. Rejected with a clear error on `keyword`/`semantic`/`hybrid` modes.
+- **Ranking:** within a tier, top-level symbols rank before nested ones (shorter qualified name), and prominent kinds (`class`/`interface`/`type`/`enum`/`namespace`) rank before functions, which rank before methods.
+- **Filters honored:** `repositoryIds`, `pathFilter` (exact/prefix/GLOB, same as keyword), `language`. Unlike semantic/hybrid, AST accepts `pathFilter` and `language`.
+- **Always wired:** no `embedding` block needed. On a Markdown-only vault (no code indexed), AST returns empty results — not an error.
+- **Empty `text`** is rejected with a clear error.
+
 ## Hybrid search (opt-in)
 
 Hybrid search runs the keyword and semantic strategies in parallel and fuses their ranked lists with **Reciprocal Rank Fusion** (`k = 60`). It is available whenever semantic search is enabled (i.e. when the `embedding` block is present in `sce.config.json`). There are no extra config keys.
@@ -201,7 +221,7 @@ Behavior:
 | `@sce/parsing` | Markdown chunking, wiki-links, and tree-sitter TS/JS AST chunking |
 | `@sce/storage` | SQLite metadata + FTS |
 | `@sce/ranking` | Simple keyword ranker |
-| `@sce/retrieval` | Keyword, semantic, and hybrid retrieval strategies |
+| `@sce/retrieval` | Keyword, semantic, hybrid, and AST retrieval strategies |
 | `@sce/runtime` | Composition (`createEngine`) |
 | `@sce/cli` / `@sce/mcp` | Adapters |
 | `@sce/embedding` | `OpenAICompatibleEmbeddingProvider` (HTTP embeddings) |
@@ -217,11 +237,13 @@ Behavior:
 - `docs/superpowers/plans/2026-07-13-sce-hybrid-search-slice.md` — hybrid slice implementation plan
 - `docs/superpowers/specs/2026-07-13-sce-code-indexing-slice-design.md` — approved code indexing slice design
 - `docs/superpowers/plans/2026-07-13-sce-code-indexing-slice.md` — code indexing slice implementation plan
+- `docs/superpowers/specs/2026-07-13-sce-ast-symbol-lookup-slice-design.md` — approved AST symbol lookup slice design
+- `docs/superpowers/plans/2026-07-13-sce-ast-symbol-lookup-slice.md` — AST symbol lookup slice implementation plan
 
 ## Explicit non-goals (v1)
 
 - Binary vector layout / ANN index
-- AST search
+- AST call hierarchy / references / inheritance
 - Cloud-only embedding providers
 - Public Obsidian-like web UI
 - Pasttime coupling
