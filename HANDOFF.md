@@ -13,8 +13,8 @@ First interface-first vertical is implemented on **`develop`**, plus a small ops
 - `GOAL.md` — long-term vision (still ahead of v1)
 - `docs/superpowers/specs/2026-07-12-sce-interface-first-vertical-design.md` — approved design
 - `docs/superpowers/plans/2026-07-12-sce-interface-first-vertical.md` — plan that was executed
-- `docs/superpowers/specs/2026-07-12-sce-semantic-search-slice-design.md` — approved semantic slice design
-- `docs/superpowers/plans/2026-07-12-sce-semantic-search-slice.md` — semantic slice implementation plan
+- `docs/superpowers/specs/2026-07-13-sce-semantic-search-slice-design.md` — approved semantic slice design
+- `docs/superpowers/plans/2026-07-13-sce-semantic-search-slice.md` — semantic slice implementation plan
 
 ## Locked product decisions
 
