@@ -25,6 +25,7 @@ export interface SemanticContextEngineDeps {
   keywordStrategy: IRetrievalStrategy;
   semanticStrategy?: IRetrievalStrategy;
   hybridStrategy?: IRetrievalStrategy;
+  astStrategy?: IRetrievalStrategy;
   indexingService?: IIndexingService;
   metadataStore?: IMetadataStore;
   logger?: Logger;
@@ -61,6 +62,7 @@ export class SemanticContextEngine {
     if (mode === "keyword") return this.keywordSearch(query);
     if (mode === "semantic") return this.semanticSearch(query);
     if (mode === "hybrid") return this.hybridSearch(query);
+    if (mode === "ast") return this.astSearch(query);
     return this.unsupported(mode, query);
   }
 
@@ -85,7 +87,10 @@ export class SemanticContextEngine {
   }
 
   async astSearch(query: SearchQuery): Promise<SearchResult> {
-    return this.unsupported("ast", query);
+    if (!this.deps.astStrategy) {
+      throw new Error("AST search is not configured");
+    }
+    return this.deps.astStrategy.search({ ...query, mode: "ast" });
   }
 
   async hybridSearch(query: SearchQuery): Promise<SearchResult> {

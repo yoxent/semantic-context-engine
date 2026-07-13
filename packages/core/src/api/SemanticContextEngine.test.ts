@@ -39,10 +39,10 @@ describe("SemanticContextEngine", () => {
     );
   });
 
-  it("rejects ast as unimplemented and hybrid as not-configured when no hybrid strategy is wired", async () => {
+  it("rejects ast as not-configured when no ast strategy is wired, and hybrid as not-configured", async () => {
     const keyword: IRetrievalStrategy = { name: "keyword", search: async () => ({ hits: [] }) };
     const engine = new SemanticContextEngine({ keywordStrategy: keyword });
-    await expect(engine.search({ text: "x", mode: "ast" })).rejects.toThrow(/Search mode ast is not implemented in v1/);
+    await expect(engine.search({ text: "x", mode: "ast" })).rejects.toThrow(/AST search is not configured/);
     await expect(engine.search({ text: "x", mode: "hybrid" })).rejects.toThrow(/Hybrid search is not configured/);
   });
 
@@ -241,5 +241,41 @@ describe("SemanticContextEngine hybrid routing", () => {
     const result = await engine.hybridSearch({ text: "inventory" });
     expect(result.diagnostics?.strategy).toBe("hybrid");
     expect(calls[0]?.mode).toBe("hybrid");
+  });
+});
+
+describe("SemanticContextEngine ast routing", () => {
+  it("routes ast mode to the ast strategy when configured", async () => {
+    const calls: SearchQuery[] = [];
+    const ast: IRetrievalStrategy = {
+      name: "ast",
+      search: async (query) => {
+        calls.push(query);
+        return { hits: [{ chunkId: "a1", score: 1, strategy: "ast", snippet: "class Widget", path: "W.ts", startLine: 1, endLine: 3, symbolKind: "class" }], diagnostics: { strategy: "ast" } };
+      }
+    };
+    const engine = new SemanticContextEngine({
+      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) },
+      astStrategy: ast
+    });
+    const result = await engine.search({ text: "Widget", mode: "ast", symbolKind: "class" });
+    expect(result.hits[0]?.chunkId).toBe("a1");
+    expect(calls[0]?.mode).toBe("ast");
+    expect(calls[0]?.symbolKind).toBe("class");
+  });
+
+  it("astSearch() delegates to the ast strategy with mode 'ast'", async () => {
+    const engine = new SemanticContextEngine({
+      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) },
+      astStrategy: { name: "ast", search: async () => ({ hits: [], diagnostics: { strategy: "ast" } }) }
+    });
+    const result = await engine.astSearch({ text: "Widget" });
+    expect(result.diagnostics?.strategy).toBe("ast");
+  });
+
+  it("throws a clear error when ast is requested but not configured", async () => {
+    const engine = new SemanticContextEngine({ keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) } });
+    await expect(engine.search({ text: "Widget", mode: "ast" })).rejects.toThrow(/AST search is not configured/);
+    await expect(engine.astSearch({ text: "Widget" })).rejects.toThrow(/AST search is not configured/);
   });
 });
