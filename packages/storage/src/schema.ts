@@ -43,4 +43,15 @@ CREATE VIRTUAL TABLE IF NOT EXISTS chunks_fts USING fts5(
   heading_path,
   text
 );
+
+CREATE TABLE IF NOT EXISTS vectors (
+  repository_id TEXT NOT NULL,
+  chunk_id TEXT NOT NULL,
+  relative_path TEXT NOT NULL,
+  model TEXT NOT NULL,
+  dimensions INTEGER NOT NULL,
+  vector TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (repository_id, chunk_id)
+);
 `;

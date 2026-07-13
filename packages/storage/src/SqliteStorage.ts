@@ -19,6 +19,11 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
     this.db.close();
   }
 
+  /** Shared DB handle for sibling stores that reuse this connection (e.g. vector store). */
+  getDatabase(): Database.Database {
+    return this.db;
+  }
+
   async saveRepository(repository: Repository): Promise<void> {
     this.db.prepare(
       `INSERT OR REPLACE INTO repositories (id, root_path, type, indexed_at, display_name)
