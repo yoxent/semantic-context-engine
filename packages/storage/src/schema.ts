@@ -54,4 +54,19 @@ CREATE TABLE IF NOT EXISTS vectors (
   updated_at TEXT NOT NULL,
   PRIMARY KEY (repository_id, chunk_id)
 );
+
+CREATE TABLE IF NOT EXISTS symbols (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  chunk_id TEXT NOT NULL,
+  repository_id TEXT NOT NULL,
+  relative_path TEXT NOT NULL,
+  language TEXT NOT NULL,
+  symbol_kind TEXT NOT NULL,
+  name TEXT NOT NULL,
+  qualified_name TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_symbols_repo_name ON symbols (repository_id, name);
+CREATE INDEX IF NOT EXISTS idx_symbols_repo_kind_name ON symbols (repository_id, symbol_kind, name);
+CREATE INDEX IF NOT EXISTS idx_symbols_repo_path ON symbols (repository_id, relative_path);
 `;
