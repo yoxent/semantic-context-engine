@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { Command } from "commander";
 import { createEngine } from "@sce/runtime";
+import { exportCommand } from "./commands/export.js";
 
 export async function run(argv: string[]): Promise<void> {
   const program = new Command();
@@ -122,6 +123,8 @@ export async function run(argv: string[]): Promise<void> {
         close();
       }
     });
+
+  program.addCommand(exportCommand);
 
   try {
     await program.parseAsync(argv, { from: "user" });

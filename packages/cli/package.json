@@ -11,7 +11,9 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@sce/core": "0.0.0",
     "@sce/runtime": "0.0.0",
+    "@sce/storage": "0.0.0",
     "commander": "^15.0.0"
   }
 }
