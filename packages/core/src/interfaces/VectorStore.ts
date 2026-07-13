@@ -33,4 +33,5 @@ export interface IVectorStore {
   deleteByFile(repositoryId: string, relativePath: string): Promise<void>;
   /** Returns the model+dimensions currently stored for a repository, or undefined if none. */
   getModelDimensions(repositoryId: string): Promise<ModelDimensions | undefined>;
+  getAllVectors(): Promise<VectorUpsert[]>;
 }

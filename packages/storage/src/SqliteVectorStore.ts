@@ -53,6 +53,20 @@ export class SqliteVectorStore implements IVectorStore {
     if (!row) return undefined;
     return { model: row.model, dimensions: row.dimensions };
   }
+
+  async getAllVectors(): Promise<VectorUpsert[]> {
+    const rows = this.db
+      .prepare("SELECT chunk_id, repository_id, relative_path, model, dimensions, vector FROM vectors")
+      .all() as { chunk_id: string; repository_id: string; relative_path: string; model: string; dimensions: number; vector: string }[];
+    return rows.map((row) => ({
+      chunkId: row.chunk_id,
+      repositoryId: row.repository_id,
+      relativePath: row.relative_path,
+      model: row.model,
+      dimensions: row.dimensions,
+      vector: JSON.parse(row.vector) as number[]
+    }));
+  }
 }
 
 function cosineSearch(db: Database.Database, query: VectorSearchQuery): VectorSearchHit[] {

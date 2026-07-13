@@ -23,6 +23,7 @@ export interface IMetadataStore {
   getChunk(id: string): Promise<Chunk | undefined>;
   getChunks(ids: string[]): Promise<Chunk[]>;
   deleteChunksForFile(repositoryId: string, relativePath: string): Promise<void>;
+  getAllChunks(): Promise<Chunk[]>;
   getStatistics(): Promise<EngineStatistics>;
 }
 

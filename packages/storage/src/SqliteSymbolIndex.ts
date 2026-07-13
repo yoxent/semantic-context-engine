@@ -1,5 +1,5 @@
 import Database from "better-sqlite3";
-import type { Chunk, ISymbolIndex, SymbolHit, SymbolSearchQuery } from "@sce/core";
+import type { Chunk, ISymbolIndex, SymbolHit, SymbolRecord, SymbolSearchQuery } from "@sce/core";
 import { buildPathFilterClause } from "./pathFilter.js";
 
 export class SqliteSymbolIndex implements ISymbolIndex {
@@ -42,6 +42,22 @@ export class SqliteSymbolIndex implements ISymbolIndex {
 
   async deleteByRepository(repositoryId: string): Promise<void> {
     this.db.prepare("DELETE FROM symbols WHERE repository_id = ?").run(repositoryId);
+  }
+
+  async getAllSymbols(): Promise<SymbolRecord[]> {
+    const rows = this.db
+      .prepare("SELECT id, chunk_id, repository_id, relative_path, language, symbol_kind, name, qualified_name FROM symbols")
+      .all() as { id: number; chunk_id: string; repository_id: string; relative_path: string; language: string; symbol_kind: string; name: string; qualified_name: string }[];
+    return rows.map((row) => ({
+      id: row.id,
+      chunkId: row.chunk_id,
+      repositoryId: row.repository_id,
+      relativePath: row.relative_path,
+      language: row.language,
+      symbolKind: row.symbol_kind,
+      name: row.name,
+      qualifiedName: row.qualified_name
+    }));
   }
 
   async searchSymbols(query: SymbolSearchQuery): Promise<SymbolHit[]> {

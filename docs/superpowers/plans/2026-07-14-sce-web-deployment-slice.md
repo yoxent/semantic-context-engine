@@ -1494,7 +1494,7 @@ for i in range(0, len(chunks), 50):
 
 ```bash
 wrangler secret put OPENROUTER_API_KEY
-# Paste: REDACTED_API_KEY
+# Paste your OpenRouter API key when prompted
 ```
 
 - [ ] **Step 5: Deploy Worker**

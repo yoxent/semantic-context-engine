@@ -19,3 +19,4 @@ export * from "./models/SymbolHit.js";
 export * from "./models/SymbolSearchQuery.js";
 export * from "./models/Search.js";
 export * from "./models/Statistics.js";
+export * from "./export.js";
