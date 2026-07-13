@@ -68,8 +68,12 @@ function cosineSearch(db: Database.Database, query: VectorSearchQuery): VectorSe
   const params: unknown[] = [...(query.repositoryIds ?? [])];
   // Order candidates newest-first so that equal-cosine ties resolve in favor
   // of the most recently upserted chunk (deterministic recency tie-break).
+  // rowid is strictly monotonic per insert (INSERT OR REPLACE assigns a fresh
+  // rowid), so it is a robust recency proxy; updated_at is NOT used because
+  // rapid upserts can share the same millisecond timestamp and collide,
+  // leaving ties unresolved (observed flaky test failures on fast machines).
   const rows = db
-    .prepare(`SELECT chunk_id, vector, model, dimensions FROM vectors WHERE 1=1 ${repositoryClause} ORDER BY updated_at DESC`)
+    .prepare(`SELECT chunk_id, vector, model, dimensions FROM vectors WHERE 1=1 ${repositoryClause} ORDER BY rowid DESC`)
     .all(...params) as { chunk_id: string; vector: string; model: string; dimensions: number }[];
 
   const queryNorm = norm(query.vector);
