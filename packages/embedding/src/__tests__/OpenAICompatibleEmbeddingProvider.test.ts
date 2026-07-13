@@ -55,6 +55,16 @@ describe("OpenAICompatibleEmbeddingProvider", () => {
     expect(result.map((v) => v[0])).toEqual([1, 2, 1, 2, 1]);
   });
 
+  it("rejects invalid batch sizes before sending a provider request", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(mockResponse({ data: [{ embedding: [1, 2, 3] }] }));
+    const provider = new OpenAICompatibleEmbeddingProvider({ ...baseConfig, batchSize: 0 });
+
+    await expect(provider.embed(["x"])).rejects.toThrow(/batchSize/i);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("throws a clear error on non-2xx response", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({ error: "boom" }, 503));
     const provider = new OpenAICompatibleEmbeddingProvider(baseConfig);

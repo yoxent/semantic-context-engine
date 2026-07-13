@@ -1,8 +1,8 @@
 # Handoff: Semantic Context Engine (SCE)
 
-## Current state (2026-07-12)
+## Current state (2026-07-13)
 
-First interface-first vertical is implemented on **`develop`**, plus a small ops polish slice (logging, stats, search filters).
+First interface-first vertical, ops polish, ranking, and the opt-in semantic search slice are implemented on **`develop`**.
 
 - Branch: `develop` (tracks `origin/develop`)
 - `main` is production-only — do not land feature work there yet
@@ -39,7 +39,8 @@ First interface-first vertical is implemented on **`develop`**, plus a small ops
 
 ## Known follow-ups
 
-- AST / hybrid search strategies
+- Hybrid search that combines keyword and semantic scores
+- AST search strategies
 - Binary vector layout / ANN index (`.sce/semantic/` layout)
 - Cloud-only embedding providers
 - Human UI on obscure Cloudflare subdomain
@@ -64,5 +65,5 @@ First interface-first vertical is implemented on **`develop`**, plus a small ops
 
 1. Read `README.md` and the design spec.
 2. Work on `develop`, not `main`.
-3. Prefer small plans for the next capability slice (ranking, embeddings, or UI).
+3. Prefer small plans for the next capability slice (hybrid search, AST search, binary vectors/ANN, cloud-only embedding providers, or UI).
 4. Keep Pasttime untouched.

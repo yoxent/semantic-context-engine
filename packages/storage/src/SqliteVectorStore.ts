@@ -82,7 +82,8 @@ function cosineSearch(db: Database.Database, query: VectorSearchQuery): VectorSe
   const scored = rows
     .filter((row) => row.model === query.model && row.dimensions === query.dimensions)
     .map((row) => {
-      const candidate = JSON.parse(row.vector) as number[];
+      const candidate = parseVectorPayload(row.vector);
+      if (!candidate) return null;
       if (candidate.length !== query.dimensions) return null;
       const dot = dotProduct(query.vector, candidate);
       const candidateNorm = norm(candidate);
@@ -93,6 +94,16 @@ function cosineSearch(db: Database.Database, query: VectorSearchQuery): VectorSe
 
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, query.limit);
+}
+
+function parseVectorPayload(payload: string): number[] | null {
+  try {
+    const parsed = JSON.parse(payload) as unknown;
+    if (!Array.isArray(parsed) || parsed.some((value) => typeof value !== "number")) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
 }
 
 function dotProduct(a: number[], b: number[]): number {

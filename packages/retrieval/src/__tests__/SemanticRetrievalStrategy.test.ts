@@ -134,4 +134,23 @@ describe("SemanticRetrievalStrategy", () => {
     const result = await strategy.search({ text: "nomatch" });
     expect(result.hits).toEqual([]);
   });
+
+  it("keeps truncated semantic snippets within very small maxSnippetChars limits", async () => {
+    const strategy = new SemanticRetrievalStrategy({
+      embeddingProvider: embedding,
+      vectorStore,
+      metadataStore: {
+        ...metadataStore,
+        getChunks: async (ids) => [makeChunk({ id: ids[0] ?? "chunk-1", text: "abcdef" })]
+      },
+      ranker,
+      model: "m",
+      dimensions: 2,
+      defaultLimit: 10,
+      maxSnippetChars: 2
+    });
+
+    const result = await strategy.search({ text: "vectors" });
+    expect(result.hits[0]?.snippet).toBe("ab");
+  });
 });

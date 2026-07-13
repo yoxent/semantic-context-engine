@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "@sce/core": "0.0.0",
-    "@sce/storage": "0.0.0",
     "fast-glob": "^3.3.3",
     "ignore": "^7.0.6"
+  },
+  "devDependencies": {
+    "@sce/storage": "0.0.0"
   }
 }

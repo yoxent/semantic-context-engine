@@ -92,6 +92,8 @@ export class SemanticRetrievalStrategy implements IRetrievalStrategy {
 
 function truncate(text: string, maxChars: number): string {
   const flat = text.replace(/\s+/g, " ").trim();
-  if (flat.length <= maxChars) return flat;
-  return `${flat.slice(0, Math.max(0, maxChars - 3))}...`;
+  const limit = Math.max(0, maxChars);
+  if (flat.length <= limit) return flat;
+  if (limit <= 3) return flat.slice(0, limit);
+  return `${flat.slice(0, limit - 3)}...`;
 }

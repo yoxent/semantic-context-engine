@@ -20,6 +20,9 @@ export class OpenAICompatibleEmbeddingProvider implements IEmbeddingProvider {
   constructor(private readonly config: EmbeddingProviderConfig) {}
 
   async embed(texts: string[]): Promise<number[][]> {
+    if (!Number.isInteger(this.config.batchSize) || this.config.batchSize <= 0) {
+      throw new Error(`Embedding provider batchSize must be a positive integer, got ${this.config.batchSize}`);
+    }
     if (texts.length === 0) return [];
     const out: number[][] = [];
     for (let i = 0; i < texts.length; i += this.config.batchSize) {

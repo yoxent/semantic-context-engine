@@ -118,4 +118,20 @@ describe("SqliteVectorStore search ordering and deletes", () => {
       await rmWithRetry(dir);
     }
   });
+
+  it("skips malformed stored vector payloads instead of failing the whole search", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-vec-"));
+    try {
+      const { storage, vectors } = await openStores(dir);
+      await vectors.upsert({ chunkId: "bad", repositoryId: "repo-a", model: "m", dimensions: 2, vector: [1, 0], relativePath: "bad.md" });
+      await vectors.upsert({ chunkId: "good", repositoryId: "repo-a", model: "m", dimensions: 2, vector: [0, 1], relativePath: "good.md" });
+      storage.getDatabase().prepare("UPDATE vectors SET vector = ? WHERE chunk_id = ?").run("{not-json", "bad");
+
+      const hits = await vectors.search({ vector: [0, 1], limit: 10, model: "m", dimensions: 2, repositoryIds: ["repo-a"] });
+      expect(hits.map((h) => h.chunkId)).toEqual(["good"]);
+      storage.close();
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
 });

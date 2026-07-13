@@ -1,8 +1,8 @@
 # Semantic Context Engine
 
-Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault (or later a code repo), then returns concise keyword hits through a shared core API exposed as CLI and MCP.
+Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault (or later a code repo), then returns concise keyword and opt-in semantic hits through a shared core API exposed as CLI and MCP.
 
-SCE is **not** a vector database. Keyword search ships in v1; semantic/AST/hybrid stay behind interfaces.
+SCE is **not** a vector database. Keyword and opt-in semantic search ship on `develop`; AST, hybrid, binary vectors, and ANN indexing stay behind interfaces for later slices.
 
 ## Status
 
@@ -65,7 +65,7 @@ Server entry: `packages/mcp/dist/src/server.js`
 |---|---|
 | `sce_index_repository` | Index a vault/repo path |
 | `sce_update_repository` | Incremental refresh (incl. deleted-file prune) |
-| `sce_search` | Keyword search (`limit`, `includeText`, `pathFilter`, `language`, `repositoryIds`) |
+| `sce_search` | Keyword or semantic search (`mode`, `limit`, `includeText`, `pathFilter`, `language`, `repositoryIds`) |
 | `sce_get_chunk` | Fetch chunk text (`maxChars` optional) |
 | `sce_stats` | Index statistics (files, chunks, links, last indexed) |
 
@@ -150,7 +150,7 @@ The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector
 | `@sce/parsing` | Markdown chunking + wiki-links |
 | `@sce/storage` | SQLite metadata + FTS |
 | `@sce/ranking` | Simple keyword ranker |
-| `@sce/retrieval` | Keyword strategy |
+| `@sce/retrieval` | Keyword and semantic retrieval strategies |
 | `@sce/runtime` | Composition (`createEngine`) |
 | `@sce/cli` / `@sce/mcp` | Adapters |
 | `@sce/embedding` | `OpenAICompatibleEmbeddingProvider` (HTTP embeddings) |
@@ -160,6 +160,8 @@ The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector
 - `GOAL.md` — long-term product vision
 - `docs/superpowers/specs/2026-07-12-sce-interface-first-vertical-design.md` — approved first-slice design
 - `docs/superpowers/plans/2026-07-12-sce-interface-first-vertical.md` — implementation plan used to build v1
+- `docs/superpowers/specs/2026-07-13-sce-semantic-search-slice-design.md` — approved semantic slice design
+- `docs/superpowers/plans/2026-07-13-sce-semantic-search-slice.md` — semantic slice implementation plan
 
 ## Explicit non-goals (v1)
 

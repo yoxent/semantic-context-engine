@@ -129,8 +129,10 @@ export async function run(argv: string[]): Promise<void> {
 }
 
 function truncate(text: string, maxChars: number): string {
-  if (text.length <= maxChars) return text;
-  return `${text.slice(0, Math.max(0, maxChars - 3))}...`;
+  const limit = Math.max(0, maxChars);
+  if (text.length <= limit) return text;
+  if (limit <= 3) return text.slice(0, limit);
+  return `${text.slice(0, limit - 3)}...`;
 }
 
 function isExecutedAsMain(): boolean {
