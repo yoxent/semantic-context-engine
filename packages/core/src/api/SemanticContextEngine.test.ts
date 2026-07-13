@@ -31,16 +31,19 @@ describe("SemanticContextEngine", () => {
     expect(result.diagnostics?.strategy).toBe("keyword");
   });
 
-  it("rejects unsupported explicit modes until implemented", async () => {
-    const keyword: IRetrievalStrategy = {
-      name: "keyword",
-      search: async () => ({ hits: [] })
-    };
+  it("throws a clear error when semantic is requested but not configured", async () => {
+    const keyword: IRetrievalStrategy = { name: "keyword", search: async () => ({ hits: [] }) };
     const engine = new SemanticContextEngine({ keywordStrategy: keyword });
-
     await expect(engine.search({ text: "architecture", mode: "semantic" })).rejects.toThrow(
-      "Search mode semantic is not implemented in v1"
+      /Semantic search is not configured/
     );
+  });
+
+  it("rejects ast and hybrid modes as unimplemented", async () => {
+    const keyword: IRetrievalStrategy = { name: "keyword", search: async () => ({ hits: [] }) };
+    const engine = new SemanticContextEngine({ keywordStrategy: keyword });
+    await expect(engine.search({ text: "x", mode: "ast" })).rejects.toThrow(/Search mode ast is not implemented in v1/);
+    await expect(engine.search({ text: "x", mode: "hybrid" })).rejects.toThrow(/Search mode hybrid is not implemented in v1/);
   });
 
   it("delegates indexRepository and getChunk when configured", async () => {
@@ -125,5 +128,63 @@ describe("SemanticContextEngine", () => {
     );
     await expect(engine.getChunk("chunk-1")).rejects.toThrow("Metadata store is not configured");
     await expect(engine.statistics()).rejects.toThrow("Metadata store is not configured");
+  });
+});
+
+describe("SemanticContextEngine semantic routing", () => {
+  it("routes semantic mode to the semantic strategy when configured", async () => {
+    const calls: SearchQuery[] = [];
+    const semantic: IRetrievalStrategy = {
+      name: "semantic",
+      search: async (query) => {
+        calls.push(query);
+        return { hits: [{ chunkId: "c2", score: 0.5, strategy: "semantic", snippet: "semantic hit", path: "S.md", startLine: 1, endLine: 3 }], diagnostics: { strategy: "semantic" } };
+      }
+    };
+    const engine = new SemanticContextEngine({
+      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) },
+      semanticStrategy: semantic
+    });
+
+    const result = await engine.search({ text: "vectors", mode: "semantic" });
+    expect(result.hits[0]?.chunkId).toBe("c2");
+    expect(calls[0]?.mode).toBe("semantic");
+  });
+
+  it("semanticSearch() delegates to the semantic strategy", async () => {
+    const semantic: IRetrievalStrategy = {
+      name: "semantic",
+      search: async () => ({ hits: [], diagnostics: { strategy: "semantic" } })
+    };
+    const engine = new SemanticContextEngine({
+      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) },
+      semanticStrategy: semantic
+    });
+    const result = await engine.semanticSearch({ text: "vectors" });
+    expect(result.diagnostics?.strategy).toBe("semantic");
+  });
+
+  it("keeps keyword as the default when semantic is also configured", async () => {
+    let keywordCalls = 0;
+    let semanticCalls = 0;
+    const engine = new SemanticContextEngine({
+      keywordStrategy: {
+        name: "keyword",
+        search: async (q) => {
+          keywordCalls++;
+          return { hits: [{ chunkId: "k1", score: 1, strategy: "keyword", snippet: "", path: "K.md", startLine: 1, endLine: 1 }], diagnostics: { strategy: "keyword" } };
+        }
+      },
+      semanticStrategy: {
+        name: "semantic",
+        search: async () => {
+          semanticCalls++;
+          return { hits: [], diagnostics: { strategy: "semantic" } };
+        }
+      }
+    });
+    await engine.search({ text: "x" });
+    expect(keywordCalls).toBe(1);
+    expect(semanticCalls).toBe(0);
   });
 });

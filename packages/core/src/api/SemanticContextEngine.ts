@@ -23,6 +23,7 @@ export interface IIndexingService {
 
 export interface SemanticContextEngineDeps {
   keywordStrategy: IRetrievalStrategy;
+  semanticStrategy?: IRetrievalStrategy;
   indexingService?: IIndexingService;
   metadataStore?: IMetadataStore;
   logger?: Logger;
@@ -56,10 +57,9 @@ export class SemanticContextEngine {
 
   async search(query: SearchQuery): Promise<SearchResult> {
     const mode = query.mode ?? "keyword";
-    if (mode !== "keyword") {
-      throw new Error(`Search mode ${mode} is not implemented in v1`);
-    }
-    return this.keywordSearch(query);
+    if (mode === "keyword") return this.keywordSearch(query);
+    if (mode === "semantic") return this.semanticSearch(query);
+    return this.unsupported(mode, query);
   }
 
   async keywordSearch(query: SearchQuery): Promise<SearchResult> {
@@ -76,7 +76,10 @@ export class SemanticContextEngine {
   }
 
   async semanticSearch(query: SearchQuery): Promise<SearchResult> {
-    return this.unsupported("semantic", query);
+    if (!this.deps.semanticStrategy) {
+      throw new Error("Semantic search is not configured (sce.config.json missing 'embedding' block)");
+    }
+    return this.deps.semanticStrategy.search({ ...query, mode: "semantic" });
   }
 
   async astSearch(query: SearchQuery): Promise<SearchResult> {
