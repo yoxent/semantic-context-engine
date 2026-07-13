@@ -33,6 +33,9 @@ export class SemanticRetrievalStrategy implements IRetrievalStrategy {
     if (query.language !== undefined) {
       throw new Error("language is not supported in semantic mode");
     }
+    if (query.symbolKind !== undefined) {
+      throw new Error("symbolKind is not supported in semantic mode");
+    }
 
     const start = performance.now();
     const [queryVector] = await this.deps.embeddingProvider.embed([query.text]);

@@ -20,6 +20,9 @@ export class HybridRetrievalStrategy implements IRetrievalStrategy {
     if (query.language !== undefined) {
       throw new Error("language is not supported in hybrid mode");
     }
+    if (query.symbolKind !== undefined) {
+      throw new Error("symbolKind is not supported in hybrid mode");
+    }
 
     const start = performance.now();
     const limit = query.limit ?? this.deps.defaultLimit;

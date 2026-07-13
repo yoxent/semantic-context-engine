@@ -41,6 +41,7 @@ describe("HybridRetrievalStrategy", () => {
     });
     await expect(strategy.search({ text: "x", pathFilter: "notes/*" })).rejects.toThrow(/pathFilter.*hybrid|hybrid.*pathFilter/i);
     await expect(strategy.search({ text: "x", language: "markdown" })).rejects.toThrow(/language.*hybrid|hybrid.*language/i);
+    await expect(strategy.search({ text: "x", symbolKind: "class" })).rejects.toThrow(/symbolKind.*hybrid|hybrid.*symbolKind/i);
   });
 
   it("over-fetches each side with max(limit*2, 20) and cuts to the requested limit", async () => {

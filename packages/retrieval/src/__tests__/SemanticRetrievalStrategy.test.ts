@@ -95,6 +95,7 @@ describe("SemanticRetrievalStrategy", () => {
     });
     await expect(strategy.search({ text: "x", pathFilter: "notes/*" })).rejects.toThrow(/pathFilter.*semantic|semantic.*pathFilter/i);
     await expect(strategy.search({ text: "x", language: "markdown" })).rejects.toThrow(/language.*semantic|semantic.*language/i);
+    await expect(strategy.search({ text: "x", symbolKind: "class" })).rejects.toThrow(/symbolKind.*semantic|semantic.*symbolKind/i);
   });
 
   it("uses defaultLimit from config when query.limit is omitted", async () => {

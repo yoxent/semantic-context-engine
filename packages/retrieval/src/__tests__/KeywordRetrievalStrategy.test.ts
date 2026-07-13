@@ -21,4 +21,12 @@ describe("KeywordRetrievalStrategy", () => {
     expect(result.hits[0]?.score).toBe(11);
     expect(result.diagnostics?.strategy).toBe("keyword");
   });
+
+  it("rejects symbolKind with a clear unsupported-filter error", async () => {
+    const strategy = new KeywordRetrievalStrategy({
+      keywordIndex: { search: async () => [], indexChunks: async () => undefined, removeChunksForFile: async () => undefined },
+      ranker: { rank: (hits) => hits }
+    });
+    await expect(strategy.search({ text: "x", symbolKind: "class" })).rejects.toThrow(/symbolKind.*keyword|keyword.*symbolKind/i);
+  });
 });

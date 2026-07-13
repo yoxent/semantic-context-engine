@@ -11,6 +11,9 @@ export class KeywordRetrievalStrategy implements IRetrievalStrategy {
   constructor(private readonly deps: KeywordRetrievalStrategyDeps) {}
 
   async search(query: SearchQuery): Promise<SearchResult> {
+    if (query.symbolKind !== undefined) {
+      throw new Error("symbolKind is not supported in keyword mode");
+    }
     const start = performance.now();
     const hits = await this.deps.keywordIndex.search({ ...query, mode: "keyword" });
     const ranked = this.deps.ranker.rank(hits, query);
