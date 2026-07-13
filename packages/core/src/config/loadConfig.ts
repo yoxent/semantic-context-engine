@@ -28,6 +28,7 @@ export async function loadConfig(rootPath: string): Promise<SceConfig> {
     },
     logging: {
       level: parsed.logging.level ?? defaultConfig.logging.level
-    }
+    },
+    embedding: parsed.embedding
   };
 }

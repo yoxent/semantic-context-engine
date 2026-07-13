@@ -6,6 +6,17 @@ export const repositoryConfigSchema = z.object({
   name: z.string().optional()
 });
 
+export const embeddingConfigSchema = z.object({
+  provider: z.literal("openai-compatible"),
+  baseUrl: z.string().url(),
+  model: z.string().min(1),
+  dimensions: z.number().int().positive(),
+  batchSize: z.number().int().positive().default(32),
+  apiKeyEnv: z.string().optional()
+});
+
+export type EmbeddingConfig = z.infer<typeof embeddingConfigSchema>;
+
 export const sceConfigSchema = z.object({
   repositories: z.array(repositoryConfigSchema).default([]),
   indexing: z
@@ -24,7 +35,8 @@ export const sceConfigSchema = z.object({
     .object({
       level: z.enum(["silent", "error", "warn", "info", "debug"]).default("info")
     })
-    .default({ level: "info" })
+    .default({ level: "info" }),
+  embedding: embeddingConfigSchema.optional()
 });
 
 export type SceConfig = z.infer<typeof sceConfigSchema>;
