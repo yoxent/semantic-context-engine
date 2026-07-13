@@ -299,6 +299,7 @@ Modify `packages/core/src/interfaces/VectorStore.ts`:
 export interface VectorUpsert {
   chunkId: string;
   repositoryId: string;
+  relativePath: string;
   model: string;
   dimensions: number;
   vector: number[];
@@ -766,7 +767,7 @@ export class SqliteVectorStore implements IVectorStore {
   }
 }
 
-export function cosineSearch(db: Database.Database, query: VectorSearchQuery): VectorSearchHit[] {
+function cosineSearch(db: Database.Database, query: VectorSearchQuery): VectorSearchHit[] {
   if (query.vector.length !== query.dimensions) {
     throw new Error(
       `Embedding dimension mismatch: expected ${query.dimensions}, got ${query.vector.length} (query vector)`
@@ -813,8 +814,6 @@ function norm(a: number[]): number {
 }
 ```
 
-> Note: `VectorUpsert` (Task 2) currently does NOT include `relativePath`. Add it in this step by editing `packages/core/src/interfaces/VectorStore.ts` `VectorUpsert` to include `relativePath: string;` (the indexer in Task 8 will supply it). Update the contract test in Task 2 to set `relativePath` if you already merged that test — but since Task 2 already committed, the contract test only checks method existence, so no edit needed.
-
 Modify `packages/storage/src/index.ts`:
 
 ```ts
@@ -836,7 +835,7 @@ Expected: green. Existing SqliteStorage tests unchanged (vectors table now also 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add packages/storage/src packages/core/src/interfaces/VectorStore.ts
+git add packages/storage/src
 git commit -m "feat(storage): add SqliteVectorStore with upsert and cosine search"
 ```
 
@@ -1630,14 +1629,6 @@ describe("SemanticContextEngine semantic routing", () => {
     expect(result.diagnostics?.strategy).toBe("semantic");
   });
 
-  it("throws a clear error when semantic is requested but not configured", async () => {
-    const engine = new SemanticContextEngine({
-      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) }
-    });
-    await expect(engine.search({ text: "vectors", mode: "semantic" })).rejects.toThrow(/Semantic search is not configured/);
-    await expect(engine.semanticSearch({ text: "vectors" })).rejects.toThrow(/Semantic search is not configured/);
-  });
-
   it("keeps keyword as the default when semantic is also configured", async () => {
     let keywordCalls = 0;
     let semanticCalls = 0;
@@ -1955,20 +1946,17 @@ it("surfaces a clear error for --mode semantic when embedding is not configured"
 - [ ] **Step 2: Run tests to verify it fails**
 
 Run: `npx vitest run packages/cli/src/__tests__/main.test.ts`
-Expected: FAIL — commander rejects unknown `--mode` option (error for unknown flag) rather than the semantic-not-configured message. The catch may print a commander help error, not our message.
+Expected: FAIL — `--mode` is not yet a known option, so the command errors before reaching the engine. (Without `exitOverride()`, commander would hard-exit the process and crash the test runner; Step 3 makes commander throw instead so the existing top-level catch surfaces the error cleanly.)
 
 - [ ] **Step 3: Add the --mode option**
 
-Modify `packages/cli/src/main.ts` `search` command definition: add after the `--language` option:
+Modify `packages/cli/src/main.ts`. First, on the top-level `program` (right after `new Command()` / before the first `.command(...)`), make commander throw on errors instead of hard-exiting, so the existing top-level `run().catch(...)` handler surfices:
 
 ```ts
-    .option("--mode <mode>", "search mode: keyword (default) or semantic")
-    .option("--path-filter <glob>", "restrict hits by path (exact, prefix, or GLOB)")
-    .option("--language <language>", "restrict hits by language")
-    .option("-m, --mode <mode>", "search mode: keyword (default) or semantic")
+  program.exitOverride();
 ```
 
-Only one `--mode` option line is needed; use:
+Then on the `search` command definition, add a `--mode` option (default `"keyword"`) alongside the existing `--path-filter` / `--language` options:
 
 ```ts
     .option("--mode <mode>", "search mode: keyword (default) or semantic", "keyword")
