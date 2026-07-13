@@ -120,3 +120,51 @@ describe("createEngine semantic wiring", () => {
     }
   });
 });
+
+describe("createEngine hybrid wiring", () => {
+  it("does not wire hybrid when embedding is absent", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-runtime-hyb-"));
+    let close: (() => void) | undefined;
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      const created = await createEngine(dir);
+      close = created.close;
+      await created.engine.indexRepository({ rootPath: created.rootPath, type: "vault" });
+      await expect(created.engine.hybridSearch({ text: "SQLite" })).rejects.toThrow(/Hybrid search is not configured/);
+    } finally {
+      close?.();
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("wires hybrid strategy when embedding block is present (routes without the not-configured error)", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-runtime-hyb-"));
+    let close: (() => void) | undefined;
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      await writeFile(
+        join(dir, "sce.config.json"),
+        JSON.stringify({
+          embedding: {
+            provider: "openai-compatible",
+            baseUrl: "http://localhost:11434/v1",
+            model: "nomic-embed-text",
+            dimensions: 4
+          }
+        })
+      );
+      const created = await createEngine(dir);
+      close = created.close;
+      // Hybrid is wired, so the call must not throw the not-configured error.
+      // With no real embedding server, the semantic side will fail during the
+      // embed call; we assert routing wires by matching the embedding failure
+      // rather than the configuration error.
+      await expect(created.engine.hybridSearch({ text: "vectors" })).rejects.toThrow(
+        /Embedding provider|fetch|HTTP/
+      );
+    } finally {
+      close?.();
+      await rmWithRetry(dir);
+    }
+  });
+});

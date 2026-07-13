@@ -12,7 +12,7 @@ import { createEmbeddingProvider } from "@sce/embedding";
 import { IndexingService } from "@sce/indexing";
 import { MarkdownChunker } from "@sce/parsing";
 import { SimpleRanker } from "@sce/ranking";
-import { KeywordRetrievalStrategy, SemanticRetrievalStrategy } from "@sce/retrieval";
+import { HybridRetrievalStrategy, KeywordRetrievalStrategy, SemanticRetrievalStrategy } from "@sce/retrieval";
 import { SqliteStorage, SqliteVectorStore } from "@sce/storage";
 
 export interface CreateEngineOptions {
@@ -59,6 +59,15 @@ export async function createEngine(rootPath: string, options: CreateEngineOption
         })
       : undefined;
 
+  const hybridStrategy =
+    semanticStrategy
+      ? new HybridRetrievalStrategy({
+          keywordStrategy,
+          semanticStrategy,
+          defaultLimit: config.search.defaultLimit
+        })
+      : undefined;
+
   const indexingService = new IndexingService({
     chunker: new MarkdownChunker(),
     metadataStore: storage,
@@ -74,6 +83,7 @@ export async function createEngine(rootPath: string, options: CreateEngineOption
     engine: new SemanticContextEngine({
       keywordStrategy,
       ...(semanticStrategy ? { semanticStrategy } : {}),
+      ...(hybridStrategy ? { hybridStrategy } : {}),
       indexingService,
       metadataStore: storage,
       logger: logger.child({ component: "engine" })
