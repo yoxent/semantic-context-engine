@@ -5,3 +5,4 @@ dist/
 .sce/
 coverage/
 .DS_Store
+.pi-subagents/
