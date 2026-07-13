@@ -113,6 +113,15 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
     return row ? fromChunkRow(row) : undefined;
   }
 
+  async getChunks(ids: string[]): Promise<Chunk[]> {
+    if (ids.length === 0) return [];
+    const placeholders = ids.map(() => "?").join(", ");
+    const rows = this.db
+      .prepare(`SELECT * FROM chunks WHERE id IN (${placeholders})`)
+      .all(...ids) as any[];
+    return rows.map(fromChunkRow);
+  }
+
   async deleteChunksForFile(repositoryId: string, relativePath: string): Promise<void> {
     const rows = this.db.prepare("SELECT id FROM chunks WHERE repository_id = ? AND relative_path = ?").all(repositoryId, relativePath) as { id: string }[];
     const tx = this.db.transaction(() => {

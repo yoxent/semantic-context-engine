@@ -80,6 +80,7 @@ describe("SemanticContextEngine", () => {
                 timestamp: new Date("2026-01-01T00:00:00.000Z")
               }
             : undefined,
+        getChunks: async () => [],
         deleteChunksForFile: async () => undefined,
         getStatistics: async () => ({
           repositoryCount: 1,

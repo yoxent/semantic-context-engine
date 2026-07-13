@@ -21,6 +21,7 @@ export interface IMetadataStore {
   deleteFile(repositoryId: string, relativePath: string): Promise<void>;
   saveChunks(chunks: Chunk[]): Promise<void>;
   getChunk(id: string): Promise<Chunk | undefined>;
+  getChunks(ids: string[]): Promise<Chunk[]>;
   deleteChunksForFile(repositoryId: string, relativePath: string): Promise<void>;
   getStatistics(): Promise<EngineStatistics>;
 }

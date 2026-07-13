@@ -276,3 +276,23 @@ describe("SqliteStorage", () => {
     }
   });
 });
+
+describe("SqliteStorage.getChunks", () => {
+  it("returns multiple chunks by id in a single call", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-storage-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      storage = await SqliteStorage.open(dir);
+      await storage.saveChunks([
+        makeChunk({ id: "chunk-1", relativePath: "a.md" }),
+        makeChunk({ id: "chunk-2", relativePath: "b.md" })
+      ]);
+      const chunks = await storage.getChunks(["chunk-1", "chunk-2", "missing"]);
+      expect(chunks.map((c) => c.id).sort()).toEqual(["chunk-1", "chunk-2"]);
+      expect(chunks.length).toBe(2);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+});
