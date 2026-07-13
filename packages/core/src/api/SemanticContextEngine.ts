@@ -24,6 +24,7 @@ export interface IIndexingService {
 export interface SemanticContextEngineDeps {
   keywordStrategy: IRetrievalStrategy;
   semanticStrategy?: IRetrievalStrategy;
+  hybridStrategy?: IRetrievalStrategy;
   indexingService?: IIndexingService;
   metadataStore?: IMetadataStore;
   logger?: Logger;
@@ -59,6 +60,7 @@ export class SemanticContextEngine {
     const mode = query.mode ?? "keyword";
     if (mode === "keyword") return this.keywordSearch(query);
     if (mode === "semantic") return this.semanticSearch(query);
+    if (mode === "hybrid") return this.hybridSearch(query);
     return this.unsupported(mode, query);
   }
 
@@ -87,7 +89,10 @@ export class SemanticContextEngine {
   }
 
   async hybridSearch(query: SearchQuery): Promise<SearchResult> {
-    return this.unsupported("hybrid", query);
+    if (!this.deps.hybridStrategy) {
+      throw new Error("Hybrid search is not configured (sce.config.json missing 'embedding' block)");
+    }
+    return this.deps.hybridStrategy.search({ ...query, mode: "hybrid" });
   }
 
   async statistics(): Promise<EngineStatistics> {

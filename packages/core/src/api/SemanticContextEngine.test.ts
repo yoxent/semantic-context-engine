@@ -39,11 +39,11 @@ describe("SemanticContextEngine", () => {
     );
   });
 
-  it("rejects ast and hybrid modes as unimplemented", async () => {
+  it("rejects ast as unimplemented and hybrid as not-configured when no hybrid strategy is wired", async () => {
     const keyword: IRetrievalStrategy = { name: "keyword", search: async () => ({ hits: [] }) };
     const engine = new SemanticContextEngine({ keywordStrategy: keyword });
     await expect(engine.search({ text: "x", mode: "ast" })).rejects.toThrow(/Search mode ast is not implemented in v1/);
-    await expect(engine.search({ text: "x", mode: "hybrid" })).rejects.toThrow(/Search mode hybrid is not implemented in v1/);
+    await expect(engine.search({ text: "x", mode: "hybrid" })).rejects.toThrow(/Hybrid search is not configured/);
   });
 
   it("delegates indexRepository and getChunk when configured", async () => {
@@ -186,5 +186,60 @@ describe("SemanticContextEngine semantic routing", () => {
     await engine.search({ text: "x" });
     expect(keywordCalls).toBe(1);
     expect(semanticCalls).toBe(0);
+  });
+});
+
+describe("SemanticContextEngine hybrid routing", () => {
+  it("throws a clear error when hybrid is requested but not configured", async () => {
+    const keyword: IRetrievalStrategy = { name: "keyword", search: async () => ({ hits: [] }) };
+    const engine = new SemanticContextEngine({
+      keywordStrategy: keyword,
+      semanticStrategy: { name: "semantic", search: async () => ({ hits: [] }) }
+    });
+    await expect(engine.search({ text: "architecture", mode: "hybrid" })).rejects.toThrow(
+      /Hybrid search is not configured/
+    );
+    await expect(engine.hybridSearch({ text: "architecture" })).rejects.toThrow(/Hybrid search is not configured/);
+  });
+
+  it("routes hybrid mode to the hybrid strategy when configured", async () => {
+    const calls: SearchQuery[] = [];
+    const hybrid: IRetrievalStrategy = {
+      name: "hybrid",
+      search: async (query) => {
+        calls.push(query);
+        return {
+          hits: [{ chunkId: "h1", score: 0.03, strategy: "hybrid", snippet: "fused", path: "H.md", startLine: 1, endLine: 3 }],
+          diagnostics: { strategy: "hybrid" }
+        };
+      }
+    };
+    const engine = new SemanticContextEngine({
+      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) },
+      semanticStrategy: { name: "semantic", search: async () => ({ hits: [] }) },
+      hybridStrategy: hybrid
+    });
+
+    const result = await engine.search({ text: "cards flip", mode: "hybrid" });
+    expect(result.hits[0]?.chunkId).toBe("h1");
+    expect(calls[0]?.mode).toBe("hybrid");
+  });
+
+  it("hybridSearch() delegates to the hybrid strategy with mode 'hybrid'", async () => {
+    const calls: SearchQuery[] = [];
+    const engine = new SemanticContextEngine({
+      keywordStrategy: { name: "keyword", search: async () => ({ hits: [] }) },
+      semanticStrategy: { name: "semantic", search: async () => ({ hits: [] }) },
+      hybridStrategy: {
+        name: "hybrid",
+        search: async (query) => {
+          calls.push(query);
+          return { hits: [], diagnostics: { strategy: "hybrid" } };
+        }
+      }
+    });
+    const result = await engine.hybridSearch({ text: "inventory" });
+    expect(result.diagnostics?.strategy).toBe("hybrid");
+    expect(calls[0]?.mode).toBe("hybrid");
   });
 });
