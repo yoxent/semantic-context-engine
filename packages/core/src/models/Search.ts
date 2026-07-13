@@ -1,3 +1,5 @@
+import type { SymbolKind } from "./SymbolKind.js";
+
 export type SearchMode = "keyword" | "semantic" | "ast" | "hybrid";
 
 /**
@@ -14,6 +16,7 @@ export interface SearchQuery {
   limit?: number;
   pathFilter?: string;
   language?: string;
+  symbolKind?: SymbolKind;
 }
 
 export interface SearchHit {
@@ -26,6 +29,7 @@ export interface SearchHit {
   endLine: number;
   /** Vault heading ancestry when available (e.g. `["Storage", "SQLite"]`). */
   headingPath?: string[];
+  symbolKind?: SymbolKind;
 }
 
 export interface SearchDiagnostics {
