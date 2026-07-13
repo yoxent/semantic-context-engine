@@ -1,7 +1,16 @@
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
-import type { IChunker, IKeywordIndex, IMetadataStore, Logger, RepositoryType, SceConfig } from "@sce/core";
+import type {
+  IChunker,
+  IEmbeddingProvider,
+  IKeywordIndex,
+  IMetadataStore,
+  IVectorStore,
+  Logger,
+  RepositoryType,
+  SceConfig
+} from "@sce/core";
 import { defaultConfig } from "@sce/core";
 import { discoverFiles } from "./FileDiscovery.js";
 
@@ -21,6 +30,9 @@ export interface IndexingServiceDeps {
   chunker: IChunker;
   metadataStore: IMetadataStore;
   keywordIndex: IKeywordIndex;
+  embeddingProvider?: IEmbeddingProvider;
+  vectorStore?: IVectorStore;
+  embeddingConfig?: { model: string; dimensions: number };
   config?: Pick<SceConfig, "indexing">;
   logger?: Logger;
 }
@@ -35,6 +47,24 @@ export class IndexingService {
     const start = performance.now();
 
     this.deps.logger?.debug("index.start", { rootPath, repositoryId, type: options.type });
+
+    const existingModel = this.deps.vectorStore
+      ? await this.deps.vectorStore.getModelDimensions(repositoryId)
+      : undefined;
+    if (
+      this.deps.vectorStore &&
+      existingModel &&
+      this.deps.embeddingConfig &&
+      (existingModel.model !== this.deps.embeddingConfig.model ||
+        existingModel.dimensions !== this.deps.embeddingConfig.dimensions)
+    ) {
+      throw new Error(
+        `Embedding model/dimensions changed for repository ${repositoryId}: ` +
+          `stored ${existingModel.model}/${existingModel.dimensions} vs config ` +
+          `${this.deps.embeddingConfig.model}/${this.deps.embeddingConfig.dimensions}. ` +
+          `Rebuild required: remove .sce/metadata.sqlite or run a fresh index.`
+      );
+    }
 
     await this.deps.metadataStore.saveRepository({
       id: repositoryId,
@@ -63,6 +93,7 @@ export class IndexingService {
 
       await this.deps.metadataStore.deleteChunksForFile(repositoryId, relativePath);
       await this.deps.keywordIndex.removeChunksForFile(repositoryId, relativePath);
+      if (this.deps.vectorStore) await this.deps.vectorStore.deleteByFile(repositoryId, relativePath);
 
       const chunks = this.deps.chunker.chunk({
         repositoryId,
@@ -81,6 +112,26 @@ export class IndexingService {
       });
       await this.deps.metadataStore.saveChunks(chunks);
       await this.deps.keywordIndex.indexChunks(chunks);
+      if (this.deps.embeddingProvider && this.deps.vectorStore && this.deps.embeddingConfig) {
+        const texts = chunks.map((c) => c.text);
+        const vectors = await this.deps.embeddingProvider.embed(texts);
+        if (vectors.length !== chunks.length) {
+          throw new Error(
+            `Embedding provider returned ${vectors.length} vectors for ${chunks.length} chunks (${relativePath})`
+          );
+        }
+        for (let i = 0; i < chunks.length; i++) {
+          await this.deps.vectorStore.upsert({
+            chunkId: chunks[i]!.id,
+            repositoryId,
+            relativePath: chunks[i]!.relativePath,
+            model: this.deps.embeddingConfig.model,
+            dimensions: this.deps.embeddingConfig.dimensions,
+            vector: vectors[i]!
+          });
+        }
+        this.deps.logger?.debug("index.embedded", { relativePath, chunks: chunks.length });
+      }
       chunksIndexed += chunks.length;
       this.deps.logger?.debug("index.file", { relativePath, chunks: chunks.length });
     }
@@ -91,6 +142,7 @@ export class IndexingService {
       if (discovered.has(record.relativePath)) continue;
       await this.deps.metadataStore.deleteChunksForFile(repositoryId, record.relativePath);
       await this.deps.keywordIndex.removeChunksForFile(repositoryId, record.relativePath);
+      if (this.deps.vectorStore) await this.deps.vectorStore.deleteByFile(repositoryId, record.relativePath);
       await this.deps.metadataStore.deleteFile(repositoryId, record.relativePath);
       this.deps.logger?.debug("index.pruned", { relativePath: record.relativePath });
     }
