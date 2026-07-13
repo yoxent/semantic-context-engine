@@ -1,0 +1,12 @@
+name = "sce-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-11"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sce-db"
+database_id = "TODO_CREATE_AND_FILL" # Replace after `wrangler d1 create sce-db`
