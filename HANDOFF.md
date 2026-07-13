@@ -2,7 +2,7 @@
 
 ## Current state (2026-07-13)
 
-First interface-first vertical, ops polish, ranking, and the opt-in semantic search slice are implemented on **`develop`**.
+First interface-first vertical, ops polish, ranking, the opt-in semantic search slice, and the opt-in hybrid search slice are implemented on **`develop`**.
 
 - Branch: `develop` (tracks `origin/develop`)
 - `main` is production-only — do not land feature work there yet
@@ -15,6 +15,8 @@ First interface-first vertical, ops polish, ranking, and the opt-in semantic sea
 - `docs/superpowers/plans/2026-07-12-sce-interface-first-vertical.md` — plan that was executed
 - `docs/superpowers/specs/2026-07-13-sce-semantic-search-slice-design.md` — approved semantic slice design
 - `docs/superpowers/plans/2026-07-13-sce-semantic-search-slice.md` — semantic slice implementation plan
+- `docs/superpowers/specs/2026-07-13-sce-hybrid-search-slice-design.md` — approved hybrid slice design
+- `docs/superpowers/plans/2026-07-13-sce-hybrid-search-slice.md` — hybrid slice implementation plan
 
 ## Locked product decisions
 
@@ -39,7 +41,6 @@ First interface-first vertical, ops polish, ranking, and the opt-in semantic sea
 
 ## Known follow-ups
 
-- Hybrid search that combines keyword and semantic scores
 - AST search strategies
 - Binary vector layout / ANN index (`.sce/semantic/` layout)
 - Cloud-only embedding providers
@@ -60,6 +61,17 @@ First interface-first vertical, ops polish, ranking, and the opt-in semantic sea
 - `@sce/runtime` wires semantic search when `embedding` config is present
 - CLI `--mode semantic`; MCP `sce_search` `mode` field (`"keyword"` / `"semantic"`)
 - Search filters `pathFilter` / `language` rejected with a clear unsupported-filter error when used with semantic mode (keyword-only); `repositoryIds` honored by semantic
+
+### Shipped (hybrid slice, 2026-07-13)
+
+- `@sce/retrieval` `HybridRetrievalStrategy` — runs keyword + semantic in parallel, fuses with Reciprocal Rank Fusion (`k = 60`)
+- Over-fetch per side `max((limit ?? defaultLimit) * 2, 20)`, then cut to `limit`; `scannedChunks` reports unique chunk ids before the cut
+- Fused hits carry `strategy: "hybrid"` and RRF score; no re-ranking after fuse
+- `@sce/core` routes `search({ mode: "hybrid" })` / `hybridSearch()` to an injected `hybridStrategy`; clear `Hybrid search is not configured` error when embedding is missing
+- `@sce/runtime` wires `HybridRetrievalStrategy` whenever the `embedding` block is present
+- CLI `--mode hybrid`; MCP `sce_search` `mode: "hybrid"`
+- Hybrid honors `repositoryIds`; rejects `pathFilter` / `language` with the same unsupported-filter errors as semantic
+- No new `sce.config.json` keys; AST fusion, configurable RRF `k`, and post-filtering remain follow-ups
 
 ## For the next agent
 

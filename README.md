@@ -1,8 +1,8 @@
 # Semantic Context Engine
 
-Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault (or later a code repo), then returns concise keyword and opt-in semantic hits through a shared core API exposed as CLI and MCP.
+Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault (or later a code repo), then returns concise keyword, opt-in semantic, and opt-in hybrid hits through a shared core API exposed as CLI and MCP.
 
-SCE is **not** a vector database. Keyword and opt-in semantic search ship on `develop`; AST, hybrid, binary vectors, and ANN indexing stay behind interfaces for later slices.
+SCE is **not** a vector database. Keyword, opt-in semantic, and opt-in hybrid search ship on `develop`; AST, binary vectors, and ANN indexing stay behind interfaces for later slices.
 
 ## Status
 
@@ -65,7 +65,7 @@ Server entry: `packages/mcp/dist/src/server.js`
 |---|---|
 | `sce_index_repository` | Index a vault/repo path |
 | `sce_update_repository` | Incremental refresh (incl. deleted-file prune) |
-| `sce_search` | Keyword or semantic search (`mode`, `limit`, `includeText`, `pathFilter`, `language`, `repositoryIds`) |
+| `sce_search` | Keyword, semantic, or hybrid search (`mode`, `limit`, `includeText`, `pathFilter`, `language`, `repositoryIds`) |
 | `sce_get_chunk` | Fetch chunk text (`maxChars` optional) |
 | `sce_stats` | Index statistics (files, chunks, links, last indexed) |
 
@@ -139,7 +139,27 @@ Semantic mode honors `repositoryIds`. `pathFilter` and `language` remain keyword
 
 ### Future work
 
-The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector.index`) behind the same `IVectorStore` interface, plus hybrid, AST, ANN indexing, and cloud-only providers as later slices.
+The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector.index`) behind the same `IVectorStore` interface, plus AST, ANN indexing, and cloud-only providers as later slices.
+
+## Hybrid search (opt-in)
+
+Hybrid search runs the keyword and semantic strategies in parallel and fuses their ranked lists with **Reciprocal Rank Fusion** (`k = 60`). It is available whenever semantic search is enabled (i.e. when the `embedding` block is present in `sce.config.json`). There are no extra config keys.
+
+Request hybrid mode explicitly:
+
+```bash
+sce search "how is inventory persisted" --path ./fixtures/sample-vault --mode hybrid
+```
+
+MCP `sce_search` accepts `mode: "hybrid"`.
+
+Behavior:
+
+- Each side over-fetches `max(limit * 2, 20)` candidates, RRF merges the two ranked lists, then results are cut to the requested `limit`.
+- A chunk that appears on **both** sides gets a higher fused score than a chunk on one side — that boost is the hybrid signal.
+- Each fused hit reports `strategy: "hybrid"` and a `score` equal to the fused RRF score. SCE does **not** re-rank fused hits with `SimpleRanker`; each side already ranked itself.
+- Hybrid honors `repositoryIds` (forwarded to both sides). `pathFilter` and `language` remain keyword-only and throw a clear unsupported-filter error when used with `--mode hybrid`.
+- If hybrid is requested without an `embedding` block, SCE throws `Hybrid search is not configured` rather than silently falling back to keyword.
 
 ## Packages
 
@@ -150,7 +170,7 @@ The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector
 | `@sce/parsing` | Markdown chunking + wiki-links |
 | `@sce/storage` | SQLite metadata + FTS |
 | `@sce/ranking` | Simple keyword ranker |
-| `@sce/retrieval` | Keyword and semantic retrieval strategies |
+| `@sce/retrieval` | Keyword, semantic, and hybrid retrieval strategies |
 | `@sce/runtime` | Composition (`createEngine`) |
 | `@sce/cli` / `@sce/mcp` | Adapters |
 | `@sce/embedding` | `OpenAICompatibleEmbeddingProvider` (HTTP embeddings) |
@@ -162,11 +182,13 @@ The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector
 - `docs/superpowers/plans/2026-07-12-sce-interface-first-vertical.md` — implementation plan used to build v1
 - `docs/superpowers/specs/2026-07-13-sce-semantic-search-slice-design.md` — approved semantic slice design
 - `docs/superpowers/plans/2026-07-13-sce-semantic-search-slice.md` — semantic slice implementation plan
+- `docs/superpowers/specs/2026-07-13-sce-hybrid-search-slice-design.md` — approved hybrid slice design
+- `docs/superpowers/plans/2026-07-13-sce-hybrid-search-slice.md` — hybrid slice implementation plan
 
 ## Explicit non-goals (v1)
 
 - Binary vector layout / ANN index
-- Hybrid / AST search
+- AST search
 - Cloud-only embedding providers
 - Public Obsidian-like web UI
 - Pasttime coupling

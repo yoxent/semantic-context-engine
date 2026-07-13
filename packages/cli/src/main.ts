@@ -46,7 +46,7 @@ export async function run(argv: string[]): Promise<void> {
     .option("--limit <limit>", "maximum hit count")
     .option("--path-filter <glob>", "restrict hits by path (exact, prefix, or GLOB)")
     .option("--language <language>", "restrict hits by language")
-    .option("--mode <mode>", "search mode: keyword (default) or semantic", "keyword")
+    .option("--mode <mode>", "search mode: keyword (default), semantic, or hybrid", "keyword")
     .option("--json", "print JSON")
     .action(async (query, options, command) => {
       const { engine, close, config } = await createEngine(options.path, { verbose: verboseFrom(command) });
