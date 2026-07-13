@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { describe, expect, it, vi } from "vitest";
 import { detectLanguage } from "@sce/core";
+import type { ISymbolIndex } from "@sce/core";
 import { LanguageChunkerRegistry, MarkdownChunker, TreeSitterCodeChunker } from "@sce/parsing";
 import { SqliteStorage, SqliteVectorStore } from "@sce/storage";
 import type { IEmbeddingProvider, IVectorStore } from "@sce/core";
@@ -389,6 +390,95 @@ describe("IndexingService language handling", () => {
       const chunks = chunkSpy.mock.results.map((r) => r.value).flat();
       expect(chunks.length).toBeGreaterThan(0);
       expect(chunks.every((c: { symbolKind?: string }) => c.symbolKind !== undefined)).toBe(true);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+});
+
+describe("IndexingService symbol index integration", () => {
+  it("writes symbols after indexChunks and prunes on file delete", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-sym-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      await writeFile(
+        join(dir, "greet.ts"),
+        "export function greet(name: string): string {\n  return `Hello, ${name}!`;\n}\n",
+        "utf8"
+      );
+      storage = await SqliteStorage.open(dir);
+
+      const symbolIndexCalls: string[] = [];
+      const symbolIndex: ISymbolIndex = {
+        indexSymbols: async (chunks) => {
+          symbolIndexCalls.push(`indexSymbols:${chunks.length}`);
+        },
+        removeSymbolsForFile: async (_repoId, relPath) => {
+          symbolIndexCalls.push(`removeSymbolsForFile:${relPath}`);
+        },
+        deleteByRepository: async () => undefined,
+        searchSymbols: async () => []
+      };
+
+      const registry = new LanguageChunkerRegistry({
+        chunkers: {
+          markdown: new MarkdownChunker(),
+          typescript: await TreeSitterCodeChunker.create("typescript"),
+          javascript: await TreeSitterCodeChunker.create("javascript")
+        }
+      });
+
+      const service = new IndexingService({
+        chunker: registry,
+        metadataStore: storage,
+        keywordIndex: storage,
+        symbolIndex,
+        config: { indexing: { include: ["**/*.ts"], ignore: [".git/**", ".sce/**"] } }
+      });
+
+      // First index: should call removeSymbolsForFile then indexSymbols
+      await service.indexRepository({ rootPath: dir, type: "vault" });
+      expect(symbolIndexCalls.some((c) => c.startsWith("removeSymbolsForFile:greet.ts"))).toBe(true);
+      expect(symbolIndexCalls.some((c) => c.startsWith("indexSymbols:") && !c.endsWith("indexSymbols:0"))).toBe(true);
+
+      // Prune: delete file, re-index — should call removeSymbolsForFile for the pruned file
+      symbolIndexCalls.length = 0;
+      await unlink(join(dir, "greet.ts"));
+      await service.indexRepository({ rootPath: dir, type: "vault" });
+      expect(symbolIndexCalls.some((c) => c === "removeSymbolsForFile:greet.ts")).toBe(true);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("does NOT call symbolIndex for text-skip files", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-sym-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      await writeFile(join(dir, "data.json"), JSON.stringify({ hello: "world" }), "utf8");
+      storage = await SqliteStorage.open(dir);
+
+      const symbolIndexCalls: string[] = [];
+      const symbolIndex: ISymbolIndex = {
+        indexSymbols: async (chunks) => { symbolIndexCalls.push(`indexSymbols:${chunks.length}`); },
+        removeSymbolsForFile: async (_repoId, relPath) => { symbolIndexCalls.push(`removeSymbolsForFile:${relPath}`); },
+        deleteByRepository: async () => undefined,
+        searchSymbols: async () => []
+      };
+
+      const service = new IndexingService({
+        chunker: new MarkdownChunker(),
+        metadataStore: storage,
+        keywordIndex: storage,
+        symbolIndex,
+        config: { indexing: { include: ["**/*.json"], ignore: [".git/**", ".sce/**"] } }
+      });
+
+      await service.indexRepository({ rootPath: dir, type: "vault" });
+      // text-skip should NOT touch symbols at all
+      expect(symbolIndexCalls).toHaveLength(0);
     } finally {
       storage?.close();
       await rmWithRetry(dir);

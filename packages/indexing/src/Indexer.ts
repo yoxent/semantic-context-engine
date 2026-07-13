@@ -6,6 +6,7 @@ import type {
   IEmbeddingProvider,
   IKeywordIndex,
   IMetadataStore,
+  ISymbolIndex,
   IVectorStore,
   Logger,
   RepositoryType,
@@ -30,6 +31,7 @@ export interface IndexingServiceDeps {
   chunker: IChunker;
   metadataStore: IMetadataStore;
   keywordIndex: IKeywordIndex;
+  symbolIndex?: ISymbolIndex;
   embeddingProvider?: IEmbeddingProvider;
   vectorStore?: IVectorStore;
   embeddingConfig?: { model: string; dimensions: number };
@@ -123,6 +125,10 @@ export class IndexingService {
       });
       await this.deps.metadataStore.saveChunks(chunks);
       await this.deps.keywordIndex.indexChunks(chunks);
+      if (this.deps.symbolIndex) {
+        await this.deps.symbolIndex.removeSymbolsForFile(repositoryId, relativePath);
+        await this.deps.symbolIndex.indexSymbols(chunks);
+      }
       if (this.deps.embeddingProvider && this.deps.vectorStore && this.deps.embeddingConfig) {
         const texts = chunks.map((c) => c.text);
         const vectors = await this.deps.embeddingProvider.embed(texts);
@@ -154,6 +160,7 @@ export class IndexingService {
       await this.deps.metadataStore.deleteChunksForFile(repositoryId, record.relativePath);
       await this.deps.keywordIndex.removeChunksForFile(repositoryId, record.relativePath);
       if (this.deps.vectorStore) await this.deps.vectorStore.deleteByFile(repositoryId, record.relativePath);
+      if (this.deps.symbolIndex) await this.deps.symbolIndex.removeSymbolsForFile(repositoryId, record.relativePath);
       await this.deps.metadataStore.deleteFile(repositoryId, record.relativePath);
       this.deps.logger?.debug("index.pruned", { relativePath: record.relativePath });
     }
