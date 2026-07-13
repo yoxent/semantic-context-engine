@@ -1,4 +1,4 @@
-import { mkdtemp, cp, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, cp, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -162,6 +162,58 @@ describe("createEngine hybrid wiring", () => {
       await expect(created.engine.hybridSearch({ text: "vectors" })).rejects.toThrow(
         /Embedding provider|fetch|HTTP/
       );
+    } finally {
+      close?.();
+      await rmWithRetry(dir);
+    }
+  });
+});
+
+describe("createEngine code indexing", () => {
+  it("indexes a repo with both .md and .ts files and returns code hits from keyword search", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-runtime-code-"));
+    let close: (() => void) | undefined;
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      // Add a TS file to the vault copy.
+      await mkdir(join(dir, "src"), { recursive: true });
+      await writeFile(
+        join(dir, "src/widget.ts"),
+        "export class Widget {\n  render(): string {\n    return 'widget';\n  }\n}\n"
+      );
+      await writeFile(
+        join(dir, "sce.config.json"),
+        JSON.stringify({
+          indexing: { include: ["**/*.md", "**/*.ts"] }
+        })
+      );
+
+      const created = await createEngine(dir);
+      close = created.close;
+      await created.engine.indexRepository({ rootPath: created.rootPath, type: "vault" });
+
+      // keyword search finds the class
+      const kw = await created.engine.search({ text: "Widget", mode: "keyword", limit: 10 });
+      expect(kw.hits.some((h) => h.path.endsWith("src/widget.ts") && h.headingPath?.[0] === "Widget")).toBe(true);
+
+      // keyword search finds the method
+      const method = await created.engine.search({ text: "render", mode: "keyword", limit: 10 });
+      expect(method.hits.some((h) => h.path.endsWith("src/widget.ts") && h.headingPath?.[1] === "render")).toBe(true);
+    } finally {
+      close?.();
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("still indexes Markdown-only repos unchanged when include stays default", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-runtime-code-"));
+    let close: (() => void) | undefined;
+    try {
+      await cp(join(repoRoot, "fixtures/sample-vault"), dir, { recursive: true });
+      const created = await createEngine(dir);
+      close = created.close;
+      const result = await created.engine.indexRepository({ rootPath: created.rootPath, type: "vault" });
+      expect(result.filesIndexed).toBe(3); // same 3 .md files as the existing runtime test
     } finally {
       close?.();
       await rmWithRetry(dir);
