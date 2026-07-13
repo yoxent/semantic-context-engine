@@ -13,6 +13,8 @@ First interface-first vertical is implemented on **`develop`**, plus a small ops
 - `GOAL.md` — long-term vision (still ahead of v1)
 - `docs/superpowers/specs/2026-07-12-sce-interface-first-vertical-design.md` — approved design
 - `docs/superpowers/plans/2026-07-12-sce-interface-first-vertical.md` — plan that was executed
+- `docs/superpowers/specs/2026-07-12-sce-semantic-search-slice-design.md` — approved semantic slice design
+- `docs/superpowers/plans/2026-07-12-sce-semantic-search-slice.md` — semantic slice implementation plan
 
 ## Locked product decisions
 
@@ -37,13 +39,26 @@ First interface-first vertical is implemented on **`develop`**, plus a small ops
 
 ## Known follow-ups
 
-- Semantic / AST / hybrid strategies (new planned slice)
+- AST / hybrid search strategies
+- Binary vector layout / ANN index (`.sce/semantic/` layout)
+- Cloud-only embedding providers
 - Human UI on obscure Cloudflare subdomain
 
 ## Recently shipped (ranking slice)
 
 - `SearchHit.headingPath` populated from SQLite
 - `SimpleRanker` basename + heading-path + phrase/identifier boosts with stable tie-break
+
+### Shipped (semantic slice, 2026-07-13)
+
+- Opt-in `embedding` config block in `sce.config.json` (provider, baseUrl, model, dimensions, batchSize, apiKeyEnv)
+- `@sce/embedding` `OpenAICompatibleEmbeddingProvider` (OpenAI-compatible HTTP embeddings)
+- `@sce/storage` `SqliteVectorStore` — SQLite vectors stored behind `IVectorStore`
+- `@sce/retrieval` `SemanticRetrievalStrategy` — embedding-based retrieval reusing `SimpleRanker`
+- Indexing embeds changed chunks and prunes vectors; rebuild boundary on `model`/`dimensions` change (fails with clear instruction instead of mixing vectors)
+- `@sce/runtime` wires semantic search when `embedding` config is present
+- CLI `--mode semantic`; MCP `sce_search` `mode` field (`"keyword"` / `"semantic"`)
+- Search filters `pathFilter` / `language` rejected with a clear unsupported-filter error when used with semantic mode (keyword-only); `repositoryIds` honored by semantic
 
 ## For the next agent
 

@@ -103,6 +103,44 @@ Defaults always keep ignores such as `.git/**`, `.sce/**`, and `node_modules/**`
 | `pathFilter` | Exact path, directory prefix (`notes` → `notes` and `notes/...`), or SQL GLOB (`*.md`, `notes/*`) |
 | `language` | Exact language match (e.g. `markdown`) |
 
+## Semantic search (opt-in)
+
+Keyword search remains the default. Enable semantic (embedding-based) search by adding an `embedding` block to `sce.config.json`:
+
+```json
+{
+  "embedding": {
+    "provider": "openai-compatible",
+    "baseUrl": "http://localhost:11434/v1",
+    "model": "nomic-embed-text",
+    "dimensions": 768,
+    "batchSize": 32,
+    "apiKeyEnv": "OPENAI_API_KEY"
+  }
+}
+```
+
+- `provider` is currently `"openai-compatible"` only (local Ollama / LM Studio compatible).
+- `apiKeyEnv` is the **name** of an environment variable holding a bearer token; the token itself is never stored in the config.
+- Vectors are stored in the existing `.sce/metadata.sqlite` behind `IVectorStore`.
+- Embeddings are generated during `index`/`update`, not lazily during search.
+- Changing `model` or `dimensions` is a rebuild boundary: re-indexing fails with a clear rebuild instruction rather than mixing vectors.
+- If the embedding server is unreachable during `index`/`update`, indexing fails hard with a clear error.
+
+Request semantic mode explicitly:
+
+```bash
+sce search "vector retrieval" --path ./fixtures/sample-vault --mode semantic
+```
+
+MCP `sce_search` accepts `mode: "semantic"`.
+
+Semantic mode honors `repositoryIds`. `pathFilter` and `language` remain keyword-only and throw a clear unsupported-filter error when used with `--mode semantic`.
+
+### Future work
+
+The future goal is a separate `.sce/semantic/` layout (`embeddings.bin`, `vector.index`) behind the same `IVectorStore` interface, plus hybrid, AST, ANN indexing, and cloud-only providers as later slices.
+
 ## Packages
 
 | Package | Role |
@@ -115,7 +153,7 @@ Defaults always keep ignores such as `.git/**`, `.sce/**`, and `node_modules/**`
 | `@sce/retrieval` | Keyword strategy |
 | `@sce/runtime` | Composition (`createEngine`) |
 | `@sce/cli` / `@sce/mcp` | Adapters |
-| `@sce/embedding` | Interface shell for later semantic search |
+| `@sce/embedding` | `OpenAICompatibleEmbeddingProvider` (HTTP embeddings) |
 
 ## Docs
 
@@ -125,7 +163,8 @@ Defaults always keep ignores such as `.git/**`, `.sce/**`, and `node_modules/**`
 
 ## Explicit non-goals (v1)
 
-- Embeddings / vector DB
-- AST / hybrid search
+- Binary vector layout / ANN index
+- Hybrid / AST search
+- Cloud-only embedding providers
 - Public Obsidian-like web UI
 - Pasttime coupling
