@@ -66,8 +66,10 @@ function cosineSearch(db: Database.Database, query: VectorSearchQuery): VectorSe
       ? `AND repository_id IN (${query.repositoryIds.map(() => "?").join(", ")})`
       : "";
   const params: unknown[] = [...(query.repositoryIds ?? [])];
+  // Order candidates newest-first so that equal-cosine ties resolve in favor
+  // of the most recently upserted chunk (deterministic recency tie-break).
   const rows = db
-    .prepare(`SELECT chunk_id, vector, model, dimensions FROM vectors WHERE 1=1 ${repositoryClause}`)
+    .prepare(`SELECT chunk_id, vector, model, dimensions FROM vectors WHERE 1=1 ${repositoryClause} ORDER BY updated_at DESC`)
     .all(...params) as { chunk_id: string; vector: string; model: string; dimensions: number }[];
 
   const queryNorm = norm(query.vector);

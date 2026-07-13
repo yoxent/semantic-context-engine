@@ -66,3 +66,56 @@ describe("SqliteVectorStore upsert + getModelDimensions", () => {
     }
   });
 });
+
+describe("SqliteVectorStore search ordering and deletes", () => {
+  it("orders hits by cosine similarity and respects repositoryIds", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-vec-"));
+    try {
+      const { storage, vectors } = await openStores(dir);
+      await vectors.upsert({ chunkId: "a", repositoryId: "repo-a", model: "m", dimensions: 2, vector: [0.0, 1.0], relativePath: "a.md" });
+      await vectors.upsert({ chunkId: "b", repositoryId: "repo-a", model: "m", dimensions: 2, vector: [1.0, 1.0], relativePath: "b.md" });
+      await vectors.upsert({ chunkId: "c", repositoryId: "repo-b", model: "m", dimensions: 2, vector: [1.0, 0.0], relativePath: "c.md" });
+
+      const hits = await vectors.search({ vector: [1.0, 1.0], limit: 10, model: "m", dimensions: 2, repositoryIds: ["repo-a"] });
+      expect(hits.map((h) => h.chunkId)).toEqual(["b", "a"]);
+      const all = await vectors.search({ vector: [1.0, 1.0], limit: 10, model: "m", dimensions: 2 });
+      expect(all.map((h) => h.chunkId)).toEqual(["b", "c", "a"]);
+      storage.close();
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("deletes by chunk, repository, and file path", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-vec-"));
+    try {
+      const { storage, vectors } = await openStores(dir);
+      await vectors.upsert({ chunkId: "a", repositoryId: "repo-a", model: "m", dimensions: 2, vector: [0, 1], relativePath: "a.md" });
+      await vectors.upsert({ chunkId: "b", repositoryId: "repo-a", model: "m", dimensions: 2, vector: [0, 1], relativePath: "b.md" });
+      await vectors.upsert({ chunkId: "c", repositoryId: "repo-b", model: "m", dimensions: 2, vector: [0, 1], relativePath: "c.md" });
+
+      await vectors.deleteByChunk("a");
+      await vectors.deleteByFile("repo-a", "b.md");
+      await vectors.deleteByRepository("repo-b");
+
+      const remaining = await vectors.search({ vector: [0, 1], limit: 10, model: "m", dimensions: 2 });
+      expect(remaining).toHaveLength(0);
+      storage.close();
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("ignores rows whose stored model or dimensions do not match the query", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-vec-"));
+    try {
+      const { storage, vectors } = await openStores(dir);
+      await vectors.upsert({ chunkId: "a", repositoryId: "repo-a", model: "old-model", dimensions: 2, vector: [0, 1], relativePath: "a.md" });
+      const hits = await vectors.search({ vector: [0, 1], limit: 10, model: "new-model", dimensions: 2, repositoryIds: ["repo-a"] });
+      expect(hits).toHaveLength(0);
+      storage.close();
+    } finally {
+      await rmWithRetry(dir);
+    }
+  });
+});
