@@ -1,4 +1,4 @@
-const API_BASE = '';  // Same origin
+const API_BASE = 'https://sce-worker.xent-xent.workers.dev';
 
 let currentMode = 'keyword';
 let searchTimeout = null;

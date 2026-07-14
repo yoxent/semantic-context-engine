@@ -6,7 +6,9 @@ compatibility_flags = ["nodejs_compat"]
 [vars]
 ENVIRONMENT = "production"
 
+# To run locally, create a .dev.vars file with:
+# DATABASE_ID=your-database-id-here
 [[d1_databases]]
 binding = "DB"
 database_name = "sce-db"
-database_id = "TODO_CREATE_AND_FILL" # Replace after `wrangler d1 create sce-db`
+# database_id is set via CLOUDFLARE_DATABASE_ID env var or .dev.vars for local dev
