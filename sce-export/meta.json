@@ -1,7 +1,7 @@
 {
-  "exportedAt": "2026-07-13T19:41:14.757Z",
-  "chunkCount": 1483,
-  "vectorCount": 0,
+  "exportedAt": "2026-07-14T05:33:06.495Z",
+  "chunkCount": 3221,
+  "vectorCount": 1737,
   "symbolCount": 0,
   "embeddingModel": "nvidia/llama-nemotron-embed-vl-1b-v2:free",
   "embeddingDimensions": 2048

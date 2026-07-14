@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS symbols (
 
 CREATE TABLE IF NOT EXISTS vectors (
   chunk_id TEXT PRIMARY KEY,
-  embedding BLOB NOT NULL,
+  embedding TEXT NOT NULL,
   FOREIGN KEY (chunk_id) REFERENCES chunks(id)
 );
 
