@@ -5,39 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SCE — Semantic Context Engine</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
 </head>
 <body>
-  <div class="container">
+  <div class="app">
     <header>
-      <h1>SCE</h1>
-      <p class="subtitle">Semantic Context Engine</p>
+      <div class="logo">
+        <span class="logo-icon">🔮</span>
+        <div>
+          <h1>SCE</h1>
+          <p class="tagline">Semantic Context Engine for AI Coding Agents</p>
+        </div>
+      </div>
     </header>
 
     <main>
-      <div class="search-box">
-        <input
-          type="text"
-          id="query"
-          placeholder="Search query..."
-          autocomplete="off"
-        >
-        <button id="search-btn">Search</button>
-      </div>
+      <div class="search-container">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
+          <input
+            type="text"
+            id="query"
+            placeholder="Search documentation..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <div class="search-shortcut">
+            <kbd>/</kbd>
+          </div>
+        </div>
 
-      <div class="mode-selector">
-        <button class="mode active" data-mode="keyword">Keyword</button>
-        <button class="mode" data-mode="semantic">Semantic</button>
-        <button class="mode" data-mode="hybrid">Hybrid</button>
-        <button class="mode" data-mode="ast">AST</button>
+        <div class="controls">
+          <div class="mode-selector">
+            <button class="mode active" data-mode="keyword" title="SQL LIKE search — fast, exact matches">
+              <span class="mode-icon">🔤</span> Keyword
+            </button>
+            <button class="mode" data-mode="semantic" title="Vector similarity — conceptual matches">
+              <span class="mode-icon">🧠</span> Semantic
+            </button>
+            <button class="mode" data-mode="hybrid" title="Reciprocal Rank Fusion of keyword + semantic">
+              <span class="mode-icon">⚡</span> Hybrid
+            </button>
+            <button class="mode" data-mode="ast" title="AST symbol lookup — functions, classes, types">
+              <span class="mode-icon">🌳</span> AST
+            </button>
+          </div>
+
+          <div class="search-meta">
+            <span id="result-count"></span>
+            <span id="search-time"></span>
+          </div>
+        </div>
       </div>
 
       <div id="results" class="results"></div>
 
-      <div id="stats" class="stats"></div>
+      <div id="welcome" class="welcome">
+        <div class="welcome-icon">🔍</div>
+        <h2>Search documentation across multiple sources</h2>
+        <p>Try queries like:</p>
+        <div class="suggestions">
+          <button class="suggestion" data-query="React hooks useState">React hooks</button>
+          <button class="suggestion" data-query="Unity ECS component system">Unity ECS</button>
+          <button class="suggestion" data-query="TypeScript generics utility types">TypeScript generics</button>
+          <button class="suggestion" data-query="Cloudflare D1 batch insert">D1 batch insert</button>
+          <button class="suggestion" data-query="Prisma schema relations">Prisma relations</button>
+        </div>
+      </div>
+
+      <div id="stats-bar" class="stats-bar"></div>
     </main>
 
+    <!-- Document Modal -->
+    <div id="doc-modal" class="modal" style="display: none;">
+      <div class="modal-overlay"></div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <span id="modal-path"></span>
+            <span id="modal-heading"></span>
+          </div>
+          <button class="modal-close" id="modal-close">&times;</button>
+        </div>
+        <div class="modal-meta" id="modal-meta"></div>
+        <div class="modal-body" id="modal-body">Loading...</div>
+      </div>
+    </div>
+
     <footer>
-      <p>Search powered by SCE</p>
+      <div class="footer-content">
+        <span>Built for <strong>AI Knowledge Systems</strong></span>
+        <span class="separator">•</span>
+        <span>4 search modes</span>
+        <span class="separator">•</span>
+        <span>Cloudflare D1 + Workers</span>
+        <span class="separator">•</span>
+        <span id="footer-stats">Loading...</span>
+      </div>
     </footer>
   </div>
 

@@ -142,6 +142,36 @@ export default {
       }
     }
 
+    // ---- /api/chunk/:id ----
+    const chunkMatch = url.pathname.match(/^\/api\/chunk\/([^/]+)$/);
+    if (chunkMatch && request.method === "GET") {
+      const chunkId = chunkMatch[1];
+      try {
+        const chunk = await env.DB.prepare(
+          "SELECT id, repository_id, relative_path, heading_path, language, text FROM chunks WHERE id = ?"
+        ).bind(chunkId).first();
+
+        if (!chunk) {
+          return jsonResponse({ error: "Chunk not found" }, 404, origin);
+        }
+
+        return jsonResponse(
+          {
+            id: chunk.id,
+            relativePath: chunk.relative_path,
+            headingPath: chunk.heading_path,
+            language: chunk.language,
+            text: chunk.text,
+          },
+          200,
+          origin
+        );
+      } catch (error) {
+        console.error("Chunk fetch error:", error);
+        return jsonResponse({ error: "Failed to fetch chunk" }, 500, origin);
+      }
+    }
+
     // ---- /api/stats ----
     if (url.pathname === "/api/stats") {
       try {

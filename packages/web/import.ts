@@ -4,16 +4,15 @@
  * Reads exported JSON files (chunks.json, vectors.json, symbols.json, meta.json)
  * and imports them into a Cloudflare D1 database via the wrangler CLI.
  *
- * Usage (standalone with wrangler):
- *   npx wrangler d1 execute sce-db --remote --command="..."
+ * Uses --file instead of --command to avoid Windows command line length limits.
  *
- * Usage (programmatic):
- *   import { importToD1 } from './import.js';
- *   await importToD1({ dbCommand: myDbRunner, exportDir: './sce-export' });
+ * Usage:
+ *   npx tsx packages/web/import.ts ./sce-export sce-db
  */
 
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, writeFileSync, unlinkSync, mkdirSync, readdirSync, rmdirSync } from "node:fs";
+import { resolve, join } from "node:path";
+import { execSync } from "node:child_process";
 
 // --- Types (mirrors packages/core/src/export.ts) ---
 
@@ -54,16 +53,15 @@ interface ExportMeta {
 
 // --- Constants ---
 
-/** D1 batch limit is 100 statements; we stay well under with 50 rows per INSERT. */
-const CHUNK_BATCH_SIZE = 50;
+/** Chunk batch size — 10 to stay under SQLite statement size limit (some chunks are ~19KB). */
+const CHUNK_BATCH_SIZE = 2;
 
-/** Vectors are large (2048 floats as JSON); keep batches small. */
-const VECTOR_BATCH_SIZE = 10;
+/** Vectors are large (2048 floats as JSON ~39KB each); D1 max statement is 100KB, so max 2 per batch. */
+const VECTOR_BATCH_SIZE = 2;
 
 // --- Helpers ---
 
 function escapeString(s: string): string {
-  // Double single-quotes for SQL string literals
   return s.replace(/'/g, "''");
 }
 
@@ -89,10 +87,14 @@ export interface ImportOptions {
   exportDir: string;
   /** Optional: skip clearing existing data (default: false). */
   skipClear?: boolean;
+  /** Optional: only import vectors and embedding config (skip chunks/symbols). */
+  vectorsOnly?: boolean;
+  /** Optional: append mode - skip clearing, just insert new data. */
+  append?: boolean;
 }
 
 export async function importToD1(options: ImportOptions): Promise<void> {
-  const { dbCommand, exportDir, skipClear = false } = options;
+  const { dbCommand, exportDir, skipClear = false, vectorsOnly = false, append = false } = options;
 
   // --- Read export files ---
 
@@ -118,33 +120,43 @@ export async function importToD1(options: ImportOptions): Promise<void> {
 
   // --- Clear existing data (idempotent re-import) ---
 
-  if (!skipClear) {
+  if (append) {
+    console.log("Append mode - skipping clear.");
+  } else if (!skipClear && !vectorsOnly) {
     console.log("Clearing existing data...");
     await dbCommand("DELETE FROM symbols");
     await dbCommand("DELETE FROM vectors");
     await dbCommand("DELETE FROM chunks");
     await dbCommand("DELETE FROM embedding_config");
+  } else if (!skipClear && vectorsOnly) {
+    console.log("Clearing vectors only...");
+    await dbCommand("DELETE FROM vectors");
+    await dbCommand("DELETE FROM embedding_config");
   }
 
   // --- Import chunks in batches ---
 
-  console.log(`Importing chunks (${chunks.length} total)...`);
-  const chunkBatches = chunkArray(chunks, CHUNK_BATCH_SIZE);
-  for (let i = 0; i < chunkBatches.length; i++) {
-    const batch = chunkBatches[i];
-    const values = batch
-      .map(
-        (c) =>
-          `('${c.id}', '${escapeString(c.repositoryId)}', '${escapeString(c.relativePath)}', ${nullableString(c.language)}, ${nullableString(c.headingPath)}, ${c.startLine}, ${c.endLine}, '${escapeString(c.text)}')`
-      )
-      .join(",\n       ");
-    await dbCommand(
-      `INSERT OR REPLACE INTO chunks (id, repository_id, relative_path, language, heading_path, start_line, end_line, text) VALUES ${values}`
-    );
-    const done = Math.min((i + 1) * CHUNK_BATCH_SIZE, chunks.length);
-    process.stdout.write(`\r  Chunks: ${done}/${chunks.length}`);
+  if (!vectorsOnly) {
+    console.log(`Importing chunks (${chunks.length} total)...`);
+    const chunkBatches = chunkArray(chunks, CHUNK_BATCH_SIZE);
+    for (let i = 0; i < chunkBatches.length; i++) {
+      const batch = chunkBatches[i];
+      const values = batch
+        .map(
+          (c) =>
+            `('${c.id}', '${escapeString(c.repositoryId)}', '${escapeString(c.relativePath)}', ${nullableString(c.language)}, ${nullableString(c.headingPath)}, ${c.startLine}, ${c.endLine}, '${escapeString(c.text)}')`
+        )
+        .join(",\n       ");
+      await dbCommand(
+        `INSERT OR REPLACE INTO chunks (id, repository_id, relative_path, language, heading_path, start_line, end_line, text) VALUES ${values}`
+      );
+      const done = Math.min((i + 1) * CHUNK_BATCH_SIZE, chunks.length);
+      process.stdout.write(`\r  Chunks: ${done}/${chunks.length}`);
+    }
+    process.stdout.write("\n");
+  } else {
+    console.log("Skipping chunks (vectors-only mode).");
   }
-  process.stdout.write("\n");
 
   // --- Import vectors in batches ---
 
@@ -166,9 +178,9 @@ export async function importToD1(options: ImportOptions): Promise<void> {
   }
   process.stdout.write("\n");
 
-  // --- Import symbols in batches (symbols can be numerous) ---
+  // --- Import symbols in batches ---
 
-  if (symbols.length > 0) {
+  if (symbols.length > 0 && !vectorsOnly) {
     console.log(`Importing symbols (${symbols.length} total)...`);
     const symbolBatches = chunkArray(symbols, CHUNK_BATCH_SIZE);
     for (let i = 0; i < symbolBatches.length; i++) {
@@ -186,6 +198,8 @@ export async function importToD1(options: ImportOptions): Promise<void> {
       process.stdout.write(`\r  Symbols: ${done}/${symbols.length}`);
     }
     process.stdout.write("\n");
+  } else if (vectorsOnly) {
+    console.log("Skipping symbols (vectors-only mode).");
   }
 
   // --- Store embedding config ---
@@ -208,33 +222,64 @@ export async function importToD1(options: ImportOptions): Promise<void> {
 
 async function main() {
   const args = process.argv.slice(2);
-  const exportDir = resolve(args[0] || "./sce-export");
-  const databaseName = args[1] || "sce-db";
+  const vectorsOnly = args.includes("--vectors-only");
+  const append = args.includes("--append");
+  const positional = args.filter((a) => !a.startsWith("--"));
+  const exportDir = resolve(positional[0] || "./sce-export");
+  const databaseName = positional[1] || "sce-db";
 
   console.log(`Import from: ${exportDir}`);
   console.log(`Target D1 database: ${databaseName}`);
+  if (vectorsOnly) console.log("Mode: vectors-only (skip chunks/symbols)");
+  if (append) console.log("Mode: append (skip clear)");
   console.log();
 
-  // Use dynamic import for child_process to avoid issues in non-Node environments
-  const { execSync } = await import("node:child_process");
+  const tmpDir = join(process.cwd(), ".sce-import-tmp");
+  mkdirSync(tmpDir, { recursive: true });
+  let fileCounter = 0;
 
-  async function dbCommand(sql: string): Promise<void> {
-    execSync(
-      `npx wrangler d1 execute ${databaseName} --remote --command="${sql.replace(/"/g, '\\"')}"`,
-      { stdio: "pipe" }
-    );
+  async function dbCommand(sql: string, retries = 3): Promise<void> {
+    // Write SQL to a temp file to avoid Windows command line length limit
+    const tmpFile = join(tmpDir, `import-${String(fileCounter++).padStart(6, "0")}.sql`);
+    writeFileSync(tmpFile, sql, "utf-8");
+    try {
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          execSync(
+            `npx wrangler d1 execute ${databaseName} --remote --file="${tmpFile}"`,
+            { stdio: "pipe" }
+          );
+          return; // success
+        } catch (err) {
+          if (attempt < retries) {
+            const delay = attempt * 2000; // 2s, 4s, 6s
+            console.log(`\n  Retry ${attempt}/${retries} after ${delay}ms...`);
+            await new Promise((r) => setTimeout(r, delay));
+          } else {
+            throw err;
+          }
+        }
+      }
+    } finally {
+      try { unlinkSync(tmpFile); } catch { /* ignore */ }
+    }
   }
 
-  await importToD1({ dbCommand, exportDir });
+  try {
+    await importToD1({ dbCommand, exportDir, vectorsOnly, append });
+  } finally {
+    // Clean up temp dir
+    try {
+      const files = readdirSync(tmpDir);
+      for (const f of files) unlinkSync(join(tmpDir, f));
+      rmdirSync(tmpDir);
+    } catch {
+      // ignore cleanup errors
+    }
+  }
 }
 
-// Run if executed directly
-const isMainModule =
-  import.meta.url === `file://${process.argv[1]}` ||
-  process.argv[1]?.endsWith("import.ts");
-if (isMainModule) {
-  main().catch((err) => {
-    console.error("Import failed:", err);
-    process.exit(1);
-  });
-}
+main().catch((err) => {
+  console.error("Import failed:", err);
+  process.exit(1);
+});
