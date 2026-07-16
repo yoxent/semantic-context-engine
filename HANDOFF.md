@@ -45,6 +45,30 @@ Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 
 ---
 
+## 🤖 MCP Server (AI Agent Integration)
+
+### Global Install
+```bash
+# Already installed globally
+sce-mcp
+```
+
+### Config Locations
+- Linux/Mac: `~/.config/mcp/sce.json`
+- Windows: `~/AppData/Roaming/MCP/sce.json`
+
+### Available Tools
+- `search_knowledge` - Search the knowledgebase
+- `get_document` - Get full content of a chunk
+- `list_sources` - See what's indexed
+- `get_stats` - Database statistics
+
+### Usage in AI Agents
+Any MCP-compatible agent can now use:
+> "Search the knowledgebase for D1 patterns"
+
+---
+
 ## 🔧 Configuration
 
 ### Worker Config
