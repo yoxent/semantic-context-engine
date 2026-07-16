@@ -1,22 +1,46 @@
 # Semantic Context Engine
 
-Local-first retrieval for AI coding agents. SCE indexes a Markdown knowledge vault and (opt-in) TypeScript/JavaScript code, then returns concise keyword, opt-in semantic, opt-in hybrid, and AST symbol lookup hits through a shared core API exposed as CLI and MCP.
+**Personal coding knowledgebase for my projects.** SCE indexes the docs and code I actually use, then feeds AI agents (CLI / MCP / web) so they pull *my* stack and patterns instead of guessing from stale training data.
 
-SCE is **not** a vector database. Keyword, opt-in semantic, opt-in hybrid search, and AST symbol lookup ship on `develop` over Markdown and (opt-in) TS/JS code; binary vectors and ANN indexing stay behind interfaces for later slices.
+It is built for **my** active work — not as a general public product:
+
+| Project | Why it’s in the corpus |
+|---|---|
+| **semantic-context-engine** (this repo) | Workers, D1, embeddings, MCP, CLI patterns |
+| **word-guess** | Expo, Firebase, IAP / AdMob, Maestro, RN |
+| **web-portfolio** | Next.js, Tailwind, Resend, Vercel |
+
+Third-party docs (Expo, Firebase, Hono, Drizzle, Cloudflare, etc.) sit alongside **own-repo corpora** so agents can reuse both official APIs and how *I* wire them.
+
+**License:** proprietary — all rights reserved. This repo and its knowledgebase are for my own projects; not offered as open-source software.
+
+### Live
+
+| | |
+|---|---|
+| Web | https://sce-web.pasttime.xyz/ |
+| API | https://sce-api.pasttime.xyz |
+| Inventory | `knowledge/INVENTORY.md` (~1249 chunks / 1232 vectors in D1) |
+| Search | `sce search "query"` |
+
+Local-first by design: each indexed root keeps `.sce/metadata.sqlite`. Production search is also mirrored to Cloudflare D1 for the live API/UI.
 
 ## Status
 
-Current branch target: `develop` (implementation). `main` is reserved for production releases.
+Branch: `develop` (implementation). `main` is for production releases.
 
-First vertical (shipped on `develop`):
+Shipped on `develop`:
 
 - TypeScript npm workspaces monorepo (`@sce/*`)
-- Vault indexing (Markdown headings + `[[wiki-links]]`)
+- Markdown vault indexing + opt-in TypeScript/JavaScript AST chunking
 - SQLite FTS5 keyword search under `.sce/metadata.sqlite`
+- Opt-in semantic / hybrid search (OpenAI-compatible embeddings)
+- AST symbol lookup
 - Shared composition via `@sce/runtime`
-- Thin **CLI** and **MCP** adapters
+- Thin **CLI** and **MCP** adapters + Cloudflare web/API worker
 - Structured logging (`logging.level` / CLI `--verbose`)
 - Index `statistics()` via `sce stats` / `sce_stats`
+- Batch scripts to grow the knowledgebase (`scripts/index-*-batch.mjs`, `scripts/index-own-corpora.mjs`)
 
 ## Requirements
 
@@ -229,21 +253,12 @@ Behavior:
 ## Docs
 
 - `GOAL.md` — long-term product vision
-- `docs/superpowers/specs/2026-07-12-sce-interface-first-vertical-design.md` — approved first-slice design
-- `docs/superpowers/plans/2026-07-12-sce-interface-first-vertical.md` — implementation plan used to build v1
-- `docs/superpowers/specs/2026-07-13-sce-semantic-search-slice-design.md` — approved semantic slice design
-- `docs/superpowers/plans/2026-07-13-sce-semantic-search-slice.md` — semantic slice implementation plan
-- `docs/superpowers/specs/2026-07-13-sce-hybrid-search-slice-design.md` — approved hybrid slice design
-- `docs/superpowers/plans/2026-07-13-sce-hybrid-search-slice.md` — hybrid slice implementation plan
-- `docs/superpowers/specs/2026-07-13-sce-code-indexing-slice-design.md` — approved code indexing slice design
-- `docs/superpowers/plans/2026-07-13-sce-code-indexing-slice.md` — code indexing slice implementation plan
-- `docs/superpowers/specs/2026-07-13-sce-ast-symbol-lookup-slice-design.md` — approved AST symbol lookup slice design
-- `docs/superpowers/plans/2026-07-13-sce-ast-symbol-lookup-slice.md` — AST symbol lookup slice implementation plan
+- `knowledge/INVENTORY.md` — what’s indexed in D1 (docs + own repos)
+- `docs/superpowers/specs/…` / `docs/superpowers/plans/…` — slice designs and implementation plans
 
-## Explicit non-goals (v1)
+## Explicit non-goals (for now)
 
-- Binary vector layout / ANN index
+- Binary ANN layout as a separate vector DB product
 - AST call hierarchy / references / inheritance
-- Cloud-only embedding providers
-- Public Obsidian-like web UI
-- Pasttime coupling
+- Multi-tenant / public SaaS knowledge hosting
+- Being a drop-in replacement for a general-purpose vector database
