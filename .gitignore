@@ -11,4 +11,4 @@ sce-export/
 .wrangler/
 knowledge/
 *-export/
-test/rmWithRetry*
+*.tsbuildinfo
