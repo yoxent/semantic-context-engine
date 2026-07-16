@@ -4,7 +4,8 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "sce-mcp": "dist/index.js"
+    "sce-mcp": "dist/index.js",
+    "sce": "dist/cli.js"
   },
   "scripts": {
     "build": "tsc",
