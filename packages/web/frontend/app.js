@@ -1,14 +1,19 @@
-const API_BASE = 'https://sce-worker.xent-xent.workers.dev';
+const API_BASE = 'https://sce-api.pasttime.xyz';
 
 let currentMode = 'keyword';
 let searchTimeout = null;
+let isSearching = false;
 
 // DOM elements
 const queryInput = document.getElementById('query');
-const searchBtn = document.getElementById('search-btn');
 const resultsDiv = document.getElementById('results');
-const statsDiv = document.getElementById('stats');
+const welcomeDiv = document.getElementById('welcome');
+const statsBar = document.getElementById('stats-bar');
+const resultCount = document.getElementById('result-count');
+const searchTime = document.getElementById('search-time');
+const footerStats = document.getElementById('footer-stats');
 const modeButtons = document.querySelectorAll('.mode');
+const suggestions = document.querySelectorAll('.suggestion');
 
 // Mode selection
 modeButtons.forEach(btn => {
@@ -16,6 +21,7 @@ modeButtons.forEach(btn => {
     modeButtons.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentMode = btn.dataset.mode;
+    queryInput.focus();
 
     // Re-search if there's a query
     if (queryInput.value.trim()) {
@@ -24,80 +30,166 @@ modeButtons.forEach(btn => {
   });
 });
 
-// Search on Enter
-queryInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
+// Suggestion clicks
+suggestions.forEach(btn => {
+  btn.addEventListener('click', () => {
+    queryInput.value = btn.dataset.query;
     performSearch();
+    queryInput.focus();
+  });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  // Focus search on /
+  if (e.key === '/' && document.activeElement !== queryInput) {
+    e.preventDefault();
+    queryInput.focus();
+  }
+  
+  // Escape to clear
+  if (e.key === 'Escape' && document.activeElement === queryInput) {
+    queryInput.value = '';
+    showWelcome();
+    queryInput.blur();
   }
 });
 
-// Search button click
-searchBtn.addEventListener('click', performSearch);
+// Search on Enter
+queryInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    clearTimeout(searchTimeout);
+    performSearch();
+  }
+});
 
 // Debounced search as you type
 queryInput.addEventListener('input', () => {
   clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
-    if (queryInput.value.trim().length >= 3) {
+    if (queryInput.value.trim().length >= 2) {
       performSearch();
+    } else if (queryInput.value.trim().length === 0) {
+      showWelcome();
     }
-  }, 500);
+  }, 400);
 });
 
 async function performSearch() {
   const query = queryInput.value.trim();
-  if (!query) {
-    resultsDiv.innerHTML = '';
-    return;
-  }
+  if (!query || isSearching) return;
 
+  isSearching = true;
+  hideWelcome();
   resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+  resultCount.textContent = '';
+  searchTime.textContent = '';
 
   try {
     const params = new URLSearchParams({
       q: query,
       mode: currentMode,
-      limit: '20',
+      limit: '15',
     });
 
     const response = await fetch(`${API_BASE}/api/search?${params}`);
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Search failed');
+      throw new Error(data.message || data.error || 'Search failed');
     }
 
     renderResults(data);
   } catch (error) {
-    resultsDiv.innerHTML = `<div class="error">${escapeHtml(error.message)}</div>`;
+    resultsDiv.innerHTML = `<div class="error">
+      <strong>Search failed</strong><br>
+      ${escapeHtml(error.message)}
+    </div>`;
+    resultCount.textContent = '';
+    searchTime.textContent = '';
+  } finally {
+    isSearching = false;
   }
 }
 
 function renderResults(data) {
   if (data.hits.length === 0) {
-    resultsDiv.innerHTML = '<div class="loading">No results found</div>';
+    resultsDiv.innerHTML = `
+      <div class="no-results">
+        <div class="no-results-icon">🔍</div>
+        <p>No results found for "${escapeHtml(data.query)}"</p>
+        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Try a different query or search mode</p>
+      </div>
+    `;
+    resultCount.textContent = '0 results';
+    searchTime.textContent = `${data.searchTimeMs}ms`;
     return;
   }
 
-  const html = data.hits.map(hit => `
-    <div class="result-card">
+  const html = data.hits.map((hit, i) => `
+    <div class="result-card" data-chunk-id="${escapeHtml(hit.chunkId || '')}" style="animation: fadeIn 0.2s ease ${i * 0.03}s both">
       <div class="result-header">
         <span class="result-path">${escapeHtml(hit.relativePath)}</span>
-        <span class="result-score">${hit.score.toFixed(3)}</span>
+        <span class="result-score">score: ${formatScore(hit.score)}</span>
       </div>
       ${hit.headingPath ? `<div class="result-heading">${escapeHtml(hit.headingPath)}</div>` : ''}
-      <div class="result-text">${escapeHtml(hit.text)}</div>
+      <div class="result-text">${escapeHtml(truncateText(hit.text, 400))}</div>
       <div class="result-meta">
-        ${hit.language ? `<span>${escapeHtml(hit.language)}</span>` : ''}
-        ${hit.symbolKind ? `<span>${escapeHtml(hit.symbolKind)}</span>` : ''}
+        ${hit.language ? `<span>📄 ${escapeHtml(hit.language)}</span>` : ''}
+        ${hit.symbolKind ? `<span>🏷️ ${escapeHtml(hit.symbolKind)}</span>` : ''}
+        ${hit.chunkId ? `<span>ID: ${hit.chunkId.substring(0, 8)}</span>` : ''}
       </div>
     </div>
   `).join('');
 
   resultsDiv.innerHTML = html;
+  resultCount.textContent = `${data.totalHits} result${data.totalHits !== 1 ? 's' : ''}`;
+  searchTime.textContent = `${data.searchTimeMs}ms`;
 
-  // Update stats
-  statsDiv.textContent = `${data.totalHits} results | ${data.searchTimeMs}ms | Mode: ${data.mode}`;
+  // Add click handlers to result cards
+  resultsDiv.querySelectorAll('.result-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const chunkId = card.dataset.chunkId;
+      if (chunkId) {
+        openModal(chunkId);
+      }
+    });
+  });
+
+  // Add fadeIn animation
+  if (!document.getElementById('dynamic-styles')) {
+    const style = document.createElement('style');
+    style.id = 'dynamic-styles';
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+function showWelcome() {
+  welcomeDiv.style.display = 'block';
+  resultsDiv.innerHTML = '';
+  resultCount.textContent = '';
+  searchTime.textContent = '';
+}
+
+function hideWelcome() {
+  welcomeDiv.style.display = 'none';
+}
+
+function formatScore(score) {
+  if (score >= 1) return '1.000';
+  if (score <= 0) return '0.000';
+  return score.toFixed(3);
+}
+
+function truncateText(text, maxLen) {
+  if (text.length <= maxLen) return text;
+  return text.substring(0, maxLen) + '...';
 }
 
 function escapeHtml(text) {
@@ -106,15 +198,74 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Modal elements
+const modal = document.getElementById('doc-modal');
+const modalOverlay = modal.querySelector('.modal-overlay');
+const modalClose = document.getElementById('modal-close');
+const modalPath = document.getElementById('modal-path');
+const modalHeading = document.getElementById('modal-heading');
+const modalMeta = document.getElementById('modal-meta');
+const modalBody = document.getElementById('modal-body');
+
+// Open modal with chunk data
+async function openModal(chunkId) {
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  modalBody.textContent = 'Loading...';
+  modalPath.textContent = '';
+  modalHeading.textContent = '';
+  modalMeta.innerHTML = '';
+
+  try {
+    const response = await fetch(`${API_BASE}/api/chunk/${chunkId}`);
+    const chunk = await response.json();
+
+    if (!response.ok) {
+      throw new Error(chunk.error || 'Failed to load chunk');
+    }
+
+    modalPath.textContent = chunk.relativePath || '';
+    modalHeading.textContent = chunk.headingPath || '';
+    modalBody.textContent = chunk.text || '';
+
+    // Build meta info
+    const metaItems = [];
+    if (chunk.language) metaItems.push(`📄 ${chunk.language}`);
+    if (chunk.symbolKind) metaItems.push(`🏷️ ${chunk.symbolKind}`);
+    metaItems.push(`ID: ${chunk.id}`);
+    modalMeta.innerHTML = metaItems.map(m => `<span>${escapeHtml(m)}</span>`).join('');
+  } catch (error) {
+    modalBody.textContent = `Error: ${error.message}`;
+  }
+}
+
+// Close modal
+function closeModal() {
+  modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+modalOverlay.addEventListener('click', closeModal);
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && modal.style.display === 'flex') {
+    closeModal();
+  }
+});
+
 // Load stats on page load
 async function loadStats() {
   try {
     const response = await fetch(`${API_BASE}/api/stats`);
     const data = await response.json();
-    statsDiv.textContent = `${data.chunks} chunks indexed | ${data.symbols} symbols | Model: ${data.embeddingModel}`;
+    footerStats.textContent = `${data.chunks.toLocaleString()} chunks`;
+    statsBar.textContent = `📊 ${data.chunks.toLocaleString()} chunks indexed • ${data.vectors.toLocaleString()} vectors • Model: ${data.embeddingModel}`;
   } catch (error) {
-    statsDiv.textContent = 'Stats unavailable';
+    footerStats.textContent = 'Stats unavailable';
+    statsBar.textContent = '';
   }
 }
 
+// Initialize
 loadStats();
+queryInput.focus();
