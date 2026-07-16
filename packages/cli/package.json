@@ -1,0 +1,19 @@
+{
+  "name": "@sce/cli",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "dist/src/main.js",
+  "types": "dist/src/main.d.ts",
+  "bin": {
+    "sce": "dist/src/main.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@sce/core": "0.0.0",
+    "@sce/runtime": "0.0.0",
+    "@sce/storage": "0.0.0",
+    "commander": "^15.0.0"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/embedding" },
+    { "path": "./packages/indexing" },
+    { "path": "./packages/parsing" },
+    { "path": "./packages/storage" },
+    { "path": "./packages/ranking" },
+    { "path": "./packages/retrieval" },
+    { "path": "./packages/runtime" },
+    { "path": "./packages/cli" },
+    { "path": "./packages/mcp" }
+  ]
+}

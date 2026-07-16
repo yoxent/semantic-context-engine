@@ -1,0 +1,14 @@
+.worktrees/
+node_modules/
+dist/
+*.log
+.sce/
+coverage/
+.DS_Store
+.pi-subagents/
+sce-export/
+.dev.vars
+.wrangler/
+knowledge/
+*-export/
+*.tsbuildinfo

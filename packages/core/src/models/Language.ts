@@ -1,0 +1,1 @@
+export type Language = "markdown" | "typescript" | "javascript" | "text";
