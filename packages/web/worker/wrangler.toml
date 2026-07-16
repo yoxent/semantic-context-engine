@@ -1,7 +1,11 @@
-name = "sce-worker"
+name = "sce-api"
 main = "src/index.ts"
 compatibility_date = "2024-01-11"
 compatibility_flags = ["nodejs_compat"]
+
+routes = [
+  { pattern = "sce-api.pasttime.xyz", zone_name = "pasttime.xyz" }
+]
 
 [vars]
 ENVIRONMENT = "production"
@@ -11,4 +15,4 @@ ENVIRONMENT = "production"
 [[d1_databases]]
 binding = "DB"
 database_name = "sce-db"
-# database_id is set via CLOUDFLARE_DATABASE_ID env var or .dev.vars for local dev
+database_id = "eca50171-09fe-48a7-be44-b20d85c6ed6c"
