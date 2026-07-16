@@ -9,3 +9,6 @@ coverage/
 sce-export/
 .dev.vars
 .wrangler/
+knowledge/
+*-export/
+test/rmWithRetry*
