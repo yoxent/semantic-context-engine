@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-07-17
-**D1 Live Total**: **1562 chunks, 1540 vectors** (originally 195 / 188)
+**D1 Live Total**: **1722 chunks, 1664 vectors** (originally 195 / 188)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
@@ -107,8 +107,12 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | system-io | 6 | 6 | FileStream, directory, path, MemoryStream |
 | luminosity-formula | 6 | 6 | Luminance, WCAG contrast ratio |
 | auth-patterns | 11 | 11 | JWT, OAuth2 PKCE, refresh tokens, sessions |
-| **Local knowledge subtotal** | **~620** | **~606** | 82 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~1488** | **~1474** | |
+| **Batch 7 — UI libraries** | | | |
+| retroui | 124 | 124 | RetroUI neobrutalist React components (shadcn-compatible) |
+| **Batch 8 — Animation libs** | | | |
+| dotmatrix | 26 | 0 | Dot Matrix loading animation components (91 loaders) |
+| **Local knowledge subtotal** | **~770** | **~730** | 84 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~1612** | **~1598** | |
 
 ## Expansion Queue (2026-07-16)
 
@@ -122,6 +126,8 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | 4b | Unity ECS deepen, Unity Cinemachine deepen | **Imported to D1** |
 | 5 | shieldcn, bolt.new | **Imported to D1** |
 | 6 | REST API, Flutter, Dart, Supabase, AWS Amplify, Node.js, Express, HTML, CSS, jQuery, BigQuery, CI/CD, Object Pooling, Vector Math, Spline, LINQ/ZLinq, DI, Unity ScriptableObjects, Number Formatting, Localization, Unity Events, Coroutines, Async/Awaitables, Unit Testing, Scene Management, DOTween, LitMotion, PrimeTween, zlib, Data Encryption, System.IO, Luminosity, Auth Patterns | **Imported to D1** |
+| 7 | RetroUI (neobrutalist React components) | **Imported to D1** |
+| 8 | Dot Matrix (loading animations) | **Imported to D1** |
 
 ## Deferred Topics — do not pull
 
@@ -202,6 +208,13 @@ Parked per scope lock (2026-07-16). Do not scrape, index, or import until explic
 | luminosity-formula | 6 | 6 |
 | auth-patterns | 11 | 11 |
 | **Total** | **219** | **219** |
+
+# Batch 7 — UI libraries (**in D1**)
+
+| Topic | Chunks | Vectors |
+|-------|--------|--------|
+| retroui (`knowledge/retroui/`) | 124 | 124 |
+| **Total** | **124** | **124** |
 
 ### Import notes
 - Free OpenRouter embed model rate-limited intermittently; some doc topics have fewer vectors than chunks (keyword search still works).
@@ -690,5 +703,18 @@ Local index stats (chunks / vectors exported):
 
 Configs: `packages/sce.config.json`, `word-guess/sce.config.json`, `web-portfolio/sce.config.json`  
 Local indexes live in each project’s `.sce/` (gitignored in SCE; add `.sce/` to the other repos if not already).
+
+---
+
+# Batch 7 — UI libraries (**in D1**)
+
+## RetroUI — `knowledge/retroui/` (65 files, 124 chunks)
+
+Scraped from https://retroui.dev/docs via custom RSC-aware scraper.
+
+- **Core docs**: introduction, installation (Next.js, Vite), MCP server, changelog
+- **Components** (57): accordion, alert, alert-dialog, aspect-ratio, avatar, badge, breadcrumb, button, button-group, calendar, card, carousel, checkbox, collapsible, command, combobox, context-menu, data-table, date-picker, dialog, direction, drawer, dropdown-menu, empty, field, hover-card, input, input-group, input-otp, item, kbd, label, menubar, navigation-menu, native-select, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner, spinner, switch, table, tabs, textarea, toggle, toggle-group, tooltip, typography
+- **Scrape method**: Custom `rsc-scraper.ts` — extracts content from Next.js React Server Component `__next_f.push` script chunks
+- **Note**: toast component page returned 404 (not yet published)
 
 
