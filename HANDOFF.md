@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-17
-**Status**: Web deployment functional, Cloudflare Workers docs indexed
+**Status**: Web deployment functional, RetroUI docs indexed
 
 ---
 
@@ -10,32 +10,32 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (1562 chunks, 1540 vectors)
+- **D1 Database**: `sce-db` (1722 chunks, 1664 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 1562 chunks |
-| Semantic Search | ✅ | 1540 vectors, 2048-dim |
+| Keyword Search | ✅ | ~55ms response, 1722 chunks |
+| Semantic Search | ✅ | 1664 vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
-| Frontend UI | ✅ | Dark theme, responsive, keyboard shortcuts |
+| Frontend UI | ✅ | RetroUI neobrutalist theme + Dot Matrix Core Rotor loader, dark, responsive, keyboard shortcuts |
 
 ---
 
 ## 📊 D1 Database State
 
 ```
-Chunks:  1562
-Vectors: 1540 (2048-dim embeddings)
+Chunks:  1722
+Vectors: 1664 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  82
+Topics:  84
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
 ### Topics Indexed
-Topics indexed (82):
-- **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new
+Topics indexed (84):
+- **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
 - **Backend**: Node.js, Express, FastAPI, Python, tRPC, REST API patterns
 - **Cloud/DB**: Cloudflare Workers (full suite), D1, DO, KV, R2, Vectorize, Queues, Workers AI
 - **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM, SQLite, Supabase, BigQuery
@@ -158,7 +158,7 @@ packages/
 5. **Show stats**: 85 chunks of Cloudflare Workers documentation
 
 ### Key Talking Points
-- "85 chunks of Cloudflare Workers documentation indexed in D1"
+- "1686 chunks of documentation indexed in D1"
 - "4 search modes: keyword, semantic, hybrid, AST"
 - "Sub-100ms keyword search, semantic search via OpenRouter"
 - "Built for AI coding agents as the primary consumer"
@@ -171,6 +171,7 @@ packages/
 ### Priority 1: Expand Knowledge Base
 - Index more documentation (TypeScript, React, etc.)
 - Index your own past projects for pattern reuse
+- RetroUI (neobrutalist React components) — **done**
 
 ### Priority 2: Add Symbol Data
 1. Index a codebase with AST extraction enabled
