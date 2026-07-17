@@ -1,6 +1,6 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-16
+**Last Updated**: 2026-07-17
 **Status**: Web deployment functional, Cloudflare Workers docs indexed
 
 ---
@@ -10,15 +10,15 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (85 chunks)
+- **D1 Database**: `sce-db` (1562 chunks, 1540 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 85 chunks |
-| Semantic Search | ✅ | 81 vectors, Cloudflare docs |
-| Hybrid Search | ✅ | Degrades gracefully to keyword-only |
-| AST Search | ✅ | 0 symbols (no symbol data) |
+| Keyword Search | ✅ | ~55ms response, 1562 chunks |
+| Semantic Search | ✅ | 1540 vectors, 2048-dim |
+| Hybrid Search | ✅ | RRF fusion (k=60) |
+| AST Search | ✅ | 287 symbols (own-repo corpora) |
 | Frontend UI | ✅ | Dark theme, responsive, keyboard shortcuts |
 
 ---
@@ -26,22 +26,28 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  85 (Cloudflare Workers documentation)
-Vectors: 81 (2048-dim embeddings)
-Symbols: 0
+Chunks:  1562
+Vectors: 1540 (2048-dim embeddings)
+Symbols: 287 (own-repo corpora)
+Topics:  82
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
 ### Topics Indexed
-- D1 (database)
-- Durable Objects
-- KV
-- Queues
-- R2
-- Vectorize
-- Workers AI
-- Workers core (runtime, APIs, config)
-- Wrangler SDK
+Topics indexed (82):
+- **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new
+- **Backend**: Node.js, Express, FastAPI, Python, tRPC, REST API patterns
+- **Cloud/DB**: Cloudflare Workers (full suite), D1, DO, KV, R2, Vectorize, Queues, Workers AI
+- **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM, SQLite, Supabase, BigQuery
+- **Mobile**: Expo, React Native, Flutter, Dart, Firebase, AWS Amplify
+- **Unity**: ECS, Cinemachine, Netcode, Shaders, ScriptableObjects, Events, Coroutines, Async/Awaitables, Scene Management
+- **Unity animation**: DOTween, LitMotion, PrimeTween
+- **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel, Wrangler
+- **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib
+- **Misc**: TypeScript, Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines, luminosity
+- shieldcn, bolt.new
+- **Batch 6 (33 topics)**: REST API, Flutter, Dart, Supabase, AWS Amplify, Node.js, Express, HTML, CSS, jQuery, BigQuery, CI/CD pipelines, Object Pooling, Vector Math, Spline, LINQ/ZLinq, Dependency Injection, Unity ScriptableObjects, Number Formatting, Localization, Unity Events, Coroutines, Async/Awaitables, Unit Testing, Scene Management, DOTween, LitMotion, PrimeTween, zlib, Data Encryption, System.IO, Luminosity, Auth Patterns
+- Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
 ---
 
