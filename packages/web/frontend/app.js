@@ -81,7 +81,8 @@ async function performSearch() {
 
   isSearching = true;
   hideWelcome();
-  resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+  resultsDiv.innerHTML = '<div class="loading"><div class="dotmatrix-core-rotor"><div class="dmx-grid"><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot dmx-active" data-frame="0"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot dmx-active" data-frame="0"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot dmx-active" data-frame="0"></span><span class="dmx-dot dmx-active" data-frame="0"></span><span class="dmx-dot dmx-hub"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span><span class="dmx-dot"></span></div></div><span>Searching...</span></div>';
+  startCoreRotor();
   resultCount.textContent = '';
   searchTime.textContent = '';
 
@@ -107,6 +108,7 @@ async function performSearch() {
     </div>`;
     resultCount.textContent = '';
     searchTime.textContent = '';
+    stopCoreRotor();
   } finally {
     isSearching = false;
   }
@@ -123,6 +125,7 @@ function renderResults(data) {
     `;
     resultCount.textContent = '0 results';
     searchTime.textContent = `${data.searchTimeMs}ms`;
+    stopCoreRotor();
     return;
   }
 
@@ -145,6 +148,7 @@ function renderResults(data) {
   resultsDiv.innerHTML = html;
   resultCount.textContent = `${data.totalHits} result${data.totalHits !== 1 ? 's' : ''}`;
   searchTime.textContent = `${data.searchTimeMs}ms`;
+  stopCoreRotor();
 
   // Add click handlers to result cards
   resultsDiv.querySelectorAll('.result-card').forEach(card => {
@@ -179,6 +183,10 @@ function showWelcome() {
 
 function hideWelcome() {
   welcomeDiv.style.display = 'none';
+}
+
+function showResults() {
+  stopCoreRotor();
 }
 
 function formatScore(score) {
@@ -269,3 +277,53 @@ async function loadStats() {
 // Initialize
 loadStats();
 queryInput.focus();
+
+// Core Rotor animation — cycles through 8 fan blade positions
+const CORE_ROTOR_FRAMES = [
+  '..x.. ..x.. ..o.. ..... .....',
+  '....x ...x. ..o.. ..... .....',
+  '..... ..... ..oxx ..... .....',
+  '..... ..... ..o.. ...x. ....x',
+  '..... ..... ..o.. ..x.. ..x..',
+  '..... ..... ..o.. .x... x....',
+  '..... ..... xxo.. ..... .....',
+  'x.... .x... ..o.. ..... .....',
+];
+const CORE_ROTOR_SEQ = [0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7];
+let rotorFrame = 0;
+let rotorInterval = null;
+
+function tickCoreRotor() {
+  const mask = CORE_ROTOR_FRAMES[CORE_ROTOR_SEQ[rotorFrame]];
+  const cells = mask.replace(/\s/g, '').split('');
+  document.querySelectorAll('.dotmatrix-core-rotor .dmx-grid').forEach(grid => {
+    const dots = grid.querySelectorAll('.dmx-dot');
+    dots.forEach((dot, i) => {
+      const ch = cells[i] || '.';
+      if (dot.classList.contains('dmx-hub')) {
+        dot.style.opacity = '0.6';
+      } else if (ch === 'x') {
+        dot.style.opacity = '1';
+      } else if (ch === 'o') {
+        dot.style.opacity = '0.56';
+      } else {
+        dot.style.opacity = '0.12';
+      }
+    });
+  });
+  rotorFrame = (rotorFrame + 1) % CORE_ROTOR_SEQ.length;
+}
+
+function startCoreRotor() {
+  if (rotorInterval) return;
+  rotorFrame = 0;
+  tickCoreRotor();
+  rotorInterval = setInterval(tickCoreRotor, 1550 / CORE_ROTOR_SEQ.length);
+}
+
+function stopCoreRotor() {
+  if (rotorInterval) {
+    clearInterval(rotorInterval);
+    rotorInterval = null;
+  }
+}
