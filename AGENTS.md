@@ -49,6 +49,13 @@ TypeScript npm workspaces monorepo (`@sce/*`). Local-first: each indexed root ke
 5. Export: `node packages/cli/dist/src/main.js export -o knowledge/<topic>-export --path knowledge/<topic>`
 6. Import: `npx tsx packages/web/import.ts knowledge/<topic>-export sce-db --append`
 
+### Unity Documentation Sources
+
+For Unity-related topics, always include official Unity 6000.3 docs:
+- Manual: `https://docs.unity3d.com/6000.3/Documentation/Manual/<Page>.html`
+- Scripting API: `https://docs.unity3d.com/6000.3/Documentation/ScriptReference/<Class>.html`
+- Combine with Context7 content for practical examples
+
 Batch helpers: `scripts/index-knowledge-batch.mjs`, `scripts/export-import-knowledge-batch.mjs`
 
 ## Search Modes
