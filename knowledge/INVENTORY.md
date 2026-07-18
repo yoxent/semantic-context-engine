@@ -135,6 +135,24 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | 8 | Dot Matrix (loading animations) | **Imported to D1** |
 | 9 | filestream (Node.js fs/streams, Python file I/O), scientific-notation (BigInt, float precision, Python decimal) | **Imported to D1** |
 
+## Expansion Roadmap
+
+See `knowledge/EXPANSION-ROADMAP.md` for ~100 planned topics across batches 10–23:
+- **Batch 10**: Particle Systems, VFX Graph
+- **Batch 11**: Post-Processing, Decals, Fog
+- **Batch 12**: Build Profiles, Build Automation
+- **Batch 13**: Unity 6.0, GPU Resident Drawer, Sentis
+- **Batch 14**: Collisions, Raycasting
+- **Batch 15**: Springs, Joints
+- **Batch 16**: Primitives, Procedural Meshes
+- **Batch 17**: Renderers, GPU Instancing, LOD
+- **Batch 18**: Camera, Cinemachine, Render Texture
+- **Batch 19**: Scene Management, Additive Scenes
+- **Batch 20**: Interfaces (IPointer, IDrag)
+- **Batch 21**: Editor Scripting, Custom Inspectors
+- **Batch 22**: Player Settings
+- **Batch 23**: Graphics API, CommandBuffer, Compute Shaders
+
 ## Deferred Topics — do not pull
 
 Parked per scope lock (2026-07-16). Do not scrape, index, or import until explicitly unparked.
