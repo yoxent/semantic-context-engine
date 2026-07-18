@@ -45,8 +45,8 @@ TypeScript npm workspaces monorepo (`@sce/*`). Local-first: each indexed root ke
 1. Create URL list: `knowledge/urls/<topic>.txt`
 2. Scrape: `npx tsx packages/web/cf-scraper.ts knowledge/urls/<topic>.txt ./knowledge/<topic>`
 3. Create `knowledge/<topic>/sce.config.json` (see README for template)
-4. Index: `OPENROUTER_API_KEY="..." node packages/cli/dist/src/main.js index .` (from `knowledge/<topic>/`)
-5. Export: `OPENROUTER_API_KEY="..." node packages/cli/dist/src/main.js export -o knowledge/<topic>-export --path knowledge/<topic>`
+4. Index: `export OPENROUTER_API_KEY=$(grep OPENROUTER_API_KEY packages/web/.dev.vars | cut -d'"' -f2) && node packages/cli/dist/src/main.js index .` (from `knowledge/<topic>/`)
+5. Export: `node packages/cli/dist/src/main.js export -o knowledge/<topic>-export --path knowledge/<topic>`
 6. Import: `npx tsx packages/web/import.ts knowledge/<topic>-export sce-db --append`
 
 Batch helpers: `scripts/index-knowledge-batch.mjs`, `scripts/export-import-knowledge-batch.mjs`
