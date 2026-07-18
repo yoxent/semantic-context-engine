@@ -44,9 +44,9 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | sqlite | 6 | 3 | SQL, FTS5, better-sqlite3 |
 | **Batch 4 — Unity + UI + CI** | | | |
 | unity-entities | 17 | 17 | ECS deepen |
-| unity-cinemachine | 12 | 12 | Cinemachine deepen |
-| unity-netcode | 17 | 17 | Netcode for GameObjects |
-| unity-shaders | 8 | 8 | ShaderLab / HLSL basics |
+| unity-cinemachine | 13 | 13 | Cinemachine deepen |
+| unity-netcode | 18 | 18 | Netcode for GameObjects |
+| unity-shaders | 13 | 13 | ShaderLab / HLSL + Shader Graph |
 | shadcn | 17 | 17 | shadcn/ui components |
 | nativewind | 11 | 11 | NativeWind (RN + Tailwind) |
 | github-actions | 16 | 15 | GitHub Actions workflows |
@@ -67,9 +67,14 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | trpc | 4 | 4 | tRPC procedures |
 | tree-sitter | 2 | 2 | Parser usage |
 | openai-api | 3 | 3 | OpenAI API / embeddings |
-| unity | 1 | 1 | Unity Manual (base) |
-| unity-addressables | 1 | 1 | Addressables |
-| unity-ui-toolkit | 1 | 1 | UI Toolkit |
+| unity | 6 | 6 | Unity Manual, Components, GameObjects, MonoBehaviours |
+| unity-addressables | 2 | 2 | Addressables system |
+| unity-async | 11 | 11 | Async/Await, UniTask, CancellationToken |
+| unity-coroutines | 6 | 6 | IEnumerator, yield patterns |
+| unity-events | 6 | 6 | UnityEvent, UnityAction, C# events |
+| unity-scene-management | 0 | 0 | (empty — needs content) |
+| unity-scriptable-objects | 0 | 0 | (empty — needs content) |
+| unity-ui-toolkit | 2 | 2 | UI Toolkit, USS/UXML |
 | unreal-engine | 1 | 1 | Unreal Blueprints |
 | cpp | 3 | 3 | C++ getting started + cppreference |
 | csharp | 4 | 4 | C# / .NET async, generics |
