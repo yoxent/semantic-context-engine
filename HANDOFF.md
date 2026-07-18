@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-18
-**Status**: Web deployment functional, RetroUI + Dot Matrix + filestream + scientific-notation indexed
+**Status**: Web deployment functional, all Unity topics rebuilt with 6000.3 docs
 
 ---
 
@@ -10,7 +10,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (1795 chunks, 1748 vectors)
+- **D1 Database**: `sce-db` (~1950 chunks, ~1920 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -26,28 +26,25 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  1795
-Vectors: 1748 (2048-dim embeddings)
+Chunks:  ~1950
+Vectors:  ~1920 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  86
+Topics:  89
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
 ### Topics Indexed
-Topics indexed (84):
+Topics indexed (89):
 - **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
 - **Backend**: Node.js, Express, FastAPI, Python, tRPC, REST API patterns
 - **Cloud/DB**: Cloudflare Workers (full suite), D1, DO, KV, R2, Vectorize, Queues, Workers AI
 - **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM, SQLite, Supabase, BigQuery
 - **Mobile**: Expo, React Native, Flutter, Dart, Firebase, AWS Amplify
-- **Unity**: ECS, Cinemachine, Netcode, Shaders, ScriptableObjects, Events, Coroutines, Async/Awaitables, Scene Management
+- **Unity (6000.3)**: Base, ECS, Cinemachine, Netcode, Shaders, UI Toolkit, Addressables, ScriptableObjects, Events, Coroutines, Async, Scene Management, Collisions, Joints, Primitives
 - **Unity animation**: DOTween, LitMotion, PrimeTween
 - **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel, Wrangler
-- **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib
-- **Misc**: TypeScript, Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines, luminosity
-- shieldcn, bolt.new
-- **Batch 6 (33 topics)**: REST API, Flutter, Dart, Supabase, AWS Amplify, Node.js, Express, HTML, CSS, jQuery, BigQuery, CI/CD pipelines, Object Pooling, Vector Math, Spline, LINQ/ZLinq, Dependency Injection, Unity ScriptableObjects, Number Formatting, Localization, Unity Events, Coroutines, Async/Awaitables, Unit Testing, Scene Management, DOTween, LitMotion, PrimeTween, zlib, Data Encryption, System.IO, Luminosity, Auth Patterns
-- **Batch 9**: filestream (Node.js fs/streams, Python file I/O), scientific-notation (BigInt, float precision, Python decimal)
+- **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib, filestream, scientific-notation
+- **Misc**: TypeScript, Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines, luminosity, auth patterns
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
 ---
