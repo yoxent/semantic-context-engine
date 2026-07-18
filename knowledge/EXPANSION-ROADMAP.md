@@ -86,7 +86,7 @@
 
 ---
 
-## Batch 14 — Unity Collisions & Physics
+## Batch 14 — Unity Collisions & Physics ✅ DONE
 
 | Topic | Scope |
 |-------|-------|
@@ -104,7 +104,7 @@
 
 ---
 
-## Batch 15 — Unity Springs & Joints
+## Batch 15 — Unity Springs & Joints ✅ DONE
 
 | Topic | Scope |
 |-------|-------|
@@ -126,7 +126,7 @@
 
 ---
 
-## Batch 16 — Unity Primitives & Meshes
+## Batch 16 — Unity Primitives & Meshes ✅ DONE
 
 | Topic | Scope |
 |-------|-------|
