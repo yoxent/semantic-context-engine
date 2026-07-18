@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-17
-**Status**: Web deployment functional, RetroUI docs indexed
+**Last Updated**: 2026-07-18
+**Status**: Web deployment functional, RetroUI + Dot Matrix + filestream + scientific-notation indexed
 
 ---
 
@@ -10,7 +10,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (1722 chunks, 1664 vectors)
+- **D1 Database**: `sce-db` (1795 chunks, 1690 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -26,10 +26,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  1722
-Vectors: 1664 (2048-dim embeddings)
+Chunks:  1795
+Vectors: 1690 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  84
+Topics:  86
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
@@ -47,6 +47,7 @@ Topics indexed (84):
 - **Misc**: TypeScript, Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines, luminosity
 - shieldcn, bolt.new
 - **Batch 6 (33 topics)**: REST API, Flutter, Dart, Supabase, AWS Amplify, Node.js, Express, HTML, CSS, jQuery, BigQuery, CI/CD pipelines, Object Pooling, Vector Math, Spline, LINQ/ZLinq, Dependency Injection, Unity ScriptableObjects, Number Formatting, Localization, Unity Events, Coroutines, Async/Awaitables, Unit Testing, Scene Management, DOTween, LitMotion, PrimeTween, zlib, Data Encryption, System.IO, Luminosity, Auth Patterns
+- **Batch 9**: filestream (Node.js fs/streams, Python file I/O), scientific-notation (BigInt, float precision, Python decimal)
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
 ---

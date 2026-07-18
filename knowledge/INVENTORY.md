@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-17
-**D1 Live Total**: **1722 chunks, 1664 vectors** (originally 195 / 188)
+**Last Updated**: 2026-07-18
+**D1 Live Total**: **1795 chunks, 1690 vectors** (originally 195 / 188)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All planned expansion batches (1–6, 3b) are **imported to D1**. Local re-index totals can lag D1 slightly after append imports or before a full re-export.
+All planned expansion batches (1–8) plus filestream and scientific-notation are **imported to D1**. Dot Matrix now has vectors (was 0). Local re-index totals can lag D1 slightly after append imports or before a full re-export.
 
 ## Topic Summary
 
@@ -89,6 +89,8 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | object-pooling | 6 | 6 | Generic pool pattern, Unity usage |
 | vector-math | 5 | 5 | Vector2/3, quaternions, formulas |
 | spline | 5 | 5 | Bezier, Catmull-Rom, path following |
+| filestream | 58 | 0 | Node.js fs/streams/buffer, Python file I/O |
+| scientific-notation | 15 | 0 | BigInt, Number, float precision, Python decimal |
 | linq | 12 | 12 | C# LINQ + ZLinq zero-alloc |
 | dependency-injection | 6 | 6 | .NET DI, VContainer, Zenject |
 | unity-scriptable-objects | 6 | 6 | Data containers, event channels |
@@ -110,9 +112,12 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **Batch 7 — UI libraries** | | | |
 | retroui | 124 | 124 | RetroUI neobrutalist React components (shadcn-compatible) |
 | **Batch 8 — Animation libs** | | | |
-| dotmatrix | 26 | 0 | Dot Matrix loading animation components (91 loaders) |
-| **Local knowledge subtotal** | **~770** | **~730** | 84 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~1612** | **~1598** | |
+| dotmatrix | 26 | 26 | Dot Matrix loading animation components (91 loaders) |
+| **Batch 9 — misc docs** | | | |
+| filestream | 58 | 0 | Node.js fs/streams/buffer, Python file I/O |
+| scientific-notation | 15 | 0 | BigInt, Number, float precision, Python decimal |
+| **Local knowledge subtotal** | **~843** | **~756** | 86 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~1685** | **~1624** | |
 
 ## Expansion Queue (2026-07-16)
 
@@ -128,6 +133,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | 6 | REST API, Flutter, Dart, Supabase, AWS Amplify, Node.js, Express, HTML, CSS, jQuery, BigQuery, CI/CD, Object Pooling, Vector Math, Spline, LINQ/ZLinq, DI, Unity ScriptableObjects, Number Formatting, Localization, Unity Events, Coroutines, Async/Awaitables, Unit Testing, Scene Management, DOTween, LitMotion, PrimeTween, zlib, Data Encryption, System.IO, Luminosity, Auth Patterns | **Imported to D1** |
 | 7 | RetroUI (neobrutalist React components) | **Imported to D1** |
 | 8 | Dot Matrix (loading animations) | **Imported to D1** |
+| 9 | filestream (Node.js fs/streams, Python file I/O), scientific-notation (BigInt, float precision, Python decimal) | **Imported to D1** |
 
 ## Deferred Topics — do not pull
 
@@ -220,6 +226,21 @@ Parked per scope lock (2026-07-16). Do not scrape, index, or import until explic
 - Free OpenRouter embed model rate-limited intermittently; some doc topics have fewer vectors than chunks (keyword search still works).
 - Oversized scrapes (Tailwind dumps, Docker builder, SQLite FTS5) truncated or replaced with Context7 to fit D1 statement limits.
 - Helper scripts: `scripts/index-knowledge-batch.mjs`, `scripts/export-import-knowledge-batch.mjs`, `scripts/index-own-corpora.mjs`
+
+# Batch 8 — Animation libs (**in D1**)
+
+| Topic | Chunks | Vectors |
+|-------|--------|--------|
+| dotmatrix (`knowledge/dotmatrix/`) | 26 | 26 |
+| **Total** | **26** | **26** |
+
+# Batch 9 — Misc docs (**in D1**)
+
+| Topic | Chunks | Vectors |
+|-------|--------|--------|
+| filestream (`knowledge/filestream/`) | 58 | 0 |
+| scientific-notation (`knowledge/scientific-notation/`) | 15 | 0 |
+| **Total** | **73** | **0** |
 
 ---
 
