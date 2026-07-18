@@ -90,7 +90,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | vector-math | 5 | 5 | Vector2/3, quaternions, formulas |
 | spline | 5 | 5 | Bezier, Catmull-Rom, path following |
 | filestream | 58 | 0 | Node.js fs/streams/buffer, Python file I/O |
-| scientific-notation | 15 | 0 | BigInt, Number, float precision, Python decimal |
+| scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
 | linq | 12 | 12 | C# LINQ + ZLinq zero-alloc |
 | dependency-injection | 6 | 6 | .NET DI, VContainer, Zenject |
 | unity-scriptable-objects | 6 | 6 | Data containers, event channels |
@@ -114,10 +114,10 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **Batch 8 — Animation libs** | | | |
 | dotmatrix | 26 | 26 | Dot Matrix loading animation components (91 loaders) |
 | **Batch 9 — misc docs** | | | |
-| filestream | 58 | 0 | Node.js fs/streams/buffer, Python file I/O |
-| scientific-notation | 15 | 0 | BigInt, Number, float precision, Python decimal |
-| **Local knowledge subtotal** | **~843** | **~756** | 86 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~1685** | **~1624** | |
+| filestream | 58 | 58 | Node.js fs/streams/buffer, Python file I/O |
+| scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
+| **Local knowledge subtotal** | **~843** | **~829** | 86 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~1685** | **~1697** | |
 
 ## Expansion Queue (2026-07-16)
 

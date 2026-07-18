@@ -10,7 +10,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (1795 chunks, 1690 vectors)
+- **D1 Database**: `sce-db` (1795 chunks, 1748 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -27,7 +27,7 @@
 
 ```
 Chunks:  1795
-Vectors: 1690 (2048-dim embeddings)
+Vectors: 1748 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
 Topics:  86
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
@@ -77,6 +77,11 @@ Any MCP-compatible agent can now use:
 ---
 
 ## 🔧 Configuration
+
+### API Key
+- **Location**: `packages/web/.dev.vars` (used by worker locally; also stored as Cloudflare secret)
+- **Env var**: `OPENROUTER_API_KEY`
+- **Usage**: Set via `export OPENROUTER_API_KEY="..."` before running CLI commands (index, export)
 
 ### Worker Config
 - **sce-api**: `packages/web/worker/wrangler.toml`
