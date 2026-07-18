@@ -117,11 +117,11 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | filestream | 58 | 58 | Node.js fs/streams/buffer, Python file I/O |
 | scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
 | **Batch 14 — Unity Collisions** | | | |
-| unity-collisions | 21 | 21 | Colliders, triggers, raycasting, physics queries |
+| unity-collisions | 23 | 23 | Colliders, triggers, raycasting, physics queries |
 | **Batch 15 — Unity Joints** | | | |
-| unity-joints | 22 | 22 | Joints, springs, vehicle suspension, ragdoll |
+| unity-joints | 28 | 28 | Joints, springs, vehicle suspension, ragdoll |
 | **Batch 16 — Unity Primitives** | | | |
-| unity-primitives | 14 | 14 | Mesh API, procedural generation, terrain |
+| unity-primitives | 18 | 18 | Mesh API, procedural generation, terrain |
 | **Local knowledge subtotal** | **~843** | **~829** | 86 doc topics under `knowledge/` |
 | **Local grand total (incl. corpora)** | **~1685** | **~1697** | |
 
