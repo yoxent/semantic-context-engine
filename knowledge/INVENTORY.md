@@ -72,8 +72,8 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-async | 11 | 11 | Async/Await, UniTask, CancellationToken |
 | unity-coroutines | 6 | 6 | IEnumerator, yield patterns |
 | unity-events | 6 | 6 | UnityEvent, UnityAction, C# events |
-| unity-scene-management | 0 | 0 | (empty — needs content) |
-| unity-scriptable-objects | 0 | 0 | (empty — needs content) |
+| unity-scene-management | 7 | 7 | Scene loading, transitions, additive scenes |
+| unity-scriptable-objects | 6 | 6 | Data containers, event channels |
 | unity-ui-toolkit | 2 | 2 | UI Toolkit, USS/UXML |
 | unreal-engine | 1 | 1 | Unreal Blueprints |
 | cpp | 3 | 3 | C++ getting started + cppreference |
