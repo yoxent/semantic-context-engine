@@ -116,6 +116,12 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **Batch 9 — misc docs** | | | |
 | filestream | 58 | 58 | Node.js fs/streams/buffer, Python file I/O |
 | scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
+| **Batch 14 — Unity Collisions** | | | |
+| unity-collisions | 21 | 21 | Colliders, triggers, raycasting, physics queries |
+| **Batch 15 — Unity Joints** | | | |
+| unity-joints | 22 | 22 | Joints, springs, vehicle suspension, ragdoll |
+| **Batch 16 — Unity Primitives** | | | |
+| unity-primitives | 14 | 14 | Mesh API, procedural generation, terrain |
 | **Local knowledge subtotal** | **~843** | **~829** | 86 doc topics under `knowledge/` |
 | **Local grand total (incl. corpora)** | **~1685** | **~1697** | |
 
@@ -134,6 +140,9 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | 7 | RetroUI (neobrutalist React components) | **Imported to D1** |
 | 8 | Dot Matrix (loading animations) | **Imported to D1** |
 | 9 | filestream (Node.js fs/streams, Python file I/O), scientific-notation (BigInt, float precision, Python decimal) | **Imported to D1** |
+| 14 | Unity Collisions (colliders, triggers, raycasting) | **Imported to D1** |
+| 15 | Unity Joints (springs, vehicle suspension, ragdoll) | **Imported to D1** |
+| 16 | Unity Primitives (mesh API, procedural generation) | **Imported to D1** |
 
 ## Expansion Roadmap
 
