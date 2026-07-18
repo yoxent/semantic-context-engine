@@ -178,6 +178,7 @@ packages/
 - Index more documentation (TypeScript, React, etc.)
 - Index your own past projects for pattern reuse
 - RetroUI (neobrutalist React components) — **done**
+- **See `knowledge/EXPANSION-ROADMAP.md`** for ~100 planned Unity topics (batches 10–23)
 
 ### Priority 2: Add Symbol Data
 1. Index a codebase with AST extraction enabled
