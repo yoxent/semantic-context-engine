@@ -177,6 +177,7 @@ Keyword search remains the default. Enable semantic (embedding-based) search by 
 
 - `provider` is currently `"openai-compatible"` only (local Ollama / LM Studio compatible).
 - `apiKeyEnv` is the **name** of an environment variable holding a bearer token; the token itself is never stored in the config.
+- For this project, the OpenRouter key is in `packages/web/.dev.vars` (also stored as a Cloudflare secret).
 - Vectors are stored in the existing `.sce/metadata.sqlite` behind `IVectorStore`.
 - Embeddings are generated during `index`/`update`, not lazily during search.
 - Changing `model` or `dimensions` is a rebuild boundary: re-indexing fails with a clear rebuild instruction rather than mixing vectors.

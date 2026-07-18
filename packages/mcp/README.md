@@ -53,7 +53,7 @@ Claude will automatically use the MCP tool to search your indexed documentation.
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `SCE_API_URL` | `https://sce-api.pasttime.xyz` | SCE API endpoint |
-| `OPENROUTER_API_KEY` | (required for semantic) | OpenRouter API key |
+| `OPENROUTER_API_KEY` | (required for semantic) | OpenRouter API key (see `packages/web/.dev.vars`) |
 
 ## Tools
 
