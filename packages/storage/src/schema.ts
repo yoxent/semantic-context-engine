@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS chunks (
   file_hash TEXT NOT NULL,
   timestamp TEXT NOT NULL,
   heading_path_json TEXT NOT NULL,
-  wiki_links_json TEXT NOT NULL
+  wiki_links_json TEXT NOT NULL,
+  part_index INTEGER,
+  total_parts INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS chunk_links (

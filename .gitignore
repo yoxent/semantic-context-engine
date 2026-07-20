@@ -12,3 +12,4 @@ sce-export/
 knowledge/
 *-export/
 *.tsbuildinfo
+packages/web/.sce-import-tmp/

@@ -10,6 +10,8 @@ CREATE TABLE IF NOT EXISTS chunks (
   start_line INTEGER,
   end_line INTEGER,
   text TEXT NOT NULL,
+  part_index INTEGER,
+  total_parts INTEGER,
   created_at TEXT DEFAULT (datetime('now'))
 );
 

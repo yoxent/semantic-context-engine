@@ -13,6 +13,8 @@ export interface ExportedChunk {
   startLine: number;
   endLine: number;
   text: string;
+  partIndex?: number;
+  totalParts?: number;
 }
 
 export interface ExportedVector {
@@ -72,7 +74,9 @@ export async function exportIndex(
     headingPath: c.headingPath ? c.headingPath.join(" / ") : null,
     startLine: c.startLine,
     endLine: c.endLine,
-    text: c.text
+    text: c.text,
+    partIndex: c.partIndex,
+    totalParts: c.totalParts,
   }));
 
   // Export vectors
