@@ -25,6 +25,8 @@ interface ExportedChunk {
   startLine: number;
   endLine: number;
   text: string;
+  partIndex?: number;
+  totalParts?: number;
 }
 
 interface ExportedVector {
@@ -54,7 +56,7 @@ interface ExportMeta {
 // --- Constants ---
 
 /** Chunk batch size — 10 to stay under SQLite statement size limit (some chunks are ~19KB). */
-const CHUNK_BATCH_SIZE = 2;
+const CHUNK_BATCH_SIZE = 2; // Split chunks are ~7500 chars, so 2 per batch is safe (~15KB < 100KB limit)
 
 /** Vectors are large (2048 floats as JSON ~39KB each); D1 max statement is 100KB, so max 2 per batch. */
 const VECTOR_BATCH_SIZE = 2;
@@ -62,7 +64,8 @@ const VECTOR_BATCH_SIZE = 2;
 // --- Helpers ---
 
 function escapeString(s: string): string {
-  return s.replace(/'/g, "''");
+  // Strip null bytes (D1/SQLite treats them as string terminators)
+  return s.replace(/\0/g, '').replace(/'/g, "''");
 }
 
 function chunkArray<T>(arr: T[], size: number): T[][] {
@@ -144,11 +147,11 @@ export async function importToD1(options: ImportOptions): Promise<void> {
       const values = batch
         .map(
           (c) =>
-            `('${c.id}', '${escapeString(c.repositoryId)}', '${escapeString(c.relativePath)}', ${nullableString(c.language)}, ${nullableString(c.headingPath)}, ${c.startLine}, ${c.endLine}, '${escapeString(c.text)}')`
+            `('${c.id}', '${escapeString(c.repositoryId)}', '${escapeString(c.relativePath)}', ${nullableString(c.language)}, ${nullableString(c.headingPath)}, ${c.startLine}, ${c.endLine}, '${escapeString(c.text)}', ${c.partIndex ?? 'NULL'}, ${c.totalParts ?? 'NULL'})`
         )
         .join(",\n       ");
       await dbCommand(
-        `INSERT OR REPLACE INTO chunks (id, repository_id, relative_path, language, heading_path, start_line, end_line, text) VALUES ${values}`
+        `INSERT OR REPLACE INTO chunks (id, repository_id, relative_path, language, heading_path, start_line, end_line, text, part_index, total_parts) VALUES ${values}`
       );
       const done = Math.min((i + 1) * CHUNK_BATCH_SIZE, chunks.length);
       process.stdout.write(`\r  Chunks: ${done}/${chunks.length}`);

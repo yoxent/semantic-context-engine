@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-18
-**Status**: Web deployment functional, all Unity topics rebuilt with 6000.3 docs
+**Last Updated**: 2026-07-19
+**Status**: Web deployment functional, Batch 24 (Full-Stack React/Next.js) indexed
 
 ---
 
@@ -10,42 +10,70 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (~1950 chunks, ~1920 vectors)
+- **D1 Database**: `sce-db` (2085 chunks, 207 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 1722 chunks |
-| Semantic Search | ✅ | 1664 vectors, 2048-dim |
+| Keyword Search | ✅ | ~55ms response, 2085 chunks |
+| Semantic Search | ✅ | Vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
 | Frontend UI | ✅ | RetroUI neobrutalist theme + Dot Matrix Core Rotor loader, dark, responsive, keyboard shortcuts |
+| Multi-Part Expansion | ✅ | Split chunks >7500 chars auto-expand in search results |
 
 ---
 
 ## 📊 D1 Database State
 
 ```
-Chunks:  ~1950
-Vectors:  ~1920 (2048-dim embeddings)
+Chunks:  2231
+Vectors:  353 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  89
+Topics:  ~92
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
-### Topics Indexed
-Topics indexed (89):
-- **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
+### Topics Indexed (~92)
+- **Web stack**: HTML, CSS, jQuery, React (thin), Next.js (thin), Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
+- **Full-stack (Batch 24)**: TanStack Query (131 chunks, split), Next.js deep (middleware, ISR, routes), React Hook Form, Auth.js v5, TypeScript patterns
 - **Backend**: Node.js, Express, FastAPI, Python, tRPC, REST API patterns
 - **Cloud/DB**: Cloudflare Workers (full suite), D1, DO, KV, R2, Vectorize, Queues, Workers AI
-- **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM, SQLite, Supabase, BigQuery
+- **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM (thin), SQLite, Supabase, BigQuery
 - **Mobile**: Expo, React Native, Flutter, Dart, Firebase, AWS Amplify
 - **Unity (6000.3)**: Base, ECS, Cinemachine, Netcode, Shaders, UI Toolkit, Addressables, ScriptableObjects, Events, Coroutines, Async, Scene Management, Collisions, Joints, Primitives
+- **Unity 6000.3 API**: ScriptReference (114 chunks), Manual (32 chunks) — GameObject, Rigidbody, Collider, Camera, Animator, Material, Shader, Mesh, etc.
+- **Unity packages**: Package docs (57 chunks, pending import) — Addressables, Cinemachine, Entities, Netcode, Input System
 - **Unity animation**: DOTween, LitMotion, PrimeTween
-- **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel, Wrangler
+- **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel (thin), Wrangler
 - **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib, filestream, scientific-notation
-- **Misc**: TypeScript, Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines, luminosity, auth patterns
+- **Misc**: TypeScript (thin), Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines, luminosity, auth patterns
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
+
+### Full-Stack Expansion Plan (Batches 24–28)
+
+**Wave 1 — Batch 24 ✅ DONE**:
+| Topic | Chunks | Status |
+|-------|--------|--------|
+| tanstack-query | 131 | ✅ Done (split into parts) |
+| nextjs-deep | 18 | ✅ Done |
+| react-hook-form | 11 | ✅ Done |
+| nextjs-auth | 3 | ✅ Done |
+| ts-patterns | 15 | ✅ Done |
+
+**Wave 2 — Batch 25 (PLANNED)**:
+radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies
+
+**Wave 3 — Batch 26 (PLANNED)**:
+react-table (TanStack Table), msw, testing-library, eslint-nextjs, sonner
+
+**Wave 4 — Batch 27 (PLANNED)**:
+vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
+
+**Wave 5 — Batch 28 (PLANNED)**:
+socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
+
+See `knowledge/EXPANSION-ROADMAP.md` for full scope per topic.
 
 ---
 
@@ -95,6 +123,9 @@ Any MCP-compatible agent can now use:
 2. **semantic**: OpenRouter embedding → cosine similarity (needs vectors)
 3. **hybrid**: RRF fusion of keyword + semantic (k=60)
 4. **ast**: Symbol table lookup — exact match then prefix fallback
+
+### Multi-Part Document Expansion
+When chunks exceed ~7500 chars, the indexer splits them into linked parts. The search API automatically expands multi-part results: when a search hits any part of a split document, all sibling parts are returned together.
 
 ---
 
@@ -161,21 +192,27 @@ packages/
 5. **Show stats**: 85 chunks of Cloudflare Workers documentation
 
 ### Key Talking Points
-- "1686 chunks of documentation indexed in D1"
+- "2231 chunks of documentation indexed in D1"
 - "4 search modes: keyword, semantic, hybrid, AST"
 - "Sub-100ms keyword search, semantic search via OpenRouter"
 - "Built for AI coding agents as the primary consumer"
 - "Edge-deployed on Cloudflare Workers for global low-latency"
+- "Multi-part document splitting for long docs (auto-expands in search)"
+- "Unity 6000.3 Scripting API + Manual indexed"
 
 ---
 
 ## 🔜 Next Steps
 
-### Priority 1: Expand Knowledge Base
-- Index more documentation (TypeScript, React, etc.)
-- Index your own past projects for pattern reuse
-- RetroUI (neobrutalist React components) — **done**
-- **See `knowledge/EXPANSION-ROADMAP.md`** for ~100 planned Unity topics (batches 10–23)
+### Priority 1: Continue Knowledge Base Expansion
+- **Import unity-packages-complete** to D1 (57 chunks)
+- **Batch 25**: radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies
+- **Batch 26**: react-table, msw, testing-library, eslint-nextjs, sonner
+- **Batch 27**: vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
+- **Batch 28**: socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
+- **Unity deepen**: Add more Scripting API classes (Terrain, TextMeshPro, Networking)
+- **Unity packages**: TextMeshPro, ProBuilder, Shader Graph, VFX Graph, Timeline, ML-Agents
+- **See `knowledge/EXPANSION-ROADMAP.md`** for full details
 
 ### Priority 2: Add Symbol Data
 1. Index a codebase with AST extraction enabled
@@ -192,7 +229,7 @@ packages/
 
 ## 🐛 Known Issues
 
-1. **No symbols in D1**: AST symbol data not yet exported/imported
+1. **Low vector count**: Only 207 vectors vs 2085 chunks — most topics have keyword search only; re-embedding needed for full semantic search
 2. **wrangler.jsonc interference**: Must use `--config wrangler.toml` when deploying worker from `packages/web/worker/` to avoid picking up parent config
 3. **Import batch size**: Reduced to 2 to avoid SQLITE_TOOBIG errors with large chunks
 

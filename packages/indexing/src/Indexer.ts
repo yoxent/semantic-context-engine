@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import type {
+  Chunk,
   IChunker,
   IEmbeddingProvider,
   IKeywordIndex,
@@ -13,6 +14,55 @@ import type {
   SceConfig
 } from "@sce/core";
 import { defaultConfig, detectLanguage } from "@sce/core";
+
+/** Max characters per embedding part (~7500 chars ≈ ~2000 tokens, safe under 8192 limit) */
+const MAX_CHARS_PER_PART = 7500;
+
+/**
+ * Split a chunk into embedding-safe parts if its text exceeds MAX_CHARS_PER_PART.
+ * Each part gets a deterministic ID, a "→ Continue to Part N" suffix, and
+ * the original chunk's metadata (heading, lines, etc.).
+ */
+function splitChunkForEmbedding(chunk: Chunk): Chunk[] {
+  if (chunk.text.length <= MAX_CHARS_PER_PART) return [chunk];
+
+  const parts: Chunk[] = [];
+  const text = chunk.text;
+  let partIndex = 0;
+  let offset = 0;
+
+  while (offset < text.length) {
+    const isLast = offset + MAX_CHARS_PER_PART >= text.length;
+    const end = isLast ? text.length : offset + MAX_CHARS_PER_PART;
+    const partText = text.substring(offset, end);
+
+    // Determine next part number for continuation pointer
+    const totalParts = Math.ceil(text.length / MAX_CHARS_PER_PART);
+    const suffix = isLast
+      ? `\n\n---\n📄 *Part ${partIndex + 1} of ${totalParts} (end)*`
+      : `\n\n---\n→ *Continues in Part ${partIndex + 2} of ${totalParts}*`;
+
+    // Deterministic part ID: hash(originalId + partIndex)
+    const partId = createHash("sha256")
+      .update(`${chunk.id}#part${partIndex}`)
+      .digest("hex");
+
+    parts.push({
+      ...chunk,
+      id: partId,
+      text: partText + suffix,
+      startLine: chunk.startLine + Math.floor(offset / 80),
+      endLine: chunk.startLine + Math.floor(end / 80),
+      partIndex: partIndex,
+      totalParts: totalParts,
+    });
+
+    partIndex++;
+    offset = end;
+  }
+
+  return parts;
+}
 import { discoverFiles } from "./FileDiscovery.js";
 
 export interface IndexRepositoryOptions {
@@ -108,13 +158,34 @@ export class IndexingService {
       await this.deps.keywordIndex.removeChunksForFile(repositoryId, relativePath);
       if (this.deps.vectorStore) await this.deps.vectorStore.deleteByFile(repositoryId, relativePath);
 
-      const chunks = this.deps.chunker.chunk({
+      const rawChunks = this.deps.chunker.chunk({
         repositoryId,
         relativePath,
         language,
         fileHash,
         text
       });
+
+      // Split oversized chunks into embedding-safe parts BEFORE saving to metadata
+      // This ensures only properly-sized chunks are stored
+      let finalChunks: Chunk[];
+      if (this.deps.embeddingProvider) {
+        finalChunks = [];
+        for (const chunk of rawChunks) {
+          finalChunks.push(...splitChunkForEmbedding(chunk));
+        }
+        const splitCount = finalChunks.length - rawChunks.length;
+        if (splitCount > 0) {
+          this.deps.logger?.debug("index.split", {
+            relativePath,
+            rawChunks: rawChunks.length,
+            finalChunks: finalChunks.length,
+            splitParts: splitCount
+          });
+        }
+      } else {
+        finalChunks = rawChunks;
+      }
 
       await this.deps.metadataStore.saveFile({
         repositoryId,
@@ -123,34 +194,34 @@ export class IndexingService {
         fileHash,
         indexedAt: new Date()
       });
-      await this.deps.metadataStore.saveChunks(chunks);
-      await this.deps.keywordIndex.indexChunks(chunks);
+      await this.deps.metadataStore.saveChunks(finalChunks);
+      await this.deps.keywordIndex.indexChunks(finalChunks);
       if (this.deps.symbolIndex) {
         await this.deps.symbolIndex.removeSymbolsForFile(repositoryId, relativePath);
-        await this.deps.symbolIndex.indexSymbols(chunks);
+        await this.deps.symbolIndex.indexSymbols(rawChunks); // symbol index uses original chunks
       }
       if (this.deps.embeddingProvider && this.deps.vectorStore && this.deps.embeddingConfig) {
-        const texts = chunks.map((c) => c.text);
+        const texts = finalChunks.map((c) => c.text);
         const vectors = await this.deps.embeddingProvider.embed(texts);
-        if (vectors.length !== chunks.length) {
+        if (vectors.length !== finalChunks.length) {
           throw new Error(
-            `Embedding provider returned ${vectors.length} vectors for ${chunks.length} chunks (${relativePath})`
+            `Embedding provider returned ${vectors.length} vectors for ${finalChunks.length} chunks (${relativePath})`
           );
         }
-        for (let i = 0; i < chunks.length; i++) {
+        for (let i = 0; i < finalChunks.length; i++) {
           await this.deps.vectorStore.upsert({
-            chunkId: chunks[i]!.id,
+            chunkId: finalChunks[i]!.id,
             repositoryId,
-            relativePath: chunks[i]!.relativePath,
+            relativePath: finalChunks[i]!.relativePath,
             model: this.deps.embeddingConfig.model,
             dimensions: this.deps.embeddingConfig.dimensions,
             vector: vectors[i]!
           });
         }
-        this.deps.logger?.debug("index.embedded", { relativePath, chunks: chunks.length });
+        this.deps.logger?.debug("index.embedded", { relativePath, chunks: finalChunks.length, originalChunks: rawChunks.length });
       }
-      chunksIndexed += chunks.length;
-      this.deps.logger?.debug("index.file", { relativePath, chunks: chunks.length });
+      chunksIndexed += finalChunks.length;
+      this.deps.logger?.debug("index.file", { relativePath, chunks: finalChunks.length });
     }
 
     const discovered = new Set(files);

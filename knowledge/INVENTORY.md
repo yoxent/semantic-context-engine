@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-18
-**D1 Live Total**: **1795 chunks, 1690 vectors** (originally 195 / 188)
+**Last Updated**: 2026-07-19
+**D1 Live Total**: **2231 chunks, 353 vectors** (Unity 6000.3 Scripting API + Manual added; Package docs pending import)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All planned expansion batches (1–8) plus filestream and scientific-notation are **imported to D1**. Dot Matrix now has vectors (was 0). Local re-index totals can lag D1 slightly after append imports or before a full re-export.
+All planned expansion batches (1–9, 14–16), Batch 24 (full-stack React/Next.js), and Unity 6000.3 Scripting API + Manual are **imported to D1**. Batch 24 topics use chunk splitting for documents exceeding ~7500 chars, with multi-part search expansion in the API.
 
 ## Topic Summary
 
@@ -127,38 +127,52 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-joints | 28 | 28 | Joints, springs, vehicle suspension, ragdoll |
 | **Batch 16 — Unity Primitives** | | | |
 | unity-primitives | 18 | 18 | Mesh API, procedural generation, terrain |
-| **Local knowledge subtotal** | **~843** | **~829** | 86 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~1685** | **~1697** | |
+| **Local knowledge subtotal** | **~1167** | **~1153** | 93 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~2035** | **~2021** | |
 
-## Expansion Queue (2026-07-16)
+## Expansion Queue
 
 | Batch | Topics | Status |
 |-------|--------|--------|
-| 1a–1e | Expo/EAS, Firebase, GCP thin, RN, Kotlin, IAP/RevenueCat/AdMob, Play Console, Game Center/StoreKit, Zustand/Maestro/Jest | **Imported to D1** |
-| 2 | Tailwind v4, Resend, Vercel, t3-env, Zod, Drizzle+Neon, FastAPI, Docker, ngrok | **Imported to D1** |
-| 3 | Wrangler, OpenRouter, MCP SDK, SQLite deepen | **Imported to D1** |
-| 3b | Own-repo corpora (SCE packages, word-guess, web-portfolio) | **Imported to D1** |
-| 4 | Unity Netcode, Unity Shaders, shadcn/ui, NativeWind, GitHub Actions | **Imported to D1** |
-| 4b | Unity ECS deepen, Unity Cinemachine deepen | **Imported to D1** |
-| 5 | shieldcn, bolt.new | **Imported to D1** |
-| 6 | REST API, Flutter, Dart, Supabase, AWS Amplify, Node.js, Express, HTML, CSS, jQuery, BigQuery, CI/CD, Object Pooling, Vector Math, Spline, LINQ/ZLinq, DI, Unity ScriptableObjects, Number Formatting, Localization, Unity Events, Coroutines, Async/Awaitables, Unit Testing, Scene Management, DOTween, LitMotion, PrimeTween, zlib, Data Encryption, System.IO, Luminosity, Auth Patterns | **Imported to D1** |
-| 7 | RetroUI (neobrutalist React components) | **Imported to D1** |
-| 8 | Dot Matrix (loading animations) | **Imported to D1** |
-| 9 | filestream (Node.js fs/streams, Python file I/O), scientific-notation (BigInt, float precision, Python decimal) | **Imported to D1** |
-| 14 | Unity Collisions (colliders, triggers, raycasting) | **Imported to D1** |
-| 15 | Unity Joints (springs, vehicle suspension, ragdoll) | **Imported to D1** |
-| 16 | Unity Primitives (mesh API, procedural generation) | **Imported to D1** |
+| 1a–1e | Expo/EAS, Firebase, GCP thin, RN, Kotlin, IAP/RevenueCat/AdMob, Play Console, Game Center/StoreKit, Zustand/Maestro/Jest | ✅ **Imported to D1** |
+| 2 | Tailwind v4, Resend, Vercel, t3-env, Zod, Drizzle+Neon, FastAPI, Docker, ngrok | ✅ **Imported to D1** |
+| 3 | Wrangler, OpenRouter, MCP SDK, SQLite deepen | ✅ **Imported to D1** |
+| 3b | Own-repo corpora (SCE packages, word-guess, web-portfolio) | ✅ **Imported to D1** |
+| 4 | Unity Netcode, Unity Shaders, shadcn/ui, NativeWind, GitHub Actions | ✅ **Imported to D1** |
+| 4b | Unity ECS deepen, Unity Cinemachine deepen | ✅ **Imported to D1** |
+| 5 | shieldcn, bolt.new | ✅ **Imported to D1** |
+| 6 | REST API, Flutter, Dart, Supabase, AWS Amplify, Node.js, Express, HTML, CSS, jQuery, BigQuery, CI/CD, Object Pooling, Vector Math, Spline, LINQ/ZLinq, DI, Unity ScriptableObjects, Number Formatting, Localization, Unity Events, Coroutines, Async/Awaitables, Unit Testing, Scene Management, DOTween, LitMotion, PrimeTween, zlib, Data Encryption, System.IO, Luminosity, Auth Patterns | ✅ **Imported to D1** |
+| 7 | RetroUI (neobrutalist React components) | ✅ **Imported to D1** |
+| 8 | Dot Matrix (loading animations) | ✅ **Imported to D1** |
+| 9 | filestream (Node.js fs/streams, Python file I/O), scientific-notation (BigInt, float precision, Python decimal) | ✅ **Imported to D1** |
+| 14 | Unity Collisions (colliders, triggers, raycasting) | ✅ **Imported to D1** |
+| 15 | Unity Joints (springs, vehicle suspension, ragdoll) | ✅ **Imported to D1** |
+| 16 | Unity Primitives (mesh API, procedural generation) | ✅ **Imported to D1** |
+| **24** | **tanstack-query (131), nextjs-deep (18), react-hook-form (11), nextjs-auth (3), ts-patterns (15)** | ✅ **Imported to D1** |
+| **Unity+** | **unity-scripting-api (114), unity-manual-6000 (32)** | ✅ **Imported to D1** |
+| **Unity++** | **unity-packages-complete (57)** — Addressables, Cinemachine, Netcode, Input System | ⚠️ **Scraped, needs import** |
+| **25** | **radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies** | ⏳ **Planned** |
+| **26** | **react-table (TanStack Table), msw, testing-library, eslint-nextjs, sonner** | ⏳ **Planned** |
+| **27** | **vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages** | ⏳ **Planned** |
+| **28** | **socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata** | ⏳ **Planned** |
 
 ## Expansion Roadmap
 
-See `knowledge/EXPANSION-ROADMAP.md` for ~100 planned topics across batches 10–23:
+See `knowledge/EXPANSION-ROADMAP.md` for full details.
+
+### Full-Stack Dev (Batches 24–28) — Active
+- **Batch 24** ✅: tanstack-query (131 chunks), nextjs-deep (18), react-hook-form (11), nextjs-auth (3), ts-patterns (15) — **Done**
+- **Unity 6000.3** ✅: unity-scripting-api (114), unity-manual-6000 (32) — **Done**
+- **Batch 25** ⏳: radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies
+- **Batch 26** ⏳: react-table, msw, testing-library, eslint-nextjs, sonner
+- **Batch 27** ⏳: vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
+- **Batch 28** ⏳: socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
+
+### Unity (Batches 10–23) — Deferred
 - **Batch 10**: Particle Systems, VFX Graph
 - **Batch 11**: Post-Processing, Decals, Fog
 - **Batch 12**: Build Profiles, Build Automation
 - **Batch 13**: Unity 6.0, GPU Resident Drawer, Sentis
-- **Batch 14**: Collisions, Raycasting
-- **Batch 15**: Springs, Joints
-- **Batch 16**: Primitives, Procedural Meshes
 - **Batch 17**: Renderers, GPU Instancing, LOD
 - **Batch 18**: Camera, Cinemachine, Render Texture
 - **Batch 19**: Scene Management, Additive Scenes
@@ -273,6 +287,25 @@ Parked per scope lock (2026-07-16). Do not scrape, index, or import until explic
 | filestream (`knowledge/filestream/`) | 58 | 0 |
 | scientific-notation (`knowledge/scientific-notation/`) | 15 | 0 |
 | **Total** | **73** | **0** |
+
+# Batch 24 — Full-Stack React/Next.js (**in D1**)
+
+| Topic | Chunks | Vectors | Notes |
+|-------|--------|---------|-------|
+| tanstack-query | 131 | 131 | Split into multi-part chunks (max 7500 chars each) |
+| nextjs-deep | 18 | 18 | Middleware, ISR, parallel/intercepting routes |
+| react-hook-form | 11 | 11 | useForm, useFieldArray, Controller, Zod validation |
+| nextjs-auth | 3 | 3 | Auth.js v5 setup, providers, sessions |
+| ts-patterns | 15 | 15 | Discriminated unions, type narrowing, branded types |
+| **Total** | **178** | **178** |
+
+# Unity 6000.3 Scripting API & Manual (**in D1**)
+
+| Topic | Chunks | Vectors | Notes |
+|-------|--------|---------|-------|
+| unity-scripting-api | 114 | 114 | 6000.3 ScriptReference: GameObject, Rigidbody, Collider, Camera, Animator, etc. |
+| unity-manual-6000 | 32 | 32 | 6000.3 Manual: Physics, Rendering, Animation, UI, Scripting |
+| **Total** | **146** | **146** |
 
 ---
 

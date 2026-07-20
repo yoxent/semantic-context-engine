@@ -94,8 +94,8 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
   async saveChunks(chunks: Chunk[]): Promise<void> {
     const insertChunk = this.db.prepare(
       `INSERT OR REPLACE INTO chunks
-       (id, repository_id, relative_path, language, start_line, end_line, text, file_hash, timestamp, heading_path_json, wiki_links_json)
-       VALUES (@id, @repositoryId, @relativePath, @language, @startLine, @endLine, @text, @fileHash, @timestamp, @headingPathJson, @wikiLinksJson)`
+       (id, repository_id, relative_path, language, start_line, end_line, text, file_hash, timestamp, heading_path_json, wiki_links_json, part_index, total_parts)
+       VALUES (@id, @repositoryId, @relativePath, @language, @startLine, @endLine, @text, @fileHash, @timestamp, @headingPathJson, @wikiLinksJson, @partIndex, @totalParts)`
     );
     const deleteLinks = this.db.prepare("DELETE FROM chunk_links WHERE source_chunk_id = ?");
     const insertLink = this.db.prepare("INSERT OR IGNORE INTO chunk_links (source_chunk_id, target) VALUES (?, ?)");
@@ -290,7 +290,9 @@ function toChunkRow(chunk: Chunk): Record<string, unknown> {
     fileHash: chunk.fileHash,
     timestamp: chunk.timestamp.toISOString(),
     headingPathJson: JSON.stringify(chunk.headingPath ?? []),
-    wikiLinksJson: JSON.stringify(chunk.wikiLinks ?? [])
+    wikiLinksJson: JSON.stringify(chunk.wikiLinks ?? []),
+    partIndex: chunk.partIndex ?? null,
+    totalParts: chunk.totalParts ?? null,
   };
 }
 
@@ -306,6 +308,8 @@ function fromChunkRow(row: any): Chunk {
     fileHash: row.file_hash,
     timestamp: new Date(row.timestamp),
     headingPath: JSON.parse(row.heading_path_json),
-    wikiLinks: JSON.parse(row.wiki_links_json)
+    wikiLinks: JSON.parse(row.wiki_links_json),
+    partIndex: row.part_index ?? undefined,
+    totalParts: row.total_parts ?? undefined,
   };
 }

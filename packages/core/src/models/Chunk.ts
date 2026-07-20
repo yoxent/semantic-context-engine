@@ -17,4 +17,7 @@ export interface Chunk {
   symbolKind?: SymbolKind;
   gitCommitHash?: string;
   wikiLinks?: string[];
+  // Multi-part document fields (set by splitChunkForEmbedding)
+  partIndex?: number;   // 0-based index of this part
+  totalParts?: number;  // Total number of parts in the document
 }

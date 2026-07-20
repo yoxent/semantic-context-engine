@@ -39,6 +39,10 @@ export interface SearchHit {
   score: number;
   language: string | null;
   symbolKind?: string | null;
+  // Multi-part document fields
+  partOf?: string;      // Original document chunk ID (if this is a split part)
+  partIndex?: number;   // 0-based part number
+  totalParts?: number;  // Total parts in this document
 }
 
 export interface SearchResult {
@@ -65,7 +69,7 @@ async function keywordSearch(
   const searchPattern = `%${query}%`;
 
   const sql = `
-    SELECT id, relative_path, heading_path, text, language, 1.0 AS score
+    SELECT id, relative_path, heading_path, text, language, part_index, total_parts, 1.0 AS score
     FROM chunks
     ${filterClause}
     ${filterClause ? "AND" : "WHERE"} (
@@ -88,6 +92,8 @@ async function keywordSearch(
     text: String(row.text).substring(0, 500),
     score: row.score as number,
     language: (row.language as string) ?? null,
+    partIndex: (row.part_index as number) ?? undefined,
+    totalParts: (row.total_parts as number) ?? undefined,
   }));
 }
 
@@ -289,6 +295,91 @@ async function hybridSearch(
 // Public entry point
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Multi-part document expansion
+// ---------------------------------------------------------------------------
+
+/** Detect if a chunk text is a split part by checking continuation pointers. */
+function detectSplitPart(text: string): { partIndex: number; totalParts: number } | null {
+  const continuesMatch = text.match(/Continues in Part (\d+) of (\d+)/);
+  if (continuesMatch) {
+    return { partIndex: parseInt(continuesMatch[1]) - 2, totalParts: parseInt(continuesMatch[2]) };
+  }
+  const endMatch = text.match(/Part (\d+) of (\d+) \(end\)/);
+  if (endMatch) {
+    return { partIndex: parseInt(endMatch[1]) - 1, totalParts: parseInt(endMatch[2]) };
+  }
+  return null;
+}
+
+/** Fetch all parts of a split document given its relativePath. */
+async function fetchSiblingParts(
+  db: D1Database,
+  relativePath: string,
+): Promise<SearchHit[]> {
+  const sql = `
+    SELECT id, relative_path, heading_path, text, language, part_index, total_parts
+    FROM chunks
+    WHERE relative_path = ?
+      AND total_parts IS NOT NULL
+    ORDER BY part_index, id
+  `;
+  const results = await db.prepare(sql).bind(relativePath).all();
+  return results.results.map((row: Record<string, unknown>) => ({
+    chunkId: row.id as string,
+    relativePath: row.relative_path as string,
+    headingPath: (row.heading_path as string) ?? null,
+    text: String(row.text).substring(0, 500),
+    score: 0.5,
+    language: (row.language as string) ?? null,
+    partIndex: (row.part_index as number) ?? 0,
+    totalParts: (row.total_parts as number) ?? 1,
+  }));
+}
+
+/** Expand search results to include all parts of split documents. */
+async function expandPartResults(
+  db: D1Database,
+  hits: SearchHit[],
+  limit: number,
+): Promise<SearchHit[]> {
+  const expanded: SearchHit[] = [];
+  const seen = new Set<string>();
+
+  for (const hit of hits) {
+    if (seen.has(hit.chunkId)) continue;
+    seen.add(hit.chunkId);
+
+    // Check if this chunk has part metadata in the database
+    const partCheck = await db.prepare(
+      "SELECT total_parts FROM chunks WHERE id = ? AND total_parts IS NOT NULL"
+    ).bind(hit.chunkId).first();
+    
+    if (partCheck) {
+      // This is a split part — fetch all siblings (don't break, include all parts)
+      const siblings = await fetchSiblingParts(db, hit.relativePath);
+      if (siblings.length > 1) {
+        // Add the original hit first, then siblings
+        expanded.push(hit);
+        for (const s of siblings) {
+          if (!seen.has(s.chunkId)) {
+            seen.add(s.chunkId);
+            expanded.push(s);
+          }
+        }
+      } else {
+        expanded.push(hit);
+      }
+    } else {
+      expanded.push(hit);
+      if (expanded.length >= limit) break;
+    }
+  }
+  // Don't truncate if we expanded any split parts — return all parts of matching docs
+  const hasSplitParts = expanded.some(h => h.totalParts && h.totalParts > 1);
+  return hasSplitParts ? expanded : expanded.slice(0, limit);
+}
+
 export async function search(
   db: D1Database,
   env: EmbeddingEnv,
@@ -314,6 +405,9 @@ export async function search(
       hits = await astSearch(db, query, limit, filters);
       break;
   }
+
+  // Expand multi-part results: if a hit is a split chunk, fetch all parts
+  hits = await expandPartResults(db, hits, limit);
 
   return {
     query,
