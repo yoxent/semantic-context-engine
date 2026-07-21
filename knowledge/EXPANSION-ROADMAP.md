@@ -1,7 +1,7 @@
 # Knowledge Base Expansion Roadmap
 
 **Created**: 2026-07-18
-**Last Updated**: 2026-07-19
+**Last Updated**: 2026-07-21
 **Total Topics Planned**: ~100+
 **Status**: Active indexing
 
@@ -10,7 +10,7 @@
 ## Current State
 
 - **D1 Live**: 2085 chunks, 207 vectors, ~90 topics
-- **Indexed**: All batches 1–9, 14–16, plus Batch 24 (tanstack-query, nextjs-deep, react-hook-form, nextjs-auth, ts-patterns)
+- **Indexed**: All batches 1–9, 14–16, 24, 29–32
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
 ---
@@ -34,6 +34,7 @@
 | 24 | tanstack-query, nextjs-deep, react-hook-form, nextjs-auth, ts-patterns | ✅ Done |
 | Unity+ | unity-scripting-api (114 chunks), unity-manual-6000 (32 chunks) | ✅ Done |
 | Unity++ | unity-packages-complete (57 chunks) — Addressables, Cinemachine, Netcode, Input System | ⚠️ Scraped, needs import |
+| 32 | pico-css, watercss, mvp-css, new-css, radix-themes | ✅ Done |
 
 ---
 
@@ -249,6 +250,40 @@ https://nextjs.org/docs/app/building-your-application/optimizing/metadata
 | 21 | Editor Scripting, Custom Inspectors | ⏳ Pending |
 | 22 | Player Settings | ⏳ Pending |
 | 23 | Graphics API, CommandBuffer, Compute | ⏳ Pending |
+
+---
+
+## ✅ Batch 32 — Minimalist UI CSS Frameworks — DONE
+
+**Priority**: MEDIUM — Classless CSS frameworks for minimalist UIs
+**Status**: ✅ Indexed and imported to D1 (3 + 9 + 3 + 9 + 286 = 310 chunks)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `pico-css` | Classless semantic CSS, dark mode, SASS customization, responsive, forms, components, utilities | picocss.com + Context7 |
+| `watercss` | Classless CSS, CSS variables, theme switching, dark/light modes, custom branding | Context7 (SPA) |
+| `mvp-css` | Classless CSS for MVP landing pages, CSS variables, dark mode, semantic HTML | andybrewer.github.io + GitHub |
+| `new-css` | Classless CSS framework, responsive, dark mode, CSS custom properties | Context7 (SPA) |
+| `radix-themes` | Unstyled React primitives (button, card, dialog, tabs, select, checkbox, switch, tooltip, popover, etc.) | radix-ui.com |
+
+### URL Sources
+```
+https://picocss.com/docs
+https://picocss.com/docs/classless
+https://picocss.com/docs/forms
+https://andybrewer.github.io/mvp/
+https://github.com/andybrewer/mvp
+https://www.radix-ui.com/themes/docs/overview/getting-started
+https://www.radix-ui.com/themes/docs/components/button
+https://www.radix-ui.com/themes/docs/components/card
+https://www.radix-ui.com/themes/docs/components/dialog
+https://www.radix-ui.com/themes/docs/components/tabs
+https://www.radix-ui.com/themes/docs/components/select
+https://www.radix-ui.com/themes/docs/components/checkbox
+https://www.radix-ui.com/themes/docs/components/switch
+https://www.radix-ui.com/themes/docs/components/tooltip
+https://www.radix-ui.com/themes/docs/components/popover
+```
 
 ---
 
