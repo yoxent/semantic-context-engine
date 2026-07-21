@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-07-21
-**D1 Live Total**: **2779 chunks, 892 vectors** (added design patterns, Unity Cloud, Unity UI, deepened GCP & Splines)
+**D1 Live Total**: **~3089 chunks, ~1186 vectors** (added minimalist UI CSS frameworks: pico-css, watercss, mvp-css, new-css, radix-themes)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
@@ -130,8 +130,14 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-joints | 28 | 28 | Joints, springs, vehicle suspension, ragdoll |
 | **Batch 16 — Unity Primitives** | | | |
 | unity-primitives | 18 | 18 | Mesh API, procedural generation, terrain |
-| **Local knowledge subtotal** | **~1167** | **~1153** | 93 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~2035** | **~2021** | |
+| **Batch 32 — Minimalist UI CSS** | | | |
+| pico-css | 3 | 3 | Classless semantic CSS, dark mode, SASS |
+| watercss | 9 | 9 | Classless CSS, CSS variables, themes |
+| mvp-css | 3 | 3 | Classless CSS for MVP landing pages |
+| new-css | 9 | 9 | Classless CSS framework |
+| radix-themes | 286 | 270 | Unstyled React primitives (button, card, dialog, tabs) |
+| **Local knowledge subtotal** | **~1477** | **~1447** | 98 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~2345** | **~2315** | |
 
 ## Expansion Queue
 
@@ -161,6 +167,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **29** | **unity-cloud (NEW), google-cloud-thin (deepen), spline (deepen)** | ✅ **Imported to D1** |
 | **30** | **unity-ui (NEW)** | ✅ **Imported to D1** |
 | **31** | **design-patterns (NEW)** | ✅ **Imported to D1** |
+| **32** | **pico-css, watercss, mvp-css, new-css, radix-themes** | ✅ **Imported to D1** |
 
 ## Expansion Roadmap
 
@@ -173,6 +180,7 @@ See `knowledge/EXPANSION-ROADMAP.md` for full details.
 - **Batch 26** ⏳: react-table, msw, testing-library, eslint-nextjs, sonner
 - **Batch 27** ⏳: vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
 - **Batch 28** ⏳: socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
+- **Batch 32** ✅: pico-css (3), watercss (9), mvp-css (3), new-css (9), radix-themes (286) — **Done**
 
 ### Unity (Batches 10–23) — Deferred
 - **Batch 10**: Particle Systems, VFX Graph
@@ -808,6 +816,26 @@ Scraped from https://retroui.dev/docs via custom RSC-aware scraper.
 - **Components** (57): accordion, alert, alert-dialog, aspect-ratio, avatar, badge, breadcrumb, button, button-group, calendar, card, carousel, checkbox, collapsible, command, combobox, context-menu, data-table, date-picker, dialog, direction, drawer, dropdown-menu, empty, field, hover-card, input, input-group, input-otp, item, kbd, label, menubar, navigation-menu, native-select, pagination, popover, progress, radio-group, resizable, scroll-area, select, separator, sheet, sidebar, skeleton, slider, sonner, spinner, switch, table, tabs, textarea, toggle, toggle-group, tooltip, typography
 - **Scrape method**: Custom `rsc-scraper.ts` — extracts content from Next.js React Server Component `__next_f.push` script chunks
 - **Note**: toast component page returned 404 (not yet published)
+
+---
+
+# Batch 32 — Minimalist UI CSS Frameworks (**in D1**)
+
+| Topic | Chunks | Vectors | Notes |
+|-------|--------|---------|-------|
+| pico-css (new) | 3 | 3 | Classless semantic CSS, dark mode, SASS customization, responsive |
+| watercss (new) | 9 | 9 | Classless CSS, CSS variables, theme switching, dark/light modes |
+| mvp-css (new) | 3 | 3 | Classless CSS for MVP landing pages, CSS variables |
+| new-css (new) | 9 | 9 | Classless CSS framework, responsive, dark mode |
+| radix-themes (new) | 286 | 270 | Unstyled React primitives (button, card, dialog, tabs, select, checkbox, switch, etc.) |
+| **Total** | **310** | **294** |
+
+### Notes
+- watercss, new-css: SPA sites, used Context7 for documentation
+- pico-css: Partial scrape (3/7 pages), supplemented with Context7
+- mvp-css: Full scrape from GitHub Pages + GitHub repo
+- radix-themes: Large component library (18 components), full scrape from radix-ui.com
+- radix-themes vectors may still be importing to D1 (286 chunks, 270 vectors)
 
 ---
 

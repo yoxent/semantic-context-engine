@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-21
-**Status**: Web deployment functional, Batch 29-30 (Unity Cloud, Unity UI, GCP deepen, Splines) indexed
+**Status**: Web deployment functional, Batch 32 (minimalist UI CSS frameworks) indexed
 
 ---
 
@@ -10,7 +10,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (2085 chunks, 207 vectors)
+- **D1 Database**: `sce-db` (3089 chunks, 1186 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -27,10 +27,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  2779
-Vectors:  892 (2048-dim embeddings)
+Chunks:  3089
+Vectors:  1186 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~96
+Topics:  ~98
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
@@ -48,6 +48,7 @@ Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 - **Unity 6000.3 API**: ScriptReference (114 chunks), Manual (32 chunks) — GameObject, Rigidbody, Collider, Camera, Animator, Material, Shader, Mesh, etc.
 - **Unity packages**: Package docs (57 chunks, pending import) — Addressables, Cinemachine, Entities, Netcode, Input System
 - **Unity animation**: DOTween, LitMotion, PrimeTween
+- **Minimalist UI CSS (NEW)**: Pico CSS (classless semantic), Water.css (classless themes), MVP.css (landing pages), new.css (classless), Radix Themes (unstyled React primitives)
 - **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel (thin), Wrangler
 - **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib, filestream, scientific-notation
 - **Misc**: TypeScript (thin), Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines (deepened), luminosity, auth patterns
