@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-19
-**Status**: Web deployment functional, Batch 24 (Full-Stack React/Next.js) indexed
+**Last Updated**: 2026-07-21
+**Status**: Web deployment functional, Batch 29-30 (Unity Cloud, Unity UI, GCP deepen, Splines) indexed
 
 ---
 
@@ -27,10 +27,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  2231
-Vectors:  353 (2048-dim embeddings)
+Chunks:  2779
+Vectors:  892 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~92
+Topics:  ~96
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
@@ -42,12 +42,16 @@ Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 - **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM (thin), SQLite, Supabase, BigQuery
 - **Mobile**: Expo, React Native, Flutter, Dart, Firebase, AWS Amplify
 - **Unity (6000.3)**: Base, ECS, Cinemachine, Netcode, Shaders, UI Toolkit, Addressables, ScriptableObjects, Events, Coroutines, Async, Scene Management, Collisions, Joints, Primitives
+- **Unity UI**: UGUI (Canvas, RectTransform, Image, Text, Button, Toggle, Slider, ScrollRect, EventSystem, Layout groups, Rich Text), UI Toolkit (VisualElement, USS/UXML, UI Builder, data binding, manipulators), TextMeshPro (fonts, rich text, input field, mesh modifiers) (NEW)
+- **Unity Cloud**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer (Sessions, Matchmaker, Relay), Economy, Authentication, Vivox, LevelPlay, Deployment, Building Blocks (NEW)
+- **Design Patterns**: Mobile UI screen patterns, Material Design 3 components, Apple HIG iOS patterns, UI-Patterns.com catalog (NEW)
 - **Unity 6000.3 API**: ScriptReference (114 chunks), Manual (32 chunks) — GameObject, Rigidbody, Collider, Camera, Animator, Material, Shader, Mesh, etc.
 - **Unity packages**: Package docs (57 chunks, pending import) — Addressables, Cinemachine, Entities, Netcode, Input System
 - **Unity animation**: DOTween, LitMotion, PrimeTween
 - **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel (thin), Wrangler
 - **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib, filestream, scientific-notation
-- **Misc**: TypeScript (thin), Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines, luminosity, auth patterns
+- **Misc**: TypeScript (thin), Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines (deepened), luminosity, auth patterns
+- **Google Cloud**: Compute Engine, Cloud Run, Cloud Functions, Cloud Storage, Cloud SQL, Firestore, Bigtable, Pub/Sub, Cloud Tasks, GKE, Cloud Build, Logging, Monitoring, Secret Manager, API Gateway, CDN, Load Balancing, VPC, IAM, Scheduler, Deployment Manager (DEEPENED from 5→185 chunks)
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
 ### Full-Stack Expansion Plan (Batches 24–28)
@@ -69,6 +73,23 @@ react-table (TanStack Table), msw, testing-library, eslint-nextjs, sonner
 
 **Wave 4 — Batch 27 (PLANNED)**:
 vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
+
+**Batch 29 ✅ DONE**:
+| Topic | Chunks | Status |
+|-------|--------|--------|
+| unity-cloud | 87 | ✅ Done |
+| google-cloud-thin (deepen) | 185 | ✅ Done |
+| spline (deepen) | 6 | ✅ Done |
+
+**Batch 30 ✅ DONE**:
+| Topic | Chunks | Status |
+|-------|--------|--------|
+| unity-ui | 92 | ✅ Done |
+
+**Batch 31 ✅ DONE**:
+| Topic | Chunks | Status |
+|-------|--------|--------|
+| design-patterns | 127 | ✅ Done |
 
 **Wave 5 — Batch 28 (PLANNED)**:
 socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata

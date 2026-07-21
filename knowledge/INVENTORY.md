@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-19
-**D1 Live Total**: **2231 chunks, 353 vectors** (Unity 6000.3 Scripting API + Manual added; Package docs pending import)
+**Last Updated**: 2026-07-21
+**D1 Live Total**: **2779 chunks, 892 vectors** (added design patterns, Unity Cloud, Unity UI, deepened GCP & Splines)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
@@ -21,7 +21,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **Batch 1 — mobile / word-guess** | | | |
 | expo | 23 | 23 | Expo + EAS |
 | firebase | 20 | 18 | Auth, Firestore, Remote Config, rules |
-| google-cloud-thin | 5 | 5 | Project, IAM, auth APIs (not full GCP) |
+| google-cloud-thin | 185 | 182 | **Deepened**: Compute, Cloud Run, Functions, Storage, SQL, Firestore, Bigtable, Pub/Sub, Tasks, GKE, Build, Logging, Monitoring, Secret Manager, API Gateway, CDN, Load Balancing, VPC, IAM, Scheduler, Deployment Manager, Source Repos |
 | react-native | 11 | 11 | RN core docs |
 | kotlin | 8 | 8 | Android / Kotlin light |
 | monetization-iap | 24 | 23 | IAP, RevenueCat, AdMob, Play/App billing |
@@ -93,7 +93,10 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | ci-cd-pipelines | 7 | 7 | GitHub Actions, deploy, matrix, caching |
 | object-pooling | 6 | 6 | Generic pool pattern, Unity usage |
 | vector-math | 5 | 5 | Vector2/3, quaternions, formulas |
-| spline | 5 | 5 | Bezier, Catmull-Rom, path following |
+| unity-cloud | 87 | 75 | **NEW**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer, Economy, Authentication, Vivox, LevelPlay, Deployment |
+| unity-ui | 92 | 92 | **NEW**: UGUI (Canvas, RectTransform, Image, Text, Button, Toggle, Slider, ScrollRect, EventSystem), UI Toolkit (VisualElement, USS, UXML, UI Builder, manipulators), TextMeshPro (fonts, rich text, input field, mesh modifiers) |
+| design-patterns | 127 | 127 | **NEW**: Mobile UI screen patterns (onboarding, login, feed, settings, etc.), Material Design 3 components (buttons, cards, chips, navigation, input), Apple HIG iOS patterns, UI-Patterns.com catalog |
+| spline | 6 | 6 | **Deepened**: Unity Splines package (knots, evaluation, SplineContainer, Animate, Instantiate, Mesh, Extrude, Jobs) + generic Bezier/Catmull-Rom formulas |
 | filestream | 58 | 0 | Node.js fs/streams/buffer, Python file I/O |
 | scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
 | linq | 12 | 12 | C# LINQ + ZLinq zero-alloc |
@@ -155,6 +158,9 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **26** | **react-table (TanStack Table), msw, testing-library, eslint-nextjs, sonner** | ⏳ **Planned** |
 | **27** | **vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages** | ⏳ **Planned** |
 | **28** | **socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata** | ⏳ **Planned** |
+| **29** | **unity-cloud (NEW), google-cloud-thin (deepen), spline (deepen)** | ✅ **Imported to D1** |
+| **30** | **unity-ui (NEW)** | ✅ **Imported to D1** |
+| **31** | **design-patterns (NEW)** | ✅ **Imported to D1** |
 
 ## Expansion Roadmap
 
@@ -803,4 +809,48 @@ Scraped from https://retroui.dev/docs via custom RSC-aware scraper.
 - **Scrape method**: Custom `rsc-scraper.ts` — extracts content from Next.js React Server Component `__next_f.push` script chunks
 - **Note**: toast component page returned 404 (not yet published)
 
+---
+
+# Batch 31 — Design Patterns (**in D1**)
+
+| Topic | Chunks | Vectors | Notes |
+|-------|--------|---------|-------|
+| design-patterns (new) | 127 | 127 | Mobile UI patterns (onboarding, login, home, feed, detail, profile, settings, navigation, input, feedback, media, commerce, social), Material Design 3 components (buttons, cards, chips, navigation, text fields, sliders, dialogs, snackbars), Apple HIG iOS patterns (nav bars, tab bars, alerts, sheets, lists, forms, dark mode, layout), UI-Patterns.com catalog |
+| **Total** | **127** | **127** |
+
+### Notes
+- Content is text-based pattern descriptions (not images) — Mobbin-style visual references not available for scraping
+- Material Design 3 JS-rendered, used Context7 for component specs
+- Apple HIG scraped via Context7
+- UI-Patterns.com scraped for pattern categories
+
+---
+
+# Batch 30 — Unity UI (**in D1**)
+
+| Topic | Chunks | Vectors | Notes |
+|-------|--------|---------|-------|
+| unity-ui (new) | 92 | 92 | UGUI (Canvas, RectTransform, Image, Text, Button, Toggle, Slider, ScrollRect, Scrollbar, CanvasScaler, GraphicRaycaster, EventSystem, Layout groups, Rich Text), UI Toolkit (VisualElement, USS/UXML, UI Builder, data binding, manipulators, scheduling, panels), TextMeshPro (TMP_Text, TMP_InputField, font assets, rich text tags, mesh modifiers) |
+| **Total** | **92** | **92** |
+
+### Notes
+- Scraped from `com.unity.ugui@2.0`, `com.unity.textmeshpro@3.2`, and 6000.3 Manual pages
+- Deep reference files created for UGUI, UI Toolkit, and TextMeshPro
+- Replaces thin `unity-ui-toolkit` (2 chunks) with comprehensive coverage
+
+---
+
+# Batch 29 — Unity Cloud + GCP deepen + Splines (**in D1**)
+
+| Topic | Chunks | Vectors | Notes |
+|-------|--------|---------|-------|
+| unity-cloud (new) | 87 | 75 | Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer (Sessions, Matchmaker, Relay), Economy, Authentication, Vivox, LevelPlay, Deployment, Building Blocks |
+| google-cloud-thin (deepen) | 185 | 182 | **Deepened from 5→185**: Compute Engine, Cloud Run, Cloud Functions, Cloud Storage, Cloud SQL (MySQL/Postgres), Firestore, Bigtable, Pub/Sub, Cloud Tasks, GKE, Cloud Build, Cloud Logging, Monitoring, Secret Manager, Endpoints, API Gateway, Cloud CDN, Load Balancing, VPC & Firewalls, IAM & Service Accounts, Cloud Scheduler, Deployment Manager, Source Repos |
+| spline (deepen) | 6 | 6 | **Deepened**: Unity Splines package (SplineContainer, BezierKnot, CatmullRomKnot, LinearKnot, SplineAnimate, SplineInstantiate, SplineMesh, SplineExtrude, SplineCompositor, evaluation, distance, jobs) + generic Bezier/Catmull-Rom math |
+| **Total** | **278** | **263** |
+
+### Notes
+- Unity Cloud docs have non-standard URL patterns (some pages 404); used Context7 + manual content for deep references
+- GCP scraper: 60/73 pages scraped (some JS-rendered pages returned minimal content)
+- All three topics indexed locally and imported to D1 via `--append`
 
