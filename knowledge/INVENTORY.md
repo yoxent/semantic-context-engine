@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-07-21
-**D1 Live Total**: **~3089 chunks, ~1186 vectors** (added minimalist UI CSS frameworks: pico-css, watercss, mvp-css, new-css, radix-themes)
+**D1 Live Total**: **~3228 chunks, ~1325 vectors** (added ZLinq deep scrape from GitHub repo)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
@@ -100,6 +100,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | filestream | 58 | 0 | Node.js fs/streams/buffer, Python file I/O |
 | scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
 | linq | 12 | 12 | C# LINQ + ZLinq zero-alloc |
+| zlinq | 139 | 139 | **NEW**: ZLinq deep scrape (GitHub repo) — architecture, operators, SIMD, Unity, LINQ to Tree |
 | dependency-injection | 6 | 6 | .NET DI, VContainer, Zenject |
 | unity-scriptable-objects | 6 | 6 | Data containers, event channels |
 | number-formatting | 5 | 5 | C#/JS formatting, scientific notation |
@@ -136,8 +137,8 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | mvp-css | 3 | 3 | Classless CSS for MVP landing pages |
 | new-css | 9 | 9 | Classless CSS framework |
 | radix-themes | 286 | 270 | Unstyled React primitives (button, card, dialog, tabs) |
-| **Local knowledge subtotal** | **~1477** | **~1447** | 98 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~2345** | **~2315** | |
+| **Local knowledge subtotal** | **~1616** | **~1586** | 99 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~2484** | **~2454** | |
 
 ## Expansion Queue
 
@@ -168,6 +169,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **30** | **unity-ui (NEW)** | ✅ **Imported to D1** |
 | **31** | **design-patterns (NEW)** | ✅ **Imported to D1** |
 | **32** | **pico-css, watercss, mvp-css, new-css, radix-themes** | ✅ **Imported to D1** |
+| **33** | **zlinq (deep scrape from Cysharp/ZLinq GitHub)** | ✅ **Imported to D1** |
 
 ## Expansion Roadmap
 
@@ -818,6 +820,19 @@ Scraped from https://retroui.dev/docs via custom RSC-aware scraper.
 - **Note**: toast component page returned 404 (not yet published)
 
 ---
+
+# Batch 33 — ZLinq Deep Scrape (**in D1**)
+
+| Topic | Chunks | Vectors | Notes |
+|-------|--------|---------|-------|
+| zlinq (new) | 139 | 139 | **Deep scrape from Cysharp/ZLinq GitHub**: Architecture & design, Getting started, Complete operators reference (99% .NET 10 compat), LINQ to SIMD guide, LINQ to Tree (FileSystem, JSON, GameObjects), Unity integration guide, ZLinq vs System.Linq comparison, plus 47 C# source files from `src/ZLinq/Linq/` |
+| **Total** | **139** | **139** |
+
+### Notes
+- Replaces thin `context7-zlinq-basics.md` (was 1 chunk) with comprehensive 139-chunk deep reference
+- Original `linq` topic (12 chunks) retained for standard C# LINQ reference
+- Covers: zero-allocation architecture, ValueEnumerable<T>, IValueEnumerator<T>, all operators, SIMD operations, Unity/DOTS/Burst integration, LINQ to Tree, UniTask/DOTween integration
+- Source files include: Where, Select, OrderBy, GroupBy, Join, Aggregate, First, Any, Count, Sum, Average, Distinct, Skip, Take, ToArray, ToList, Concat, Zip, Reverse, Range, Sequence, Shuffle, LeftJoin, RightJoin, AggregateBy, CountBy, Chunk, Except, Intersect, Union, Append, Prepend, Single, Last, ElementAt, Min, Max, CopyTo, AsValueEnumerable, ForEach, ToArrayPool, JoinToString, Pinned, ToImmutableArray
 
 # Batch 32 — Minimalist UI CSS Frameworks (**in D1**)
 

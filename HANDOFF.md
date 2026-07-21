@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-21
-**Status**: Web deployment functional, Batch 32 (minimalist UI CSS frameworks) indexed
+**Status**: Web deployment functional, Batch 33 (ZLinq deep scrape from GitHub) indexed
 
 ---
 
@@ -10,7 +10,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (3089 chunks, 1186 vectors)
+- **D1 Database**: `sce-db` (3228 chunks, 1325 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -27,10 +27,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  3089
-Vectors:  1186 (2048-dim embeddings)
+Chunks:  3228
+Vectors: 1325 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~98
+Topics:  ~99
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
@@ -50,7 +50,7 @@ Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 - **Unity animation**: DOTween, LitMotion, PrimeTween
 - **Minimalist UI CSS (NEW)**: Pico CSS (classless semantic), Water.css (classless themes), MVP.css (landing pages), new.css (classless), Radix Themes (unstyled React primitives)
 - **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel (thin), Wrangler
-- **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib, filestream, scientific-notation
+- **C#/.NET**: LINQ, **ZLinq (NEW: 139 chunks, deep scrape from Cysharp/ZLinq GitHub — architecture, operators, SIMD, Unity, LINQ to Tree)**, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib, filestream, scientific-notation
 - **Misc**: TypeScript (thin), Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines (deepened), luminosity, auth patterns
 - **Google Cloud**: Compute Engine, Cloud Run, Cloud Functions, Cloud Storage, Cloud SQL, Firestore, Bigtable, Pub/Sub, Cloud Tasks, GKE, Cloud Build, Logging, Monitoring, Secret Manager, API Gateway, CDN, Load Balancing, VPC, IAM, Scheduler, Deployment Manager (DEEPENED from 5→185 chunks)
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
@@ -91,6 +91,20 @@ vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
 | Topic | Chunks | Status |
 |-------|--------|--------|
 | design-patterns | 127 | ✅ Done |
+
+**Batch 32 ✅ DONE**:
+| Topic | Chunks | Status |
+|-------|--------|--------|
+| pico-css | 3 | ✅ Done |
+| watercss | 9 | ✅ Done |
+| mvp-css | 3 | ✅ Done |
+| new-css | 9 | ✅ Done |
+| radix-themes | 286 | ✅ Done |
+
+**Batch 33 ✅ DONE**:
+| Topic | Chunks | Status |
+|-------|--------|--------|
+| zlinq (deep scrape) | 139 | ✅ Done |
 
 **Wave 5 — Batch 28 (PLANNED)**:
 socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
