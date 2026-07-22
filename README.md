@@ -20,7 +20,7 @@ Third-party docs (Expo, Firebase, Hono, Drizzle, Cloudflare, etc.) sit alongside
 |---|---|
 | Web | https://sce-web.pasttime.xyz/ |
 | API | https://sce-api.pasttime.xyz |
-| Inventory | `knowledge/INVENTORY.md` (~3228 chunks / 1325 vectors in D1) |
+| Inventory | `knowledge/INVENTORY.md` (~5475 chunks / 2962 vectors in D1) |
 | Search | `sce search "query"` |
 
 Local-first by design: each indexed root keeps `.sce/metadata.sqlite`. Production search is also mirrored to Cloudflare D1 for the live API/UI.

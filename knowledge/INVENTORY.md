@@ -1,12 +1,125 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-21
-**D1 Live Total**: **~3228 chunks, ~1325 vectors** (added ZLinq deep scrape from GitHub repo)
+**Last Updated**: 2026-07-22
+**D1 Live Total**: **~5475 chunks, ~2962 vectors** (added Batch 28: socket-io 58, server-sent-events 35, nextjs-image 74, nextjs-fonts 32, nextjs-metadata 40)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All planned expansion batches (1–9, 14–16), Batch 24 (full-stack React/Next.js), and Unity 6000.3 Scripting API + Manual are **imported to D1**. Batch 24 topics use chunk splitting for documents exceeding ~7500 chars, with multi-part search expansion in the API.
+All planned expansion batches (1–9, 14–16), Batch 24 (full-stack React/Next.js), Batch 34 (IAP/Ads/Networking/Figma/Canva/Payments), Unity 6000.3 Scripting API + Manual, RetroUI (124 chunks), and Unity Splines deep (25 chunks) are **imported to D1**. Batch 24 topics use chunk splitting for documents exceeding ~7500 chars, with multi-part search expansion in the API.
+
+## Batch 34 — IAP Deep, Ads, Unity Networking, Figma, Canva (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `iap-deep` | 83 | 0 | ✅ Imported |
+| `ads-monetization` | 73 | 0 | ✅ Imported |
+| `unity-networking-deep` | 72 | 0 | ✅ Imported |
+| `figma` | 36 | 0 | ✅ Imported |
+| `canva` | 41 | 0 | ✅ Imported |
+| `payment-platforms` | 85 | 0 | ✅ Imported |
+| **Total** | **390** | **0** | |
+
+### Batch 34 Details
+
+**IAP Deep (`iap-deep`)** — Deep dive into in-app purchases across platforms:
+- Unity IAP package (cross-platform, codeless, consumables, non-consumables, subscriptions)
+- Google Play Billing v5+ (Android integration, subscriptions, RTDN)
+- Apple StoreKit 2 (iOS, promotional offers, introductory pricing)
+- Windows Store IAP (Microsoft Partner Center, UWP)
+- RevenueCat Paywalls (configuration, A/B testing, analytics)
+- Paywall design patterns (hard, soft, metered, trial, gated)
+
+**Ads Monetization (`ads-monetization`)** — Comprehensive ad network coverage:
+- Google AdMob (Unity, Android, iOS — banner, interstitial, rewarded, native, app open)
+- Unity Ads / LevelPlay (mediation, A/B testing, player segmentation)
+- Meta Audience Network (Facebook demand, Unity integration)
+- AppLovin MAX (unified auction, 25+ networks, reporting APIs)
+- ironSource → LevelPlay migration
+- Chartboost (cross-promotion)
+- Google AdSense (web monetization)
+- Ad mediation platforms comparison (waterfall vs in-app bidding)
+
+**Unity Networking Deep (`unity-networking-deep`)** — All major networking solutions:
+- Photon PUN2 (legacy, room-based, state sync via PhotonView)
+- Photon Fusion 2 (state replication, server-authoritative, prediction/rollback, AoI)
+- Photon Quantum (deterministic ECS, 128 players, predict/rollback)
+- Mirror (open-source, high-level API, 12+ transports, interest management)
+- FishNet (server-authoritative, free, relevancy, time manager)
+- Unity Transport Package (UTP, low-level, UDP/WebTransport/QUIC)
+- Nakama (open-source game server, auth, matchmaking, chat, leaderboards)
+- Comparison matrix by game type and transport
+
+**Figma (`figma`)** — Design tool, API, plugin development:
+- Figma REST API (files, comments, versions, webhooks, components, variables)
+- Figma Plugin API (code.ts, UI, node operations, codegen, variables)
+- Figma Code Connect (React, Vue, custom frameworks)
+- Figma MCP Server (AI workflow integration)
+- Dev Mode, design tokens, variable modes
+
+**Canva (`canva`)** — Design tool, Connect API, Apps SDK:
+- Canva Connect API (designs, exports, brand kits, assets, folders)
+- Canva Apps SDK (content apps, design extensions, data apps)
+- Canva MCP Server (community implementation)
+- Node.js and Python SDKs
+- Canva vs Figma comparison
+
+**Payment Platforms (`payment-platforms`)** — Web/SaaS billing:
+- Stripe (Checkout, Elements, Subscriptions, Billing Portal, Webhooks)
+- PayPal (Checkout, Orders, Subscriptions)
+- Paddle (Merchant of Record, global tax, subscriptions)
+- Braintree (Drop-in UI, Hosted Fields, PayPal integration)
+- Lemon Squeezy (MoR, license keys, digital products)
+- RevenueCat (Web integration, paywalls)
+- Platform comparison matrix
+
+### Dependencies
+| Package | Topic | Purpose |
+|---------|-------|--------|
+| `com.unity.purchasing` | iap-deep | Unity IAP package |
+| `com.google.android.ads` | ads-monetization | AdMob Android SDK |
+| `com.google.unity.ads` | ads-monetization | AdMob Unity plugin |
+| `com.unity.ads` | ads-monetization | Unity Ads SDK |
+| `com.unity.services.mediation` | ads-monetization | LevelPlay mediation |
+| `com.applovin.sdk` | ads-monetization | AppLovin MAX SDK |
+| Photon Fusion 2 | unity-networking-deep | Photon networking |
+| Photon Quantum | unity-networking-deep | Deterministic ECS |
+| Mirror | unity-networking-deep | Open-source networking |
+| FishNet | unity-networking-deep | Server-authoritative |
+| nakama-dotnet | unity-networking-deep | Game server client |
+| `figma-js` | figma | REST API client |
+| `@figma/code-connect` | figma | Code Connect |
+| `@canva/connect-api` | canva | Node.js SDK |
+| `stripe` | payment-platforms | Stripe Node.js SDK |
+| `@stripe/stripe-js` | payment-platforms | Stripe browser SDK |
+| `@paypal/paypal-server-sdk` | payment-platforms | PayPal Node.js SDK |
+| `@paddle/paddle-node-sdk` | payment-platforms | Paddle Node.js SDK |
+| `braintree` | payment-platforms | Braintree Node.js SDK |
+| `@lemonsqueezy/lemonsqueezy.js` | payment-platforms | Lemon Squeezy JS SDK |
+
+### MCP Servers (Future Reference)
+| Tool | Topic | Purpose |
+|------|-------|--------|
+| `@anthropic-ai/figma-mcp-server` | figma | Figma design context for AI |
+| `@nicholasgriffintn/canva-mcp` | canva | Canva integration for AI |
+
+### URL Sources
+- `knowledge/urls/iap-deep.txt` — Unity IAP, Play Billing, StoreKit, Windows Store, RevenueCat
+- `knowledge/urls/ads-monetization.txt` — AdMob, Unity Ads, AppLovin, Meta, ironSource, Chartboost, AdSense
+- `knowledge/urls/unity-networking-deep.txt` — Photon, Mirror, FishNet, UTP, Nakama
+- `knowledge/urls/figma.txt` — REST API, Plugin API, Code Connect, MCP Server
+- `knowledge/urls/canva.txt` — Connect API, Apps SDK, MCP Server
+
+### Import Commands
+```bash
+# Index each topic
+for topic in iap-deep ads-monetization unity-networking-deep figma canva; do
+  export OPENROUTER_API_KEY=$(grep OPENROUTER_API_KEY packages/web/.dev.vars | cut -d'"' -f2)
+  node packages/cli/dist/src/main.js index knowledge/$topic
+  node packages/cli/dist/src/main.js export --path knowledge/$topic -o knowledge/$topic-export
+  npx tsx packages/web/import.ts knowledge/$topic-export sce-db --append
+done
+```
 
 ## Topic Summary
 
@@ -97,6 +210,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-ui | 92 | 92 | **NEW**: UGUI (Canvas, RectTransform, Image, Text, Button, Toggle, Slider, ScrollRect, EventSystem), UI Toolkit (VisualElement, USS, UXML, UI Builder, manipulators), TextMeshPro (fonts, rich text, input field, mesh modifiers) |
 | design-patterns | 127 | 127 | **NEW**: Mobile UI screen patterns (onboarding, login, feed, settings, etc.), Material Design 3 components (buttons, cards, chips, navigation, input), Apple HIG iOS patterns, UI-Patterns.com catalog |
 | spline | 6 | 6 | **Deepened**: Unity Splines package (knots, evaluation, SplineContainer, Animate, Instantiate, Mesh, Extrude, Jobs) + generic Bezier/Catmull-Rom formulas |
+| unity-splines | 25 | 25 | **NEW**: Unity Splines deep reference — SplineContainer, BezierKnot, CatmullRomKnot, LinearKnot, SplineAnimate, SplineInstantiate, SplineMesh, SplineExtrude, evaluation, distance, Jobs |
 | filestream | 58 | 0 | Node.js fs/streams/buffer, Python file I/O |
 | scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
 | linq | 12 | 12 | C# LINQ + ZLinq zero-alloc |
@@ -131,14 +245,65 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-joints | 28 | 28 | Joints, springs, vehicle suspension, ragdoll |
 | **Batch 16 — Unity Primitives** | | | |
 | unity-primitives | 18 | 18 | Mesh API, procedural generation, terrain |
+| **Batch 10 — Unity Particles & VFX** | | | |
+| unity-particles-vfx | 7 | 7 | Particle System, VFX Graph, emission, shapes, physics, trails, scripting |
+| **Batch 11 — Unity Post-Processing & Effects** | | | |
+| unity-postprocessing-fog | 33 | 33 | Bloom, Color Grading, DOF, Motion Blur, AO, SSR, Vignette, Decals, Fog |
+| **Batch 12 — Unity Build** | | | |
+| unity-build-profiles | 7 | 7 | Build Profiles, Build Pipeline, BuildReport, EditorBuildSettings |
+| **Batch 13 — Unity 6 Features** | | | |
+| unity-v6-features | 19 | 19 | GPU Resident Drawer, Sentis ML inference, DOTS improvements, Animation Rigging |
+| **Batch 17 — Unity Renderers & LOD** | | | |
+| unity-renderers-lod | 21 | 21 | MeshRenderer, SkinnedMeshRenderer, TrailRenderer, GPU Instancing, LODGroup, OcclusionCulling |
+| **Batch 18 — Unity Camera & Cinemachine** | | | |
+| unity-camera-advanced | 13 | 13 | Camera rays, ObliqueFrustum, RenderTexture, Cinemachine advanced (FreeLook, StateDriven, Impulse, Confiner) |
+| **Batch 20 — Unity Input Interfaces** | | | |
+| unity-interfaces | 24 | 24 | IPointer, IDrag, IScroll, ISubmit, EventSystem, Input System, PointerEventData |
+| **Batch 21 — Unity Editor Scripting** | | | |
+| unity-editor-scripting | 23 | 23 | CustomEditor, EditorWindow, PropertyDrawer, SerializedObject, EditorGUI, GUILayout |
+| **Batch 22 — Unity Player Settings** | | | |
+| unity-player-settings | 47 | 47 | PlayerSettings, QualitySettings, GraphicsSettings, platform config (Android/iOS/WebGL/Windows) |
+| **Batch 23 — Unity Graphics API** | | | |
+| unity-graphics-api | 8 | 8 | CommandBuffer, ComputeShader, RenderPipeline, Graphics Jobs |
+| **Batch 25 — Full-Stack UI & Polish** | | | |
+| radix-ui | 303 | 211 | Radix UI Primitives — Dialog, Popover, Tooltip, Select, DropdownMenu, Tabs, Accordion, NavigationMenu, ContextMenu, RadioGroup, Switch, Toggle, Collapsible, Slider, ScrollArea |
+| framer-motion | 49 | 49 | Motion for React — AnimatePresence, layout animations, gestures, scroll, variants, spring physics, motion values |
+| drizzle-deep | 37 | 37 | Drizzle ORM deep — relations, joins, transactions, relational query builder, $with, subqueries |
+| playwright | 55 | 55 | Playwright testing — fixtures, page objects, locators, assertions, mocking, trace viewer, CI |
+| caching-strategies | 51 | 51 | Next.js caching — fetch cache, unstable_cache, ISR, revalidateTag, revalidatePath, stale-while-revalidate |
+| **Unity Packages** | | | |
+| unity-postprocessing-package | 34 | 34 | Post Processing Stack v2 — Bloom, DOF, Color Grading, AO, SSR, Vignette, Volume system, custom effects |
+| unity-build-pipeline | 32 | 32 | Scriptable Build Pipeline — BuildPlayer, Asset Bundles, Content Pipeline, Script Compilation, Build Reports |
+| unity-test-framework | 39 | 39 | Test Framework — Edit Mode/Play Mode tests, assertions, parameterized tests, performance testing, mocking |
+| unity-ui-test-framework | 25 | 25 | UI Test Framework — UGUI/UI Toolkit testing, interaction simulation, visual validation, performance |
+| unity-localization | 58 | 58 | Localization — String Tables, Asset Tables, Smart Strings, pluralization, runtime locale switching |
+| unity-platform-toolkit | 34 | 34 | Platform Toolkit — Android/iOS/WebGL/Windows/Linux APIs, native code, build automation |
+| **Batch 26 — Testing & TypeScript** | | | |
+| react-table | 89 | 89 | TanStack Table v8 — column defs, sorting, filtering, pagination, row selection, virtualization, grouping |
+| msw | 35 | 35 | Mock Service Worker — HTTP/GraphQL handlers, request matching, lifecycle events, Vitest/Jest integration |
+| testing-library | 45 | 45 | React Testing Library — queries, user events, assertions, async utilities, mocking, debugging |
+| eslint-nextjs | 25 | 25 | ESLint + TypeScript — Next.js rules, typescript-eslint, consistent type imports, no-explicit-any |
+| sonner | 32 | 32 | Sonner toasts — toast types, promise toasts, actions, styling, themes, accessibility |
+| **Batch 27 — Deployment & DevOps** | | | |
+| vercel-deep | 39 | 39 | Vercel — Edge functions, ISR, KV/Postgres storage, image optimization, analytics, monorepos |
+| docker-nextjs | 202 | 202 | Docker + Next.js — multi-stage builds, standalone output, Docker Compose, health checks, Alpine |
+| github-actions-nextjs | 69 | 69 | GitHub Actions — CI workflows, caching, matrix builds, preview deployments, secrets |
+| sentry-nextjs | 57 | 57 | Sentry — error tracking, performance monitoring, session replay, source maps, user feedback |
+| cloudflare-pages | 81 | 81 | Cloudflare Pages — Functions, KV/D1/R2 bindings, custom domains, preview deployments |
+| **Batch 28 — Real-time & Advanced** | | | |
+| socket-io | 58 | 58 | Socket.io — server/client setup, rooms, namespaces, middleware, acknowledgements, error handling |
+| server-sent-events | 35 | 35 | SSE — EventSource API, streaming, reconnection, React integration, AI streaming patterns |
+| nextjs-image | 74 | 74 | next/image — fill mode, sizes, remote patterns, blur placeholder, priority, custom loader |
+| nextjs-fonts | 32 | 32 | next/font — Google fonts, local fonts, CSS variables, display strategies, fallback metrics |
+| nextjs-metadata | 40 | 40 | Metadata API — generateMetadata, OpenGraph, Twitter cards, sitemaps, robots.txt, viewport |
 | **Batch 32 — Minimalist UI CSS** | | | |
 | pico-css | 3 | 3 | Classless semantic CSS, dark mode, SASS |
 | watercss | 9 | 9 | Classless CSS, CSS variables, themes |
 | mvp-css | 3 | 3 | Classless CSS for MVP landing pages |
 | new-css | 9 | 9 | Classless CSS framework |
 | radix-themes | 286 | 270 | Unstyled React primitives (button, card, dialog, tabs) |
-| **Local knowledge subtotal** | **~1616** | **~1586** | 99 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~2484** | **~2454** | |
+| **Local knowledge subtotal** | **~3430** | **~3350** | 136 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~4298** | **~4218** | |
 
 ## Expansion Queue
 
@@ -158,13 +323,23 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | 14 | Unity Collisions (colliders, triggers, raycasting) | ✅ **Imported to D1** |
 | 15 | Unity Joints (springs, vehicle suspension, ragdoll) | ✅ **Imported to D1** |
 | 16 | Unity Primitives (mesh API, procedural generation) | ✅ **Imported to D1** |
+| **10** | **unity-particles-vfx (7)** — Particle System, VFX Graph | ✅ **Imported to D1** |
+| **11** | **unity-postprocessing-fog (33)** — Bloom, DOF, AO, SSR, Decals, Fog | ✅ **Imported to D1** |
+| **12** | **unity-build-profiles (7)** — Build Profiles, Build Pipeline | ✅ **Imported to D1** |
+| **13** | **unity-v6-features (19)** — GPU Resident Drawer, Sentis ML, DOTS | ✅ **Imported to D1** |
+| **17** | **unity-renderers-lod (21)** — Renderers, GPU Instancing, LOD, Occlusion | ✅ **Imported to D1** |
+| **18** | **unity-camera-advanced (13)** — Camera, Cinemachine advanced | ✅ **Imported to D1** |
+| **20** | **unity-interfaces (24)** — IPointer, IDrag, EventSystem, Input System | ✅ **Imported to D1** |
+| **21** | **unity-editor-scripting (23)** — CustomEditor, EditorWindow, PropertyDrawer | ✅ **Imported to D1** |
+| **22** | **unity-player-settings (47)** — PlayerSettings, QualitySettings, GraphicsSettings | ✅ **Imported to D1** |
+| **23** | **unity-graphics-api (8)** — CommandBuffer, ComputeShader, RenderPipeline | ✅ **Imported to D1** |
 | **24** | **tanstack-query (131), nextjs-deep (18), react-hook-form (11), nextjs-auth (3), ts-patterns (15)** | ✅ **Imported to D1** |
 | **Unity+** | **unity-scripting-api (114), unity-manual-6000 (32)** | ✅ **Imported to D1** |
 | **Unity++** | **unity-packages-complete (57)** — Addressables, Cinemachine, Netcode, Input System | ⚠️ **Scraped, needs import** |
-| **25** | **radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies** | ⏳ **Planned** |
-| **26** | **react-table (TanStack Table), msw, testing-library, eslint-nextjs, sonner** | ⏳ **Planned** |
-| **27** | **vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages** | ⏳ **Planned** |
-| **28** | **socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata** | ⏳ **Planned** |
+| **25** | **radix-ui (303), framer-motion (49), drizzle-deep (37), playwright (55), caching-strategies (51)** | ✅ **Imported to D1** |
+| **26** | **react-table (89), msw (35), testing-library (45), eslint-nextjs (25), sonner (32)** | ✅ **Imported to D1** |
+| **27** | **vercel-deep (39), docker-nextjs (202), github-actions-nextjs (69), sentry-nextjs (57), cloudflare-pages (81)** | ✅ **Imported to D1** |
+| **28** | **socket-io (58), server-sent-events (35), nextjs-image (74), nextjs-fonts (32), nextjs-metadata (40)** | ✅ **Imported to D1** |
 | **29** | **unity-cloud (NEW), google-cloud-thin (deepen), spline (deepen)** | ✅ **Imported to D1** |
 | **30** | **unity-ui (NEW)** | ✅ **Imported to D1** |
 | **31** | **design-patterns (NEW)** | ✅ **Imported to D1** |
