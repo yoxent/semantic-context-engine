@@ -18,8 +18,12 @@ const suggestions = document.querySelectorAll('.suggestion');
 // Mode selection
 modeButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    modeButtons.forEach(b => b.classList.remove('active'));
+    modeButtons.forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
     currentMode = btn.dataset.mode;
     queryInput.focus();
 

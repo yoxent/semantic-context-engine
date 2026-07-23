@@ -11,6 +11,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
 </head>
 <body>
+  <a href="#query" class="skip-link sr-only">Skip to search</a>
   <div class="app">
     <header>
       <div class="logo">
@@ -35,7 +36,10 @@
             placeholder="Search documentation..."
             autocomplete="off"
             spellcheck="false"
+            aria-label="Search documentation"
+            aria-describedby="search-hint"
           >
+          <span id="search-hint" class="sr-only">Press / to focus search. Press Escape to clear.</span>
           <div class="search-shortcut">
             <kbd>/</kbd>
           </div>
@@ -43,14 +47,14 @@
 
         <div class="controls">
           <div class="mode-selector">
-            <button class="mode active" data-mode="keyword" title="SQL LIKE search — fast, exact matches">
-              <span class="mode-icon">🔤</span> Keyword
+            <button class="mode active" data-mode="keyword" aria-pressed="true" title="SQL LIKE search — fast, exact matches">
+              <span class="mode-icon" aria-hidden="true">🔤</span> Keyword
             </button>
-            <button class="mode" data-mode="semantic" title="Vector similarity — conceptual matches">
-              <span class="mode-icon">🧠</span> Semantic
+            <button class="mode" data-mode="semantic" aria-pressed="false" title="Vector similarity — conceptual matches">
+              <span class="mode-icon" aria-hidden="true">🧠</span> Semantic
             </button>
-            <button class="mode" data-mode="hybrid" title="Reciprocal Rank Fusion of keyword + semantic">
-              <span class="mode-icon">⚡</span> Hybrid
+            <button class="mode" data-mode="hybrid" aria-pressed="false" title="Reciprocal Rank Fusion of keyword + semantic">
+              <span class="mode-icon" aria-hidden="true">⚡</span> Hybrid
             </button>
           </div>
 
@@ -61,7 +65,7 @@
         </div>
       </div>
 
-      <div id="results" class="results"></div>
+      <div id="results" class="results" role="region" aria-live="polite" aria-label="Search results"></div>
 
       <div id="welcome" class="welcome">
         <div class="welcome-icon">🔍</div>
