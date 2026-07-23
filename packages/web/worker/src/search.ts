@@ -85,7 +85,7 @@ async function keywordSearch(
 
   const results = await db.prepare(sql).bind(...params).all();
 
-  return results.results.map((row: Record<string, unknown>) => ({
+  const baseHits = results.results.map((row: Record<string, unknown>) => ({
     chunkId: row.id as string,
     relativePath: row.relative_path as string,
     headingPath: (row.heading_path as string) ?? null,
@@ -95,6 +95,8 @@ async function keywordSearch(
     partIndex: (row.part_index as number) ?? undefined,
     totalParts: (row.total_parts as number) ?? undefined,
   }));
+
+  return applyKeywordBoosts(baseHits, query);
 }
 
 // ---------------------------------------------------------------------------
@@ -289,6 +291,57 @@ async function hybridSearch(
     ...allHits.get(chunkId)!,
     score,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Ranking helpers – filename / heading / snippet boosts
+// ---------------------------------------------------------------------------
+
+const TERM_RE = /[\p{L}\p{N}_]+/gu;
+
+function tokenize(text: string): string[] {
+  return Array.from(text.toLowerCase().matchAll(TERM_RE), (m) => m[0]).filter(Boolean);
+}
+
+function fileNameFromPath(path: string): string {
+  const normalized = path.replace(/\\/g, "/");
+  const idx = normalized.lastIndexOf("/");
+  return idx >= 0 ? normalized.slice(idx + 1) : normalized;
+}
+
+function fileStem(fileName: string): string {
+  const dot = fileName.lastIndexOf(".");
+  return dot > 0 ? fileName.slice(0, dot) : fileName;
+}
+
+function applyKeywordBoosts(hits: SearchHit[], query: string): SearchHit[] {
+  const needle = query.trim().toLowerCase();
+  const terms = tokenize(query);
+
+  return hits.map((hit) => {
+    let score = hit.score;
+    const fileName = fileNameFromPath(hit.relativePath).toLowerCase();
+    const stem = fileStem(fileName);
+    const snippetLower = hit.text.toLowerCase();
+    const headingLower = (hit.headingPath ?? "").toLowerCase();
+
+    // Filename match (+5)
+    if (fileName.includes(needle) || stem === needle || terms.some((t) => stem === t || fileName.includes(t))) {
+      score += 5;
+    }
+
+    // Heading match (+4)
+    if (headingLower.includes(needle) || terms.some((t) => headingLower.includes(t))) {
+      score += 4;
+    }
+
+    // Snippet exact match (+2)
+    if (snippetLower.includes(needle)) {
+      score += 2;
+    }
+
+    return { ...hit, score };
+  });
 }
 
 // ---------------------------------------------------------------------------
