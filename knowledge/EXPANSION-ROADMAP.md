@@ -9,8 +9,9 @@
 
 ## Current State
 
-- **D1 Live**: 2085 chunks, 207 vectors, ~90 topics
-- **Indexed**: All batches 1–9, 14–16, 24, 29–32
+- **D1 Live**: ~5532 chunks, ~3019 vectors, ~137 topics
+- **Indexed**: All batches 1–35, Unity packages (all planned batches complete)
+- **Pending**: None
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
 ---
@@ -31,10 +32,28 @@
 | 14 | Unity Collisions (colliders, triggers, raycasting) | ✅ Done |
 | 15 | Unity Joints (springs, vehicle suspension, ragdoll) | ✅ Done |
 | 16 | Unity Primitives (mesh API, procedural generation) | ✅ Done |
+| 10 | Particle Systems, VFX Graph | ✅ Done |
+| 11 | Post-Processing, Decals, Fog | ✅ Done |
+| 12 | Build Profiles, Build Automation | ✅ Done |
+| 13 | Unity 6 Features (GPU Resident Drawer, Sentis ML) | ✅ Done |
+| 17 | Renderers, GPU Instancing, LOD, Occlusion | ✅ Done |
+| 18 | Camera, Cinemachine Advanced | ✅ Done |
+| 20 | Interfaces (IPointer, IDrag, EventSystem, Input System) | ✅ Done |
+| 21 | Editor Scripting, Custom Inspectors | ✅ Done |
+| 22 | Player Settings, Quality Settings | ✅ Done |
+| 23 | Graphics API, CommandBuffer, Compute Shaders | ✅ Done |
 | 24 | tanstack-query, nextjs-deep, react-hook-form, nextjs-auth, ts-patterns | ✅ Done |
+| 25 | radix-ui (303), framer-motion (49), drizzle-deep (37), playwright (55), caching-strategies (51) | ✅ **Imported to D1** |
 | Unity+ | unity-scripting-api (114 chunks), unity-manual-6000 (32 chunks) | ✅ Done |
 | Unity++ | unity-packages-complete (57 chunks) — Addressables, Cinemachine, Netcode, Input System | ⚠️ Scraped, needs import |
 | 32 | pico-css, watercss, mvp-css, new-css, radix-themes | ✅ Done |
+| 33 | zlinq (deep scrape from GitHub) | ✅ Done |
+| 34 | iap-deep, ads-monetization, unity-networking-deep, figma, canva, payment-platforms | ✅ **Imported to D1** |
+| 35 | retroui (124 chunks), unity-splines-deep (25 chunks) | ✅ **Imported to D1** |
+| 36 | unity-postprocessing-package (34), unity-build-pipeline (32), unity-test-framework (39), unity-ui-test-framework (25), unity-localization (58), unity-platform-toolkit (34) | ✅ **Imported to D1** |
+| 26 | react-table (89), msw (35), testing-library (45), eslint-nextjs (25), sonner (32) | ✅ **Imported to D1** |
+| 27 | vercel-deep (39), docker-nextjs (202), github-actions-nextjs (69), sentry-nextjs (57), cloudflare-pages (81) | ✅ **Imported to D1** |
+| 28 | socket-io (58), server-sent-events (35), nextjs-image (74), nextjs-fonts (32), nextjs-metadata (40) | ✅ **Imported to D1** |
 
 ---
 
@@ -86,10 +105,11 @@ https://next.authjs.dev/resources/application-router
 
 ---
 
-## 💡 Batch 25 — Full-Stack React/Next.js — UI & Polish (Wave 2)
+## ✅ Batch 25 — Full-Stack React/Next.js — UI & Polish (Wave 2) — DONE
 
 **Priority**: MEDIUM — Component libraries and UX patterns
-**Estimated chunks**: ~55–70
+**Status**: ✅ Indexed and imported to D1 (303 + 49 + 37 + 55 + 51 = 495 chunks)
+**Actual chunks**: 495 (higher than estimated due to Radix UI's extensive component docs)
 
 | Topic | Scope | Source |
 |-------|-------|--------|
@@ -235,21 +255,21 @@ https://nextjs.org/docs/app/building-your-application/optimizing/metadata
 
 ---
 
-## Unity Batches (10–23) — Deferred to separate initiative
+## Unity Batches (10–23) — DONE
 
 | Batch | Topic | Status |
 |-------|-------|--------|
-| 10 | Particle Systems, VFX Graph | ⏳ Pending |
-| 11 | Effects & Post-Processing | ⏳ Pending |
-| 12 | Build & Profiles | ⏳ Pending |
-| 13 | Unity 6.0 Features | ⏳ Pending |
-| 17 | Renderers, GPU Instancing, LOD | ⏳ Pending |
-| 18 | Camera, Cinemachine Advanced | ⏳ Pending |
-| 19 | Scene Management Advanced | ⏳ Pending |
-| 20 | Interfaces (IPointer, IDrag) | ⏳ Pending |
-| 21 | Editor Scripting, Custom Inspectors | ⏳ Pending |
-| 22 | Player Settings | ⏳ Pending |
-| 23 | Graphics API, CommandBuffer, Compute | ⏳ Pending |
+| 10 | Particle Systems, VFX Graph | ✅ **Imported to D1** (7 chunks) |
+| 11 | Effects & Post-Processing, Decals, Fog | ✅ **Imported to D1** (33 chunks) |
+| 12 | Build Profiles, Build Automation | ✅ **Imported to D1** (7 chunks) |
+| 13 | Unity 6.0 Features (GPU Resident Drawer, Sentis ML) | ✅ **Imported to D1** (19 chunks) |
+| 17 | Renderers, GPU Instancing, LOD, Occlusion | ✅ **Imported to D1** (21 chunks) |
+| 18 | Camera, Cinemachine Advanced | ✅ **Imported to D1** (13 chunks) |
+| 19 | Scene Management Advanced | ✅ **Covered by existing** unity-scene-management |
+| 20 | Interfaces (IPointer, IDrag, EventSystem) | ✅ **Imported to D1** (24 chunks) |
+| 21 | Editor Scripting, Custom Inspectors | ✅ **Imported to D1** (23 chunks) |
+| 22 | Player Settings, Quality Settings | ✅ **Imported to D1** (47 chunks) |
+| 23 | Graphics API, CommandBuffer, Compute Shaders | ✅ **Imported to D1** (8 chunks) |
 
 ---
 
@@ -283,6 +303,57 @@ https://www.radix-ui.com/themes/docs/components/checkbox
 https://www.radix-ui.com/themes/docs/components/switch
 https://www.radix-ui.com/themes/docs/components/tooltip
 https://www.radix-ui.com/themes/docs/components/popover
+```
+
+---
+
+## ⏳ Batch 34 — IAP Deep, Ads, Unity Networking, Figma, Canva — PENDING IMPORT
+
+**Priority**: HIGH — Monetization, networking, and design tools for cross-platform development
+**Status**: ⏳ Scraped, needs import to D1
+**Estimated chunks**: ~210
+**Platforms**: Windows, Android, iOS (where applicable)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `iap-deep` | Unity IAP (cross-platform, codeless), Google Play Billing v5+ (Android), Apple StoreKit 2 (iOS), Windows Store IAP (Microsoft Partner Center), RevenueCat Paywalls (configuration, A/B testing), paywall design patterns (hard, soft, metered, trial, gated), subscription lifecycle | Context7 + Unity docs + Google/Apple/MS docs |
+| `ads-monetization` | Google AdMob (Unity/Android/iOS: banner, interstitial, rewarded, native, app open), Unity Ads / LevelPlay (mediation, A/B testing), Meta Audience Network, AppLovin MAX (unified auction, 25+ networks), ironSource → LevelPlay, Chartboost, Google AdSense (web), ad mediation comparison (waterfall vs in-app bidding) | Context7 + Google/Unity/AppLovin/Meta docs |
+| `unity-networking-deep` | Photon PUN2 (legacy, room-based), Photon Fusion 2 (state replication, prediction/rollback, AoI), Photon Quantum (deterministic ECS, 128 players), Mirror (open-source, 12+ transports, interest management), FishNet (server-authoritative, free), Unity Transport Package (UTP), Nakama (game server: auth, matchmaking, chat, leaderboards), comparison by game type | Context7 + Photon/Mirror/FishNet/Nakama docs |
+| `figma` | Figma REST API (files, comments, versions, webhooks, components, variables), Figma Plugin API (code.ts, UI, node operations, codegen), Figma Code Connect (React, Vue), Figma MCP Server (AI workflow integration), Dev Mode, design tokens, variable modes | Context7 + Figma docs |
+| `canva` | Canva Connect API (designs, exports, brand kits, assets, folders), Canva Apps SDK (content apps, design extensions, data apps), Canva MCP Server (community), Node.js/Python SDKs, Canva vs Figma comparison | Context7 + Canva docs |
+
+### Dependencies
+| Package | Topic | Purpose |
+|---------|-------|--------|
+| `com.unity.purchasing` | iap-deep | Unity IAP package |
+| `com.google.android.ads` | ads-monetization | AdMob Android SDK |
+| `com.google.unity.ads` | ads-monetization | AdMob Unity plugin |
+| `com.unity.ads` | ads-monetization | Unity Ads SDK |
+| `com.unity.services.mediation` | ads-monetization | LevelPlay mediation |
+| `com.applovin.sdk` | ads-monetization | AppLovin MAX SDK |
+| Photon Fusion 2 | unity-networking-deep | Photon networking |
+| Photon Quantum | unity-networking-deep | Deterministic ECS |
+| Mirror | unity-networking-deep | Open-source networking |
+| FishNet | unity-networking-deep | Server-authoritative |
+| nakama-dotnet | unity-networking-deep | Game server client |
+| `figma-js` | figma | REST API client |
+| `@figma/code-connect` | figma | Code Connect |
+| `@canva/connect-api` | canva | Node.js SDK |
+
+### MCP Servers (Future Reference)
+| Tool | Topic | Purpose |
+|------|-------|--------|
+| `@anthropic-ai/figma-mcp-server` | figma | Figma design context for AI agents |
+| `@nicholasgriffintn/canva-mcp` | canva | Canva integration for AI agents |
+
+### Import Commands
+```bash
+for topic in iap-deep ads-monetization unity-networking-deep figma canva; do
+  export OPENROUTER_API_KEY=$(grep OPENROUTER_API_KEY packages/web/.dev.vars | cut -d'"' -f2)
+  node packages/cli/dist/src/main.js index knowledge/$topic
+  node packages/cli/dist/src/main.js export --path knowledge/$topic -o knowledge/$topic-export
+  npx tsx packages/web/import.ts knowledge/$topic-export sce-db --append
+done
 ```
 
 ---

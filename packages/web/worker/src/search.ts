@@ -85,7 +85,7 @@ async function keywordSearch(
 
   const results = await db.prepare(sql).bind(...params).all();
 
-  return results.results.map((row: Record<string, unknown>) => ({
+  const baseHits = results.results.map((row: Record<string, unknown>) => ({
     chunkId: row.id as string,
     relativePath: row.relative_path as string,
     headingPath: (row.heading_path as string) ?? null,
@@ -95,6 +95,8 @@ async function keywordSearch(
     partIndex: (row.part_index as number) ?? undefined,
     totalParts: (row.total_parts as number) ?? undefined,
   }));
+
+  return deduplicateHits(applyKeywordBoosts(baseHits, query), 2);
 }
 
 // ---------------------------------------------------------------------------
@@ -163,7 +165,7 @@ async function semanticSearch(
     }
   }
 
-  return hits;
+  return deduplicateHits(applyKeywordBoosts(hits, query), 2);
 }
 
 // ---------------------------------------------------------------------------
@@ -285,10 +287,151 @@ async function hybridSearch(
     allHits.set(hit.chunkId, hit);
   }
 
-  return sorted.map(([chunkId, score]) => ({
+  const results = sorted.map(([chunkId, score]) => ({
     ...allHits.get(chunkId)!,
     score,
   }));
+
+  return deduplicateHits(results, 2);
+}
+
+// ---------------------------------------------------------------------------
+// Ranking helpers – filename / heading / snippet boosts
+// ---------------------------------------------------------------------------
+
+const TERM_RE = /[\p{L}\p{N}_]+/gu;
+
+function tokenize(text: string): string[] {
+  return Array.from(text.toLowerCase().matchAll(TERM_RE), (m) => m[0]).filter(Boolean);
+}
+
+function fileNameFromPath(path: string): string {
+  const normalized = path.replace(/\\/g, "/");
+  const idx = normalized.lastIndexOf("/");
+  return idx >= 0 ? normalized.slice(idx + 1) : normalized;
+}
+
+function fileStem(fileName: string): string {
+  const dot = fileName.lastIndexOf(".");
+  return dot > 0 ? fileName.slice(0, dot) : fileName;
+}
+
+function applyKeywordBoosts(hits: SearchHit[], query: string): SearchHit[] {
+  const needle = query.trim().toLowerCase();
+  const terms = tokenize(query);
+  const isMultiWord = terms.length > 1;
+
+  return hits.map((hit) => {
+    let score = hit.score;
+    const fileName = fileNameFromPath(hit.relativePath).toLowerCase();
+    const stem = fileStem(fileName);
+    const snippetLower = hit.text.toLowerCase();
+    const headingLower = (hit.headingPath ?? "").toLowerCase();
+
+    // === FILENAME BOOSTS ===
+    // Exact filename match (+8) - highest priority
+    if (stem === needle || fileName === needle + '.md') {
+      score += 8;
+    }
+    // Filename contains exact phrase (+6)
+    else if (fileName.includes(needle)) {
+      score += 6;
+    }
+    // All terms in filename (+5)
+    else if (terms.every(t => fileName.includes(t))) {
+      score += 5;
+    }
+    // Some terms in filename (+3 per term, max +4)
+    else {
+      const termHits = terms.filter(t => fileName.includes(t)).length;
+      if (termHits > 0) {
+        score += Math.min(termHits * 3, 4);
+      }
+    }
+
+    // === HEADING BOOSTS ===
+    // Exact heading match (+7)
+    if (headingLower === needle) {
+      score += 7;
+    }
+    // Heading contains exact phrase (+5)
+    else if (headingLower.includes(needle)) {
+      score += 5;
+    }
+    // All terms in heading (+4)
+    else if (terms.every(t => headingLower.includes(t))) {
+      score += 4;
+    }
+    // Some terms in heading (+2 per term, max +3)
+    else {
+      const headingTermHits = terms.filter(t => headingLower.includes(t)).length;
+      if (headingTermHits > 0) {
+        score += Math.min(headingTermHits * 2, 3);
+      }
+    }
+
+    // === CONTENT/TEXT BOOSTS ===
+    // Exact phrase in text (+4)
+    if (snippetLower.includes(needle)) {
+      score += 4;
+    }
+    // All terms in text, in order (+3)
+    else if (isMultiWord) {
+      let lastIdx = -1;
+      let allInOrder = true;
+      for (const term of terms) {
+        const idx = snippetLower.indexOf(term, lastIdx + 1);
+        if (idx === -1) {
+          allInOrder = false;
+          break;
+        }
+        lastIdx = idx;
+      }
+      if (allInOrder) {
+        score += 3;
+      }
+    }
+
+    // All terms present in text (+2)
+    if (terms.every(t => snippetLower.includes(t))) {
+      score += 2;
+    }
+
+    // === CONTENT QUALITY SIGNALS ===
+    // Longer content with more detail (+1 for 500+ chars, +2 for 1000+ chars)
+    if (hit.text.length > 1000) {
+      score += 2;
+    } else if (hit.text.length > 500) {
+      score += 1;
+    }
+
+    // Bonus for heading path with multiple levels (+1)
+    const headingParts = (hit.headingPath ?? '').split(' / ').filter(Boolean);
+    if (headingParts.length >= 2) {
+      score += 1;
+    }
+
+    return { ...hit, score };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Deduplication – max N hits per file
+// ---------------------------------------------------------------------------
+
+function deduplicateHits(hits: SearchHit[], maxPerFile: number = 2): SearchHit[] {
+  const fileCounts = new Map<string, number>();
+  const deduplicated: SearchHit[] = [];
+
+  for (const hit of hits) {
+    const count = fileCounts.get(hit.relativePath) ?? 0;
+    if (count < maxPerFile) {
+      deduplicated.push(hit);
+      fileCounts.set(hit.relativePath, count + 1);
+    }
+  }
+
+  return deduplicated;
 }
 
 // ---------------------------------------------------------------------------

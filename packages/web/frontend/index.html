@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SCE — Semantic Context Engine</title>
+  <meta name="description" content="Search documentation across multiple sources with keyword, semantic, and hybrid modes. Built for AI coding agents.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,6 +12,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔮</text></svg>">
 </head>
 <body>
+  <a href="#query" class="skip-link sr-only">Skip to search</a>
   <div class="app">
     <header>
       <div class="logo">
@@ -35,7 +37,10 @@
             placeholder="Search documentation..."
             autocomplete="off"
             spellcheck="false"
+            aria-label="Search documentation"
+            aria-describedby="search-hint"
           >
+          <span id="search-hint" class="sr-only">Press / to focus search. Press Escape to clear.</span>
           <div class="search-shortcut">
             <kbd>/</kbd>
           </div>
@@ -43,17 +48,14 @@
 
         <div class="controls">
           <div class="mode-selector">
-            <button class="mode active" data-mode="keyword" title="SQL LIKE search — fast, exact matches">
-              <span class="mode-icon">🔤</span> Keyword
+            <button class="mode active" data-mode="keyword" aria-pressed="true" title="SQL LIKE search — fast, exact matches">
+              <span class="mode-icon" aria-hidden="true">🔤</span> Keyword
             </button>
-            <button class="mode" data-mode="semantic" title="Vector similarity — conceptual matches">
-              <span class="mode-icon">🧠</span> Semantic
+            <button class="mode" data-mode="semantic" aria-pressed="false" title="Vector similarity — conceptual matches">
+              <span class="mode-icon" aria-hidden="true">🧠</span> Semantic
             </button>
-            <button class="mode" data-mode="hybrid" title="Reciprocal Rank Fusion of keyword + semantic">
-              <span class="mode-icon">⚡</span> Hybrid
-            </button>
-            <button class="mode" data-mode="ast" title="AST symbol lookup — functions, classes, types">
-              <span class="mode-icon">🌳</span> AST
+            <button class="mode" data-mode="hybrid" aria-pressed="false" title="Reciprocal Rank Fusion of keyword + semantic">
+              <span class="mode-icon" aria-hidden="true">⚡</span> Hybrid
             </button>
           </div>
 
@@ -64,18 +66,28 @@
         </div>
       </div>
 
-      <div id="results" class="results"></div>
+      <div id="results" class="results" role="region" aria-live="polite" aria-label="Search results"></div>
 
       <div id="welcome" class="welcome">
         <div class="welcome-icon">🔍</div>
         <h2>Search documentation across multiple sources</h2>
         <p>Try queries like:</p>
         <div class="suggestions">
-          <button class="suggestion" data-query="React hooks useState">React hooks</button>
-          <button class="suggestion" data-query="Unity ECS component system">Unity ECS</button>
-          <button class="suggestion" data-query="TypeScript generics utility types">TypeScript generics</button>
-          <button class="suggestion" data-query="Cloudflare D1 batch insert">D1 batch insert</button>
-          <button class="suggestion" data-query="Prisma schema relations">Prisma relations</button>
+          <button class="suggestion" data-query="Unity Addressables loading">Unity Addressables</button>
+          <button class="suggestion" data-query="Google Cloud Run deploy">Google Cloud Run</button>
+          <button class="suggestion" data-query="Radix UI dialog component">Radix UI Dialog</button>
+          <button class="suggestion" data-query="Next.js app router patterns">Next.js App Router</button>
+          <button class="suggestion" data-query="Drizzle ORM migrations">Drizzle Migrations</button>
+          <button class="suggestion" data-query="React Hook Form validation">React Hook Form</button>
+          <button class="suggestion" data-query="TypeScript generics utility">TypeScript Generics</button>
+          <button class="suggestion" data-query="Playwright test automation">Playwright Testing</button>
+        </div>
+        <div id="search-history" class="search-history" style="display: none;">
+          <div class="history-header">
+            <span class="history-title">Recent Searches</span>
+            <button class="history-clear" id="clear-history">Clear</button>
+          </div>
+          <div class="history-list" id="history-list"></div>
         </div>
       </div>
 
@@ -102,7 +114,7 @@
       <div class="footer-content">
         <span>Built for <strong>AI Knowledge Systems</strong></span>
         <span class="separator">★</span>
-        <span>4 search modes</span>
+        <span>3 search modes</span>
         <span class="separator">★</span>
         <span>Cloudflare D1 + Workers</span>
         <span class="separator">★</span>

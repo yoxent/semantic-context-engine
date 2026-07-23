@@ -56,7 +56,7 @@ interface ExportMeta {
 // --- Constants ---
 
 /** Chunk batch size — 10 to stay under SQLite statement size limit (some chunks are ~19KB). */
-const CHUNK_BATCH_SIZE = 2; // Split chunks are ~7500 chars, so 2 per batch is safe (~15KB < 100KB limit)
+const CHUNK_BATCH_SIZE = 10; // Average chunk ~6KB, 10 per batch = ~60KB < 100KB limit
 
 /** Vectors are large (2048 floats as JSON ~39KB each); D1 max statement is 100KB, so max 2 per batch. */
 const VECTOR_BATCH_SIZE = 2;

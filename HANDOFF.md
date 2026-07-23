@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-21
-**Status**: Web deployment functional, Batch 32 (minimalist UI CSS frameworks) indexed
+**Last Updated**: 2026-07-25
+**Status**: All planned expansion batches (1–28, 29–36) complete, 5532 chunks indexed. File renaming complete (870 files).
 
 ---
 
@@ -10,16 +10,18 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (3089 chunks, 1186 vectors)
+- **D1 Database**: `sce-db` (5532 chunks, 3019 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 2085 chunks |
+| Keyword Search | ✅ | ~55ms response, 5532 chunks |
 | Semantic Search | ✅ | Vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
-| Frontend UI | ✅ | RetroUI neobrutalist theme + Dot Matrix Core Rotor loader, dark, responsive, keyboard shortcuts |
+| Ranking Boosts | ✅ | Filename +5, Heading +4, Snippet +2 |
+| Deduplication | ✅ | Max 2 hits per file |
+| Frontend UI | ✅ | RetroUI neobrutalist theme, dark, responsive, keyboard shortcuts, search highlighting, expandable cards, copy button, search history, ARIA accessible |
 | Multi-Part Expansion | ✅ | Split chunks >7500 chars auto-expand in search results |
 
 ---
@@ -27,75 +29,56 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  3089
-Vectors:  1186 (2048-dim embeddings)
+Chunks:  5532
+Vectors: 3019 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~98
+Topics:  ~137
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
-### Topics Indexed (~92)
-- **Web stack**: HTML, CSS, jQuery, React (thin), Next.js (thin), Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
-- **Full-stack (Batch 24)**: TanStack Query (131 chunks, split), Next.js deep (middleware, ISR, routes), React Hook Form, Auth.js v5, TypeScript patterns
+### Topics Indexed (~137)
+- **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
+- **Full-stack (Batch 24)**: TanStack Query (131 chunks), Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns
+- **Full-stack UI (Batch 25)**: Radix UI (303 chunks), Framer Motion, Drizzle ORM deep, Playwright, Caching Strategies
+- **Testing (Batch 26)**: TanStack Table, MSW, React Testing Library, ESLint, Sonner
+- **DevOps (Batch 27)**: Vercel deep, Docker+Next.js (202 chunks), GitHub Actions, Sentry, Cloudflare Pages
+- **Advanced (Batch 28)**: Socket.io, Server-Sent Events, next/image, next/font, Metadata API
 - **Backend**: Node.js, Express, FastAPI, Python, tRPC, REST API patterns
 - **Cloud/DB**: Cloudflare Workers (full suite), D1, DO, KV, R2, Vectorize, Queues, Workers AI
-- **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM (thin), SQLite, Supabase, BigQuery
+- **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM, SQLite, Supabase, BigQuery
 - **Mobile**: Expo, React Native, Flutter, Dart, Firebase, AWS Amplify
 - **Unity (6000.3)**: Base, ECS, Cinemachine, Netcode, Shaders, UI Toolkit, Addressables, ScriptableObjects, Events, Coroutines, Async, Scene Management, Collisions, Joints, Primitives
-- **Unity UI**: UGUI (Canvas, RectTransform, Image, Text, Button, Toggle, Slider, ScrollRect, EventSystem, Layout groups, Rich Text), UI Toolkit (VisualElement, USS/UXML, UI Builder, data binding, manipulators), TextMeshPro (fonts, rich text, input field, mesh modifiers) (NEW)
-- **Unity Cloud**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer (Sessions, Matchmaker, Relay), Economy, Authentication, Vivox, LevelPlay, Deployment, Building Blocks (NEW)
-- **Design Patterns**: Mobile UI screen patterns, Material Design 3 components, Apple HIG iOS patterns, UI-Patterns.com catalog (NEW)
-- **Unity 6000.3 API**: ScriptReference (114 chunks), Manual (32 chunks) — GameObject, Rigidbody, Collider, Camera, Animator, Material, Shader, Mesh, etc.
-- **Unity packages**: Package docs (57 chunks, pending import) — Addressables, Cinemachine, Entities, Netcode, Input System
-- **Unity animation**: DOTween, LitMotion, PrimeTween
-- **Minimalist UI CSS (NEW)**: Pico CSS (classless semantic), Water.css (classless themes), MVP.css (landing pages), new.css (classless), Radix Themes (unstyled React primitives)
-- **DevOps**: GitHub Actions, CI/CD pipelines, Docker, ngrok, Vercel (thin), Wrangler
-- **C#/.NET**: LINQ, ZLinq, Dependency Injection, Unit Testing, Data Encryption, System.IO, zlib, filestream, scientific-notation
-- **Misc**: TypeScript (thin), Hono, Vitest, MCP SDK, OpenRouter, localization, number formatting, vector math, splines (deepened), luminosity, auth patterns
-- **Google Cloud**: Compute Engine, Cloud Run, Cloud Functions, Cloud Storage, Cloud SQL, Firestore, Bigtable, Pub/Sub, Cloud Tasks, GKE, Cloud Build, Logging, Monitoring, Secret Manager, API Gateway, CDN, Load Balancing, VPC, IAM, Scheduler, Deployment Manager (DEEPENED from 5→185 chunks)
+- **Unity Deep**: Particles/VFX, Post-Processing, Build Profiles, GPU Instancing/LOD, Camera, Input Interfaces, Editor Scripting, Player Settings, Graphics API
+- **Unity Packages**: Post-Processing Stack, Scriptable Build Pipeline, Test Framework, UI Test Framework, Localization, Platform Toolkit, Addressables, Cinemachine 3, Netcode, Input System
+- **Unity UI**: UGUI, UI Toolkit, TextMeshPro (92 chunks)
+- **Unity Cloud**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer, Economy, Authentication (87 chunks)
+- **Unity Networking**: Photon PUN2/Fusion/Quantum, Mirror, FishNet, UTP, Nakama (72 chunks)
+- **Design Patterns**: Mobile UI, Material Design 3, Apple HIG (127 chunks)
+- **IAP/Ads**: Unity IAP, Google Play Billing, StoreKit 2, RevenueCat, AdMob, AppLovin MAX, LevelPlay
+- **Payment Platforms**: Stripe, PayPal, Paddle, Braintree, Lemon Squeezy
+- **Figma/Canva**: REST API, Plugin API, Code Connect, Connect API, Apps SDK
+- **Minimalist CSS**: Pico CSS, Water.css, MVP.css, new.css, Radix Themes
+- **C#/.NET**: LINQ, ZLinq (139 chunks), Dependency Injection, Unit Testing
+- **Unity Splines**: Deep reference (25 chunks)
+- **Google Cloud**: Compute, Cloud Run, Functions, Storage, SQL, Firestore, Bigtable, Pub/Sub, GKE, IAM, etc. (185 chunks)
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
-### Full-Stack Expansion Plan (Batches 24–28)
+### Expansion Batches — ALL COMPLETE ✅
 
-**Wave 1 — Batch 24 ✅ DONE**:
-| Topic | Chunks | Status |
-|-------|--------|--------|
-| tanstack-query | 131 | ✅ Done (split into parts) |
-| nextjs-deep | 18 | ✅ Done |
-| react-hook-form | 11 | ✅ Done |
-| nextjs-auth | 3 | ✅ Done |
-| ts-patterns | 15 | ✅ Done |
+| Batch | Topics | Chunks | Status |
+|-------|--------|--------|--------|
+| 1–9, 14–16 | Mobile, portfolio, base corpus, Unity basics | ~600 | ✅ |
+| 24 | TanStack Query, Next.js deep, React Hook Form, Auth.js, TS patterns | 178 | ✅ |
+| 25 | Radix UI, Framer Motion, Drizzle deep, Playwright, Caching | 495 | ✅ |
+| 26 | TanStack Table, MSW, Testing Library, ESLint, Sonner | 226 | ✅ |
+| 27 | Vercel deep, Docker, GitHub Actions, Sentry, Cloudflare Pages | 448 | ✅ |
+| 28 | Socket.io, SSE, next/image, next/font, Metadata | 239 | ✅ |
+| 29–33 | Unity Cloud, UI, Design Patterns, Minimalist CSS, ZLinq | ~800 | ✅ |
+| 34–35 | IAP/Ads/Networking, Figma/Canva, Payments, RetroUI, Splines | ~560 | ✅ |
+| Unity 10–23 | Particles, Post-Processing, Build, v6, Renderers, Camera, Interfaces, Editor, Player, Graphics | 202 | ✅ |
+| Unity Packages | Post-Processing, Build Pipeline, Test Framework, Localization, Platform Toolkit, Addressables, Cinemachine 3, Netcode, Input System | 279 | ✅ |
 
-**Wave 2 — Batch 25 (PLANNED)**:
-radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies
-
-**Wave 3 — Batch 26 (PLANNED)**:
-react-table (TanStack Table), msw, testing-library, eslint-nextjs, sonner
-
-**Wave 4 — Batch 27 (PLANNED)**:
-vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
-
-**Batch 29 ✅ DONE**:
-| Topic | Chunks | Status |
-|-------|--------|--------|
-| unity-cloud | 87 | ✅ Done |
-| google-cloud-thin (deepen) | 185 | ✅ Done |
-| spline (deepen) | 6 | ✅ Done |
-
-**Batch 30 ✅ DONE**:
-| Topic | Chunks | Status |
-|-------|--------|--------|
-| unity-ui | 92 | ✅ Done |
-
-**Batch 31 ✅ DONE**:
-| Topic | Chunks | Status |
-|-------|--------|--------|
-| design-patterns | 127 | ✅ Done |
-
-**Wave 5 — Batch 28 (PLANNED)**:
-socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
-
-See `knowledge/EXPANSION-ROADMAP.md` for full scope per topic.
+See `knowledge/EXPANSION-ROADMAP.md` for full details.
 
 ---
 
@@ -145,6 +128,8 @@ Any MCP-compatible agent can now use:
 2. **semantic**: OpenRouter embedding → cosine similarity (needs vectors)
 3. **hybrid**: RRF fusion of keyword + semantic (k=60)
 4. **ast**: Symbol table lookup — exact match then prefix fallback
+
+> **Note**: AST search is API/MCP only (not in frontend UI). With 287 symbols indexed, it's more useful for AI agents than human users.
 
 ### Multi-Part Document Expansion
 When chunks exceed ~7500 chars, the indexer splits them into linked parts. The search API automatically expands multi-part results: when a search hits any part of a split document, all sibling parts are returned together.
@@ -208,52 +193,100 @@ packages/
 ### For Job Application Demo
 
 1. **Open**: https://sce-web.pasttime.xyz/
-2. **Show keyword search**: Type "D1 database"
+2. **Show keyword search**: Type "D1 database" — notice highlighted terms
 3. **Show search modes**: Click through Keyword → Semantic → Hybrid
 4. **Show response times**: Point out ~55ms keyword, semantic search
-5. **Show stats**: 85 chunks of Cloudflare Workers documentation
+5. **Show result features**: Click card to expand, copy button, score display
+6. **Show search history**: Recent searches appear below suggestions
+7. **Show stats**: 5532 chunks of documentation indexed
 
 ### Key Talking Points
-- "2231 chunks of documentation indexed in D1"
-- "4 search modes: keyword, semantic, hybrid, AST"
+- "5532 chunks of documentation indexed in D1"
+- "3 search modes: keyword, semantic, hybrid (AST for API/MCP)"
 - "Sub-100ms keyword search, semantic search via OpenRouter"
 - "Built for AI coding agents as the primary consumer"
 - "Edge-deployed on Cloudflare Workers for global low-latency"
 - "Multi-part document splitting for long docs (auto-expands in search)"
-- "Unity 6000.3 Scripting API + Manual indexed"
+- "Unity 6000.3 full coverage: Scripting API, Manual, Packages, UI, Cloud, Networking"
+- "Full-stack web: React, Next.js, Vercel, Docker, Sentry, testing, deployment"
+- "Frontend: search highlighting, expandable cards, copy button, search history, ARIA accessible"
+
+---
+
+## 📈 Ranking Improvements (2026-07-25)
+
+Enhanced ranking with multi-word query handling and content quality signals:
+
+| Boost Type | Points | Description |
+|------------|--------|-------------|
+| **Filename** | | |
+| Exact filename | +8 | Query exactly matches file stem |
+| Filename phrase | +6 | Query phrase found in filename |
+| All terms in filename | +5 | All query terms in filename |
+| Some terms in filename | +3-4 | Partial term matches |
+| **Heading** | | |
+| Exact heading | +7 | Query exactly matches heading |
+| Heading phrase | +5 | Query phrase in heading |
+| All terms in heading | +4 | All query terms in heading |
+| Some terms in heading | +2-3 | Partial heading matches |
+| **Content** | | |
+| Exact phrase in text | +4 | Full query in chunk text |
+| Ordered terms in text | +3 | Terms appear in query order |
+| All terms in text | +2 | All terms present |
+| **Quality** | | |
+| Long content (1000+) | +2 | Detailed content bonus |
+| Medium content (500+) | +1 | Moderate content bonus |
+| Heading depth (2+) | +1 | Structured content bonus |
+
+**Deduplication**: Max 2 hits per file to improve result diversity.
+
+Applied to: keyword, semantic, and hybrid search modes.
 
 ---
 
 ## 🔜 Next Steps
 
-### Priority 1: Continue Knowledge Base Expansion
-- **Import unity-packages-complete** to D1 (57 chunks)
-- **Batch 25**: radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies
-- **Batch 26**: react-table, msw, testing-library, eslint-nextjs, sonner
-- **Batch 27**: vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
-- **Batch 28**: socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
-- **Unity deepen**: Add more Scripting API classes (Terrain, TextMeshPro, Networking)
-- **Unity packages**: TextMeshPro, ProBuilder, Shader Graph, VFX Graph, Timeline, ML-Agents
-- **See `knowledge/EXPANSION-ROADMAP.md`** for full details
+### All Expansion Batches Complete ✅
+The knowledge base is now comprehensive across all planned topics.
 
-### Priority 2: Add Symbol Data
-1. Index a codebase with AST extraction enabled
-2. Export symbols
-3. Import to D1
+### File Renaming Complete ✅
+870 files across 101 topics renamed from URL-based names to descriptive names:
 
-### Priority 3: Polish
-- Add loading skeleton animations
-- Add search history (localStorage)
-- Add result highlighting
-- Add pagination for large result sets
+| Topic | Files | Example |
+|-------|-------|---------|
+| Unity | ~260 | `unity-addressables.md`, `unity-animationclip.md` |
+| Google Cloud | 64 | `gcp-cloud-run.md`, `gcp-bigtable.md` |
+| Radix UI | 41 | `radix-dialog.md`, `radix-accordion.md` |
+| Next.js | 31 | `nextjs-app-router.md`, `nextjs-image.md` |
+| Drizzle | 31 | `drizzle-migrations.md`, `drizzle-schema.md` |
+| + 50 more | ~420 | Various frameworks and libraries |
+
+**Scripts:**
+- `scripts/rename-url-files.mjs` — Batch rename URL-based files
+- `scripts/re-index-all.mjs` — Re-index all topics after renaming
+- `scripts/fix-local-db-schema.mjs` — Fix missing columns in local databases
+
+**To re-index a topic:**
+```bash
+export OPENROUTER_API_KEY=$(grep OPENROUTER_API_KEY packages/web/.dev.vars | cut -d'"' -f2)
+node scripts/re-index-all.mjs --topic=<topic-name>
+```
+
+**Note:** `knowledge/` is gitignored, so renames are local.
+
+### Optional Future Work
+- **Deepen specific topics**: More Unity packages (Timeline, ML-Agents, Shader Graph)
+- **Add symbol data**: Index more codebases with AST extraction
+- **Performance**: Optimize semantic search latency
+- **UI enhancements**: Loading skeletons, pagination
 
 ---
 
 ## 🐛 Known Issues
 
-1. **Low vector count**: Only 207 vectors vs 2085 chunks — most topics have keyword search only; re-embedding needed for full semantic search
-2. **wrangler.jsonc interference**: Must use `--config wrangler.toml` when deploying worker from `packages/web/worker/` to avoid picking up parent config
-3. **Import batch size**: Reduced to 2 to avoid SQLITE_TOOBIG errors with large chunks
+1. **Import batch size**: Reduced to 2 to avoid SQLITE_TOOBIG errors with large chunks
+2. **wrangler.jsonc interference**: Must use `--config wrangler.toml` when deploying worker from `packages/web/worker/`
+3. **Free embedding rate limits**: OpenRouter free model occasionally rate-limits; batch size 2 mitigates this
 
 ---
 
@@ -264,3 +297,4 @@ packages/
 - D1 import uses `INSERT OR REPLACE` for idempotent re-imports
 - Each vector is ~39KB as JSON (2048 floats), batch size = 2 to stay under D1's ~100KB statement limit
 - Cloudflare docs scraper available at `packages/web/cf-scraper.ts`
+- Unity docs scraped via Context7 for better reliability (SPA JS rendering)
