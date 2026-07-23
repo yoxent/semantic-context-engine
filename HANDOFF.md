@@ -235,18 +235,24 @@ Applied to: keyword, semantic, and hybrid search modes.
 The knowledge base is now comprehensive across all planned topics.
 
 ### File Renaming Needed
-Unity and Cloudflare docs have URL-based filenames that don't benefit from filename search boosts:
+850+ files across ALL topics have URL-based filenames that don't benefit from filename search boosts:
 
-| Current Pattern | Target Pattern |
-|-----------------|----------------|
-| `https___docs_unity3d_com_...html.md` | `unity-<topic>.md` |
-| `https___developers_cloudflare_com_...html.md` | `cloudflare-<topic>.md` |
+| Topic | Files | Example Current → Target |
+|-------|-------|--------------------------|
+| Unity | ~260 | `https___docs_unity3d_com_...html.md` → `unity-addressables.md` |
+| Google Cloud | 64 | `https___cloud_google_com_...html.md` → `gcp-cloud-run.md` |
+| Radix UI | 41 | `https___www_radix_ui_...html.md` → `radix-dialog.md` |
+| Next.js | 31 | `https___nextjs_org_docs_...html.md` → `nextjs-app-router.md` |
+| Drizzle | 31 | `https___orm_drizzle_team_...html.md` → `drizzle-migrations.md` |
+| + 50 more | ~420 | Various frameworks and libraries |
 
 **Workflow:**
-1. Rename files in `knowledge/<topic>/`
+1. Rename files in `knowledge/<topic>/` using `git mv`
 2. Re-index: `node packages/cli/dist/src/main.js update .`
 3. Re-export: `node packages/cli/dist/src/main.js export -o <export-dir> --path .`
 4. Re-import: `npx tsx packages/web/import.ts <export-dir> sce-db --append`
+
+**Full task plan:** `docs/TASK-rename-files.md`
 
 ### Optional Future Work
 - **Deepen specific topics**: More Unity packages (Timeline, ML-Agents, Shader Graph)
