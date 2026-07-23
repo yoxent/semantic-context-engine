@@ -215,13 +215,28 @@ packages/
 
 ## 📈 Ranking Improvements (2026-07-25)
 
-Added SimpleRanker boosts and deduplication to all search modes:
+Enhanced ranking with multi-word query handling and content quality signals:
 
 | Boost Type | Points | Description |
 |------------|--------|-------------|
-| Filename match | +5 | Query terms found in filename |
-| Heading match | +4 | Query terms found in heading path |
-| Snippet exact | +2 | Full query found in chunk text |
+| **Filename** | | |
+| Exact filename | +8 | Query exactly matches file stem |
+| Filename phrase | +6 | Query phrase found in filename |
+| All terms in filename | +5 | All query terms in filename |
+| Some terms in filename | +3-4 | Partial term matches |
+| **Heading** | | |
+| Exact heading | +7 | Query exactly matches heading |
+| Heading phrase | +5 | Query phrase in heading |
+| All terms in heading | +4 | All query terms in heading |
+| Some terms in heading | +2-3 | Partial heading matches |
+| **Content** | | |
+| Exact phrase in text | +4 | Full query in chunk text |
+| Ordered terms in text | +3 | Terms appear in query order |
+| All terms in text | +2 | All terms present |
+| **Quality** | | |
+| Long content (1000+) | +2 | Detailed content bonus |
+| Medium content (500+) | +1 | Moderate content bonus |
+| Heading depth (2+) | +1 | Structured content bonus |
 
 **Deduplication**: Max 2 hits per file to improve result diversity.
 
