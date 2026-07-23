@@ -257,6 +257,13 @@ const modalPath = document.getElementById('modal-path');
 const modalHeading = document.getElementById('modal-heading');
 const modalMeta = document.getElementById('modal-meta');
 const modalBody = document.getElementById('modal-body');
+const modalNav = document.getElementById('modal-nav');
+const navPrev = document.getElementById('nav-prev');
+const navNext = document.getElementById('nav-next');
+const navInfo = document.getElementById('nav-info');
+
+let currentSiblings = [];
+let currentPartIndex = 0;
 
 // Open modal with chunk data
 async function openModal(chunkId) {
@@ -266,6 +273,9 @@ async function openModal(chunkId) {
   modalPath.textContent = '';
   modalHeading.textContent = '';
   modalMeta.innerHTML = '';
+  modalNav.style.display = 'none';
+  currentSiblings = [];
+  currentPartIndex = 0;
 
   try {
     const response = await fetch(`${API_BASE}/api/chunk/${chunkId}`);
@@ -283,12 +293,57 @@ async function openModal(chunkId) {
     const metaItems = [];
     if (chunk.language) metaItems.push(`📄 ${chunk.language}`);
     if (chunk.symbolKind) metaItems.push(`🏷️ ${chunk.symbolKind}`);
+    if (chunk.totalParts) metaItems.push(`📄 Part ${chunk.partIndex + 1} of ${chunk.totalParts}`);
     metaItems.push(`ID: ${chunk.id}`);
     modalMeta.innerHTML = metaItems.map(m => `<span>${escapeHtml(m)}</span>`).join('');
+
+    // Handle multi-part navigation
+    if (chunk.siblings && chunk.siblings.length > 1) {
+      currentSiblings = chunk.siblings;
+      currentPartIndex = chunk.siblings.findIndex(s => s.id === chunkId);
+      if (currentPartIndex === -1) currentPartIndex = 0;
+      updateNavButtons();
+      modalNav.style.display = 'flex';
+    }
   } catch (error) {
     modalBody.textContent = `Error: ${error.message}`;
   }
 }
+
+function updateNavButtons() {
+  navPrev.disabled = currentPartIndex === 0;
+  navNext.disabled = currentPartIndex === currentSiblings.length - 1;
+  navInfo.textContent = `Part ${currentPartIndex + 1} of ${currentSiblings.length}`;
+}
+
+async function navigateToPart(direction) {
+  const newIndex = currentPartIndex + direction;
+  if (newIndex < 0 || newIndex >= currentSiblings.length) return;
+  
+  const siblingId = currentSiblings[newIndex].id;
+  modalBody.textContent = 'Loading...';
+  
+  try {
+    const response = await fetch(`${API_BASE}/api/chunk/${siblingId}`);
+    const chunk = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(chunk.error || 'Failed to load chunk');
+    }
+    
+    modalPath.textContent = chunk.relativePath || '';
+    modalHeading.textContent = chunk.headingPath || '';
+    modalBody.textContent = chunk.text || '';
+    
+    currentPartIndex = newIndex;
+    updateNavButtons();
+  } catch (error) {
+    modalBody.textContent = `Error: ${error.message}`;
+  }
+}
+
+navPrev.addEventListener('click', () => navigateToPart(-1));
+navNext.addEventListener('click', () => navigateToPart(1));
 
 // Close modal
 function closeModal() {
