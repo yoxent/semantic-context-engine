@@ -401,6 +401,34 @@ header h1 {
   margin-bottom: 0.5rem;
 }
 
+.result-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copy-btn {
+  background: var(--muted);
+  border: 2px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: var(--shadow-xs);
+  line-height: 1;
+}
+
+.copy-btn:hover {
+  background: var(--primary);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.copy-btn.copied {
+  background: var(--success);
+  color: white;
+}
+
 .result-path {
   font-size: 0.85rem;
   font-weight: 600;
@@ -440,6 +468,7 @@ header h1 {
   max-height: 200px;
   overflow: hidden;
   position: relative;
+  transition: max-height 0.3s ease;
 }
 
 .result-text::after {
@@ -451,6 +480,20 @@ header h1 {
   height: 60px;
   background: linear-gradient(transparent, var(--card));
   pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.result-card.expanded .result-text {
+  max-height: none;
+}
+
+.result-card.expanded .result-text::after {
+  opacity: 0;
+}
+
+.result-card.expanded {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-lg);
 }
 
 .result-card:hover .result-text::after {

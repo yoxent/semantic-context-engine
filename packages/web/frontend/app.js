@@ -135,10 +135,13 @@ function renderResults(data) {
   }
 
   const html = data.hits.map((hit, i) => `
-    <div class="result-card" data-chunk-id="${escapeHtml(hit.chunkId || '')}" style="animation: fadeIn 0.2s ease ${i * 0.03}s both">
+    <div class="result-card" data-chunk-id="${escapeHtml(hit.chunkId || '')}" data-full-text="${escapeHtml(hit.text)}" style="animation: fadeIn 0.2s ease ${i * 0.03}s both">
       <div class="result-header">
         <span class="result-path">${escapeHtml(hit.relativePath)}</span>
-        <span class="result-score">score: ${formatScore(hit.score)}</span>
+        <div class="result-actions">
+          <button class="copy-btn" title="Copy text" aria-label="Copy text to clipboard">📋</button>
+          <span class="result-score">score: ${formatScore(hit.score)}</span>
+        </div>
       </div>
       ${hit.headingPath ? `<div class="result-heading">${escapeHtml(hit.headingPath)}</div>` : ''}
       <div class="result-text">${highlightText(truncateText(hit.text, 400), data.query)}</div>
@@ -157,11 +160,38 @@ function renderResults(data) {
 
   // Add click handlers to result cards
   resultsDiv.querySelectorAll('.result-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const chunkId = card.dataset.chunkId;
-      if (chunkId) {
-        openModal(chunkId);
+    card.addEventListener('click', (e) => {
+      // Don't expand if clicking copy button
+      if (e.target.closest('.copy-btn')) return;
+      
+      const textEl = card.querySelector('.result-text');
+      const isExpanded = card.classList.contains('expanded');
+      
+      if (isExpanded) {
+        card.classList.remove('expanded');
+        textEl.innerHTML = highlightText(truncateText(card.dataset.fullText, 400), data.query);
+      } else {
+        card.classList.add('expanded');
+        textEl.innerHTML = highlightText(card.dataset.fullText, data.query);
       }
+    });
+  });
+
+  // Copy button handlers
+  resultsDiv.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.result-card');
+      const text = card.dataset.fullText;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.textContent = '✓';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = '📋';
+        }, 1500);
+      });
     });
   });
 
