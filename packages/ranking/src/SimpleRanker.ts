@@ -7,6 +7,7 @@ export class SimpleRanker implements IRanker {
     const needle = query.text.trim().toLowerCase();
     const terms = tokenize(query.text);
     const identifierQuery = isIdentifierLike(query.text.trim());
+    const isMultiWord = terms.length > 1;
 
     const ranked = hits.map((hit) => {
       let score = hit.score;
@@ -17,21 +18,57 @@ export class SimpleRanker implements IRanker {
       const headings = (hit.headingPath ?? []).map((part) => part.toLowerCase());
 
       if (needle) {
-        if (fileName.includes(needle) || stem === needle || terms.some((term) => stem === term || fileName.includes(term))) {
+        // === FILENAME BOOSTS ===
+        if (stem === needle || fileName === needle + '.md') {
+          score += 8;
+        } else if (fileName.includes(needle)) {
+          score += 6;
+        } else if (terms.every(t => fileName.includes(t))) {
           score += 5;
-        } else if (pathLower.includes(needle) || terms.some((term) => pathLower.includes(term))) {
-          score += 2;
+        } else {
+          const termHits = terms.filter(t => fileName.includes(t)).length;
+          if (termHits > 0) {
+            score += Math.min(termHits * 3, 4);
+          }
         }
 
+        // === HEADING BOOSTS ===
         const headingHits = headings.filter(
           (heading) => heading === needle || heading.includes(needle) || terms.some((term) => heading === term || heading.includes(term))
         ).length;
         if (headingHits > 0) {
-          score += 4 + Math.min(headingHits - 1, 2);
+          score += 4 + Math.min(headingHits - 1, 3);
         }
 
-        if (snippetLower.includes(needle)) score += 2;
-        if (snippetLower.includes(` ${needle} `)) score += 1;
+        // === CONTENT/TEXT BOOSTS ===
+        if (snippetLower.includes(needle)) {
+          score += 4;
+        } else if (isMultiWord) {
+          let lastIdx = -1;
+          let allInOrder = true;
+          for (const term of terms) {
+            const idx = snippetLower.indexOf(term, lastIdx + 1);
+            if (idx === -1) {
+              allInOrder = false;
+              break;
+            }
+            lastIdx = idx;
+          }
+          if (allInOrder) {
+            score += 3;
+          }
+        }
+
+        if (terms.every(t => snippetLower.includes(t))) {
+          score += 2;
+        }
+
+        // === QUALITY SIGNALS ===
+        if (hit.snippet.length > 1000) {
+          score += 2;
+        } else if (hit.snippet.length > 500) {
+          score += 1;
+        }
 
         if (identifierQuery && hasIdentifierMatch(hit.snippet, needle)) {
           score += 3;

@@ -319,6 +319,7 @@ function fileStem(fileName: string): string {
 function applyKeywordBoosts(hits: SearchHit[], query: string): SearchHit[] {
   const needle = query.trim().toLowerCase();
   const terms = tokenize(query);
+  const isMultiWord = terms.length > 1;
 
   return hits.map((hit) => {
     let score = hit.score;
@@ -327,19 +328,87 @@ function applyKeywordBoosts(hits: SearchHit[], query: string): SearchHit[] {
     const snippetLower = hit.text.toLowerCase();
     const headingLower = (hit.headingPath ?? "").toLowerCase();
 
-    // Filename match (+5)
-    if (fileName.includes(needle) || stem === needle || terms.some((t) => stem === t || fileName.includes(t))) {
+    // === FILENAME BOOSTS ===
+    // Exact filename match (+8) - highest priority
+    if (stem === needle || fileName === needle + '.md') {
+      score += 8;
+    }
+    // Filename contains exact phrase (+6)
+    else if (fileName.includes(needle)) {
+      score += 6;
+    }
+    // All terms in filename (+5)
+    else if (terms.every(t => fileName.includes(t))) {
       score += 5;
     }
-
-    // Heading match (+4)
-    if (headingLower.includes(needle) || terms.some((t) => headingLower.includes(t))) {
-      score += 4;
+    // Some terms in filename (+3 per term, max +4)
+    else {
+      const termHits = terms.filter(t => fileName.includes(t)).length;
+      if (termHits > 0) {
+        score += Math.min(termHits * 3, 4);
+      }
     }
 
-    // Snippet exact match (+2)
+    // === HEADING BOOSTS ===
+    // Exact heading match (+7)
+    if (headingLower === needle) {
+      score += 7;
+    }
+    // Heading contains exact phrase (+5)
+    else if (headingLower.includes(needle)) {
+      score += 5;
+    }
+    // All terms in heading (+4)
+    else if (terms.every(t => headingLower.includes(t))) {
+      score += 4;
+    }
+    // Some terms in heading (+2 per term, max +3)
+    else {
+      const headingTermHits = terms.filter(t => headingLower.includes(t)).length;
+      if (headingTermHits > 0) {
+        score += Math.min(headingTermHits * 2, 3);
+      }
+    }
+
+    // === CONTENT/TEXT BOOSTS ===
+    // Exact phrase in text (+4)
     if (snippetLower.includes(needle)) {
+      score += 4;
+    }
+    // All terms in text, in order (+3)
+    else if (isMultiWord) {
+      let lastIdx = -1;
+      let allInOrder = true;
+      for (const term of terms) {
+        const idx = snippetLower.indexOf(term, lastIdx + 1);
+        if (idx === -1) {
+          allInOrder = false;
+          break;
+        }
+        lastIdx = idx;
+      }
+      if (allInOrder) {
+        score += 3;
+      }
+    }
+
+    // All terms present in text (+2)
+    if (terms.every(t => snippetLower.includes(t))) {
       score += 2;
+    }
+
+    // === CONTENT QUALITY SIGNALS ===
+    // Longer content with more detail (+1 for 500+ chars, +2 for 1000+ chars)
+    if (hit.text.length > 1000) {
+      score += 2;
+    } else if (hit.text.length > 500) {
+      score += 1;
+    }
+
+    // Bonus for heading path with multiple levels (+1)
+    const headingParts = (hit.headingPath ?? '').split(' / ').filter(Boolean);
+    if (headingParts.length >= 2) {
+      score += 1;
     }
 
     return { ...hit, score };
