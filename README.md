@@ -263,3 +263,45 @@ Behavior:
 - AST call hierarchy / references / inheritance
 - Multi-tenant / public SaaS knowledge hosting
 - Being a drop-in replacement for a general-purpose vector database
+
+## Knowledge Base Maintenance
+
+### File Naming Convention
+
+All indexed files should have **descriptive, human-readable names**:
+
+| Pattern | Example | Bad Example |
+|---------|---------|-------------|
+| Unity docs | `unity-addressables.md` | `https___docs_unity3d_com_...html.md` |
+| Cloudflare docs | `cloudflare-d1-batch-insert.md` | `https___developers_cloudflare_com_...html.md` |
+| Context7 docs | `context7-cinemachine-deepen.md` | (already good) |
+
+**Why:** Descriptive names enable filename-based search boosts (+5 points) and make results more readable.
+
+### Adding New Documentation
+
+1. **Scrape with descriptive filenames** — Use `cf-scraper.ts` or manual scraping, ensuring files are named descriptively
+2. **Create URL list** — `knowledge/urls/<topic>.txt`
+3. **Scrape** — `npx tsx packages/web/cf-scraper.ts knowledge/urls/<topic>.txt ./knowledge/<topic>`
+4. **Index** — `node packages/cli/dist/src/main.js index .` (from `knowledge/<topic>/`)
+5. **Export** — `node packages/cli/dist/src/main.js export -o knowledge/<topic>-export --path knowledge/<topic>`
+6. **Import** — `npx tsx packages/web/import.ts knowledge/<topic>-export sce-db --append`
+
+### Renaming Existing Files
+
+For files with URL-based names (e.g., `https___docs_unity3d_com_...`):
+
+1. **Rename the file** — Change to descriptive name (e.g., `unity-addressables.md`)
+2. **Re-index** — `node packages/cli/dist/src/main.js update .`
+3. **Re-export** — `node packages/cli/dist/src/main.js export -o <export-dir> --path .`
+4. **Re-import** — `npx tsx packages/web/import.ts <export-dir> sce-db --append`
+
+### Frontend Suggestions
+
+Keep suggestion buttons updated with relevant, non-redundant queries:
+
+| Good | Bad |
+|------|-----|
+| `Unity Entity Component System` | `Unity ECS component system` (ECS = Entity Component System) |
+| `React hooks useState` | `React hooks useState hook` (redundant) |
+| `Cloudflare D1 batch insert` | `Cloudflare D1 database batch insert` (verbose) |

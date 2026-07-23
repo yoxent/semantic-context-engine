@@ -234,11 +234,25 @@ Applied to: keyword, semantic, and hybrid search modes.
 ### All Expansion Batches Complete ✅
 The knowledge base is now comprehensive across all planned topics.
 
+### File Renaming Needed
+Unity and Cloudflare docs have URL-based filenames that don't benefit from filename search boosts:
+
+| Current Pattern | Target Pattern |
+|-----------------|----------------|
+| `https___docs_unity3d_com_...html.md` | `unity-<topic>.md` |
+| `https___developers_cloudflare_com_...html.md` | `cloudflare-<topic>.md` |
+
+**Workflow:**
+1. Rename files in `knowledge/<topic>/`
+2. Re-index: `node packages/cli/dist/src/main.js update .`
+3. Re-export: `node packages/cli/dist/src/main.js export -o <export-dir> --path .`
+4. Re-import: `npx tsx packages/web/import.ts <export-dir> sce-db --append`
+
 ### Optional Future Work
 - **Deepen specific topics**: More Unity packages (Timeline, ML-Agents, Shader Graph)
 - **Add symbol data**: Index more codebases with AST extraction
 - **Performance**: Optimize semantic search latency
-- **UI enhancements**: Loading skeletons, search history, result highlighting, pagination
+- **UI enhancements**: Loading skeletons, pagination
 
 ---
 
