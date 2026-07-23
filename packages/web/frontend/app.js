@@ -158,21 +158,15 @@ function renderResults(data) {
   searchTime.textContent = `${data.searchTimeMs}ms`;
   stopCoreRotor();
 
-  // Add click handlers to result cards
+  // Add click handlers to result cards — open modal
   resultsDiv.querySelectorAll('.result-card').forEach(card => {
     card.addEventListener('click', (e) => {
-      // Don't expand if clicking copy button
+      // Don't open modal if clicking copy button
       if (e.target.closest('.copy-btn')) return;
       
-      const textEl = card.querySelector('.result-text');
-      const isExpanded = card.classList.contains('expanded');
-      
-      if (isExpanded) {
-        card.classList.remove('expanded');
-        textEl.innerHTML = highlightText(truncateText(card.dataset.fullText, 400), data.query);
-      } else {
-        card.classList.add('expanded');
-        textEl.innerHTML = highlightText(card.dataset.fullText, data.query);
+      const chunkId = card.dataset.chunkId;
+      if (chunkId) {
+        openModal(chunkId);
       }
     });
   });
