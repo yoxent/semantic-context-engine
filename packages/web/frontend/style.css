@@ -301,6 +301,67 @@ header h1 {
   box-shadow: var(--shadow-md);
 }
 
+.search-history {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.history-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.history-clear {
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+}
+
+.history-clear:hover {
+  color: var(--destructive);
+}
+
+.history-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.history-item {
+  padding: 0.5rem 0.875rem;
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-xs);
+}
+
+.history-item:hover {
+  background: var(--muted);
+  color: var(--foreground);
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-sm);
+}
+
 /* ============================================
    Results
    ============================================ */

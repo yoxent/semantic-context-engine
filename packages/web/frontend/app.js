@@ -105,6 +105,7 @@ async function performSearch() {
     }
 
     renderResults(data);
+    saveToHistory(query);
   } catch (error) {
     resultsDiv.innerHTML = `<div class="error">
       <strong>Search failed</strong><br>
@@ -292,8 +293,66 @@ async function loadStats() {
   }
 }
 
+// Search history
+const MAX_HISTORY = 8;
+const historyDiv = document.getElementById('search-history');
+const historyList = document.getElementById('history-list');
+const clearHistoryBtn = document.getElementById('clear-history');
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('sce-search-history') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveToHistory(query) {
+  if (!query || query.length < 2) return;
+  
+  const history = getHistory();
+  const filtered = history.filter(h => h.toLowerCase() !== query.toLowerCase());
+  filtered.unshift(query);
+  
+  if (filtered.length > MAX_HISTORY) {
+    filtered.pop();
+  }
+  
+  localStorage.setItem('sce-search-history', JSON.stringify(filtered));
+  renderHistory();
+}
+
+function renderHistory() {
+  const history = getHistory();
+  
+  if (history.length === 0) {
+    historyDiv.style.display = 'none';
+    return;
+  }
+  
+  historyDiv.style.display = 'block';
+  historyList.innerHTML = history.map(q => 
+    `<button class="history-item" data-query="${escapeHtml(q)}">${escapeHtml(q)}</button>`
+  ).join('');
+  
+  historyList.querySelectorAll('.history-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      queryInput.value = btn.dataset.query;
+      performSearch();
+    });
+  });
+}
+
+function clearHistory() {
+  localStorage.removeItem('sce-search-history');
+  renderHistory();
+}
+
+clearHistoryBtn.addEventListener('click', clearHistory);
+
 // Initialize
 loadStats();
+renderHistory();
 queryInput.focus();
 
 // Core Rotor animation — cycles through 8 fan blade positions
