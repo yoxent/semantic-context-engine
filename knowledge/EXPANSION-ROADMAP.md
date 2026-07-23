@@ -9,7 +9,7 @@
 
 ## Current State
 
-- **D1 Live**: ~5475 chunks, ~2962 vectors, ~136 topics
+- **D1 Live**: ~5532 chunks, ~3019 vectors, ~137 topics
 - **Indexed**: All batches 1–35, Unity packages (all planned batches complete)
 - **Pending**: None
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents

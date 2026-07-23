@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-22
-**D1 Live Total**: **~5475 chunks, ~2962 vectors** (added Batch 28: socket-io 58, server-sent-events 35, nextjs-image 74, nextjs-fonts 32, nextjs-metadata 40)
+**Last Updated**: 2026-07-25
+**D1 Live Total**: **~5532 chunks, ~3019 vectors** (added Unity++: unity-packages-complete 57)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
@@ -335,7 +335,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **23** | **unity-graphics-api (8)** — CommandBuffer, ComputeShader, RenderPipeline | ✅ **Imported to D1** |
 | **24** | **tanstack-query (131), nextjs-deep (18), react-hook-form (11), nextjs-auth (3), ts-patterns (15)** | ✅ **Imported to D1** |
 | **Unity+** | **unity-scripting-api (114), unity-manual-6000 (32)** | ✅ **Imported to D1** |
-| **Unity++** | **unity-packages-complete (57)** — Addressables, Cinemachine, Netcode, Input System | ⚠️ **Scraped, needs import** |
+| **Unity++** | **unity-packages-complete (57)** — Addressables, Cinemachine, Netcode, Input System | ✅ **Imported to D1** |
 | **25** | **radix-ui (303), framer-motion (49), drizzle-deep (37), playwright (55), caching-strategies (51)** | ✅ **Imported to D1** |
 | **26** | **react-table (89), msw (35), testing-library (45), eslint-nextjs (25), sonner (32)** | ✅ **Imported to D1** |
 | **27** | **vercel-deep (39), docker-nextjs (202), github-actions-nextjs (69), sentry-nextjs (57), cloudflare-pages (81)** | ✅ **Imported to D1** |
@@ -353,10 +353,10 @@ See `knowledge/EXPANSION-ROADMAP.md` for full details.
 ### Full-Stack Dev (Batches 24–28) — Active
 - **Batch 24** ✅: tanstack-query (131 chunks), nextjs-deep (18), react-hook-form (11), nextjs-auth (3), ts-patterns (15) — **Done**
 - **Unity 6000.3** ✅: unity-scripting-api (114), unity-manual-6000 (32) — **Done**
-- **Batch 25** ⏳: radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies
-- **Batch 26** ⏳: react-table, msw, testing-library, eslint-nextjs, sonner
-- **Batch 27** ⏳: vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages
-- **Batch 28** ⏳: socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata
+- **Batch 25** ✅: radix-ui, framer-motion, drizzle-deep, playwright, caching-strategies — **Done**
+- **Batch 26** ✅: react-table, msw, testing-library, eslint-nextjs, sonner — **Done**
+- **Batch 27** ✅: vercel-deep, docker-nextjs, github-actions-nextjs, sentry, cloudflare-pages — **Done**
+- **Batch 28** ✅: socket.io, server-sent-events, nextjs-image, nextjs-fonts, nextjs-metadata — **Done**
 - **Batch 32** ✅: pico-css (3), watercss (9), mvp-css (3), new-css (9), radix-themes (286) — **Done**
 
 ### Unity (Batches 10–23) — Deferred
