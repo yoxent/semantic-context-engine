@@ -257,13 +257,6 @@ const modalPath = document.getElementById('modal-path');
 const modalHeading = document.getElementById('modal-heading');
 const modalMeta = document.getElementById('modal-meta');
 const modalBody = document.getElementById('modal-body');
-const modalNav = document.getElementById('modal-nav');
-const navPrev = document.getElementById('nav-prev');
-const navNext = document.getElementById('nav-next');
-const navInfo = document.getElementById('nav-info');
-
-let currentSiblings = [];
-let currentPartIndex = 0;
 
 // Open modal with chunk data
 async function openModal(chunkId) {
@@ -273,9 +266,6 @@ async function openModal(chunkId) {
   modalPath.textContent = '';
   modalHeading.textContent = '';
   modalMeta.innerHTML = '';
-  modalNav.style.display = 'none';
-  currentSiblings = [];
-  currentPartIndex = 0;
 
   try {
     const response = await fetch(`${API_BASE}/api/chunk/${chunkId}`);
@@ -297,53 +287,40 @@ async function openModal(chunkId) {
     metaItems.push(`ID: ${chunk.id}`);
     modalMeta.innerHTML = metaItems.map(m => `<span>${escapeHtml(m)}</span>`).join('');
 
-    // Handle multi-part navigation
+    // Handle multi-part documents — combine all parts
     if (chunk.siblings && chunk.siblings.length > 1) {
-      currentSiblings = chunk.siblings;
-      currentPartIndex = chunk.siblings.findIndex(s => s.id === chunkId);
-      if (currentPartIndex === -1) currentPartIndex = 0;
-      updateNavButtons();
-      modalNav.style.display = 'flex';
+      const fullText = await fetchAllParts(chunk.siblings, chunkId, chunk.text);
+      modalBody.textContent = fullText;
     }
   } catch (error) {
     modalBody.textContent = `Error: ${error.message}`;
   }
 }
 
-function updateNavButtons() {
-  navPrev.disabled = currentPartIndex === 0;
-  navNext.disabled = currentPartIndex === currentSiblings.length - 1;
-  navInfo.textContent = `Part ${currentPartIndex + 1} of ${currentSiblings.length}`;
-}
-
-async function navigateToPart(direction) {
-  const newIndex = currentPartIndex + direction;
-  if (newIndex < 0 || newIndex >= currentSiblings.length) return;
+async function fetchAllParts(siblings, currentId, currentText) {
+  const parts = [];
   
-  const siblingId = currentSiblings[newIndex].id;
-  modalBody.textContent = 'Loading...';
-  
-  try {
-    const response = await fetch(`${API_BASE}/api/chunk/${siblingId}`);
-    const chunk = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(chunk.error || 'Failed to load chunk');
+  for (const sibling of siblings) {
+    if (sibling.id === currentId) {
+      parts.push({ index: sibling.part_index, text: currentText });
+    } else {
+      try {
+        const response = await fetch(`${API_BASE}/api/chunk/${sibling.id}`);
+        const data = await response.json();
+        if (data.text) {
+          parts.push({ index: sibling.part_index, text: data.text });
+        }
+      } catch (e) {
+        // Skip failed parts
+      }
     }
-    
-    modalPath.textContent = chunk.relativePath || '';
-    modalHeading.textContent = chunk.headingPath || '';
-    modalBody.textContent = chunk.text || '';
-    
-    currentPartIndex = newIndex;
-    updateNavButtons();
-  } catch (error) {
-    modalBody.textContent = `Error: ${error.message}`;
   }
+  
+  parts.sort((a, b) => a.index - b.index);
+  return parts.map(p => p.text).join('\n\n');
 }
 
-navPrev.addEventListener('click', () => navigateToPart(-1));
-navNext.addEventListener('click', () => navigateToPart(1));
+
 
 // Close modal
 function closeModal() {

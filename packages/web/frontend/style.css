@@ -739,46 +739,6 @@ footer {
   background: var(--muted);
 }
 
-.modal-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 2px solid var(--border);
-  background: var(--card);
-}
-
-.nav-btn {
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  background: var(--muted);
-  border: 2px solid var(--border);
-  color: var(--foreground);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: var(--shadow-xs);
-}
-
-.nav-btn:hover:not(:disabled) {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  transform: translate(-1px, -1px);
-  box-shadow: var(--shadow-sm);
-}
-
-.nav-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.nav-info {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--muted-foreground);
-}
-
 .modal-meta span {
   display: inline-flex;
   align-items: center;
