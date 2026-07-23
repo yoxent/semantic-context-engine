@@ -96,7 +96,7 @@ async function keywordSearch(
     totalParts: (row.total_parts as number) ?? undefined,
   }));
 
-  return applyKeywordBoosts(baseHits, query);
+  return deduplicateHits(applyKeywordBoosts(baseHits, query), 2);
 }
 
 // ---------------------------------------------------------------------------
@@ -165,7 +165,7 @@ async function semanticSearch(
     }
   }
 
-  return applyKeywordBoosts(hits, query);
+  return deduplicateHits(applyKeywordBoosts(hits, query), 2);
 }
 
 // ---------------------------------------------------------------------------
@@ -287,10 +287,12 @@ async function hybridSearch(
     allHits.set(hit.chunkId, hit);
   }
 
-  return sorted.map(([chunkId, score]) => ({
+  const results = sorted.map(([chunkId, score]) => ({
     ...allHits.get(chunkId)!,
     score,
   }));
+
+  return deduplicateHits(results, 2);
 }
 
 // ---------------------------------------------------------------------------
@@ -342,6 +344,25 @@ function applyKeywordBoosts(hits: SearchHit[], query: string): SearchHit[] {
 
     return { ...hit, score };
   });
+}
+
+// ---------------------------------------------------------------------------
+// Deduplication – max N hits per file
+// ---------------------------------------------------------------------------
+
+function deduplicateHits(hits: SearchHit[], maxPerFile: number = 2): SearchHit[] {
+  const fileCounts = new Map<string, number>();
+  const deduplicated: SearchHit[] = [];
+
+  for (const hit of hits) {
+    const count = fileCounts.get(hit.relativePath) ?? 0;
+    if (count < maxPerFile) {
+      deduplicated.push(hit);
+      fileCounts.set(hit.relativePath, count + 1);
+    }
+  }
+
+  return deduplicated;
 }
 
 // ---------------------------------------------------------------------------
