@@ -136,7 +136,7 @@ function renderResults(data) {
         <span class="result-score">score: ${formatScore(hit.score)}</span>
       </div>
       ${hit.headingPath ? `<div class="result-heading">${escapeHtml(hit.headingPath)}</div>` : ''}
-      <div class="result-text">${escapeHtml(truncateText(hit.text, 400))}</div>
+      <div class="result-text">${highlightText(truncateText(hit.text, 400), data.query)}</div>
       <div class="result-meta">
         ${hit.language ? `<span>📄 ${escapeHtml(hit.language)}</span>` : ''}
         ${hit.symbolKind ? `<span>🏷️ ${escapeHtml(hit.symbolKind)}</span>` : ''}
@@ -204,6 +204,20 @@ function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
   return div.innerHTML;
+}
+
+function highlightText(text, query) {
+  if (!query || !text) return escapeHtml(text);
+  
+  const escaped = escapeHtml(text);
+  const terms = query.trim().split(/\s+/).filter(t => t.length >= 2);
+  
+  if (terms.length === 0) return escaped;
+  
+  const pattern = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const regex = new RegExp(`(${pattern})`, 'gi');
+  
+  return escaped.replace(regex, '<mark class="highlight">$1</mark>');
 }
 
 // Modal elements

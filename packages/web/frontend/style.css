@@ -459,6 +459,13 @@ header h1 {
   margin-bottom: 0.5rem;
 }
 
+.highlight {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.1em 0.2em;
+  font-weight: 600;
+}
+
 /* ============================================
    Footer
    ============================================ */
