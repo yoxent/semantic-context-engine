@@ -129,6 +129,8 @@ Any MCP-compatible agent can now use:
 3. **hybrid**: RRF fusion of keyword + semantic (k=60)
 4. **ast**: Symbol table lookup — exact match then prefix fallback
 
+> **Note**: AST search is API/MCP only (not in frontend UI). With 287 symbols indexed, it's more useful for AI agents than human users.
+
 ### Multi-Part Document Expansion
 When chunks exceed ~7500 chars, the indexer splits them into linked parts. The search API automatically expands multi-part results: when a search hits any part of a split document, all sibling parts are returned together.
 
