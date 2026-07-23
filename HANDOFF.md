@@ -21,7 +21,7 @@
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
 | Ranking Boosts | ✅ | Filename +5, Heading +4, Snippet +2 |
 | Deduplication | ✅ | Max 2 hits per file |
-| Frontend UI | ✅ | RetroUI neobrutalist theme + Dot Matrix Core Rotor loader, dark, responsive, keyboard shortcuts |
+| Frontend UI | ✅ | RetroUI neobrutalist theme, dark, responsive, keyboard shortcuts, search highlighting, expandable cards, copy button, search history, ARIA accessible |
 | Multi-Part Expansion | ✅ | Split chunks >7500 chars auto-expand in search results |
 
 ---
@@ -193,20 +193,23 @@ packages/
 ### For Job Application Demo
 
 1. **Open**: https://sce-web.pasttime.xyz/
-2. **Show keyword search**: Type "D1 database"
+2. **Show keyword search**: Type "D1 database" — notice highlighted terms
 3. **Show search modes**: Click through Keyword → Semantic → Hybrid
 4. **Show response times**: Point out ~55ms keyword, semantic search
-5. **Show stats**: 5532 chunks of documentation indexed
+5. **Show result features**: Click card to expand, copy button, score display
+6. **Show search history**: Recent searches appear below suggestions
+7. **Show stats**: 5532 chunks of documentation indexed
 
 ### Key Talking Points
 - "5532 chunks of documentation indexed in D1"
-- "4 search modes: keyword, semantic, hybrid, AST"
+- "3 search modes: keyword, semantic, hybrid (AST for API/MCP)"
 - "Sub-100ms keyword search, semantic search via OpenRouter"
 - "Built for AI coding agents as the primary consumer"
 - "Edge-deployed on Cloudflare Workers for global low-latency"
 - "Multi-part document splitting for long docs (auto-expands in search)"
 - "Unity 6000.3 full coverage: Scripting API, Manual, Packages, UI, Cloud, Networking"
 - "Full-stack web: React, Next.js, Vercel, Docker, Sentry, testing, deployment"
+- "Frontend: search highlighting, expandable cards, copy button, search history, ARIA accessible"
 
 ---
 
