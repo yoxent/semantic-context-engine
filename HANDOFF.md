@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-25
-**Status**: All planned expansion batches (1–28, 29–36) complete, 5532 chunks indexed
+**Status**: All planned expansion batches (1–28, 29–36) complete, 5532 chunks indexed. File renaming complete (870 files).
 
 ---
 
@@ -234,25 +234,23 @@ Applied to: keyword, semantic, and hybrid search modes.
 ### All Expansion Batches Complete ✅
 The knowledge base is now comprehensive across all planned topics.
 
-### File Renaming Needed
-850+ files across ALL topics have URL-based filenames that don't benefit from filename search boosts:
+### File Renaming Complete ✅
+870 files across 101 topics renamed from URL-based names to descriptive names:
 
-| Topic | Files | Example Current → Target |
-|-------|-------|--------------------------|
-| Unity | ~260 | `https___docs_unity3d_com_...html.md` → `unity-addressables.md` |
-| Google Cloud | 64 | `https___cloud_google_com_...html.md` → `gcp-cloud-run.md` |
-| Radix UI | 41 | `https___www_radix_ui_...html.md` → `radix-dialog.md` |
-| Next.js | 31 | `https___nextjs_org_docs_...html.md` → `nextjs-app-router.md` |
-| Drizzle | 31 | `https___orm_drizzle_team_...html.md` → `drizzle-migrations.md` |
+| Topic | Files | Example |
+|-------|-------|---------|
+| Unity | ~260 | `unity-addressables.md`, `unity-animationclip.md` |
+| Google Cloud | 64 | `gcp-cloud-run.md`, `gcp-bigtable.md` |
+| Radix UI | 41 | `radix-dialog.md`, `radix-accordion.md` |
+| Next.js | 31 | `nextjs-app-router.md`, `nextjs-image.md` |
+| Drizzle | 31 | `drizzle-migrations.md`, `drizzle-schema.md` |
 | + 50 more | ~420 | Various frameworks and libraries |
 
-**Workflow:**
-1. Rename files in `knowledge/<topic>/` using `git mv`
-2. Re-index: `node packages/cli/dist/src/main.js update .`
-3. Re-export: `node packages/cli/dist/src/main.js export -o <export-dir> --path .`
-4. Re-import: `npx tsx packages/web/import.ts <export-dir> sce-db --append`
+**Scripts:**
+- `scripts/rename-url-files.mjs` — Batch rename URL-based files
+- `scripts/re-index-all.mjs` — Re-index all topics after renaming
 
-**Full task plan:** `docs/TASK-rename-files.md`
+**Note:** `knowledge/` is gitignored, so renames are local. Re-index when ready to update D1.
 
 ### Optional Future Work
 - **Deepen specific topics**: More Unity packages (Timeline, ML-Agents, Shader Graph)
