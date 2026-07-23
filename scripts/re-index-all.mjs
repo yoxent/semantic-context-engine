@@ -29,7 +29,7 @@ function hasSceConfig(dirPath) {
  */
 function reIndexTopic(topicDir) {
   const topicPath = join(KNOWLEDGE_DIR, topicDir);
-  const exportPath = join(KNOWLEDGE_DIR, `${topicDir}-export`);
+  const exportPath = resolve(KNOWLEDGE_DIR, `${topicDir}-export`);
   
   console.log(`\n🔄 Processing: ${topicDir}`);
   
@@ -52,9 +52,24 @@ function reIndexTopic(topicDir) {
       stdio: 'pipe'
     });
     
+    // Step 2.5: Delete old data from D1 for this topic
+    console.log('   🗑️  Deleting old data from D1...');
+    const deleteCommands = [
+      `cd packages/web/worker && npx wrangler d1 execute ${TARGET_DB} --remote --command "DELETE FROM vectors WHERE chunk_id IN (SELECT id FROM chunks WHERE relative_path LIKE 'https___%' OR relative_path LIKE '${topicDir}-%')"`,
+      `cd packages/web/worker && npx wrangler d1 execute ${TARGET_DB} --remote --command "DELETE FROM chunks WHERE relative_path LIKE 'https___%' OR relative_path LIKE '${topicDir}-%'"`,
+    ];
+    for (const cmd of deleteCommands) {
+      try {
+        execSync(cmd, { stdio: 'pipe' });
+      } catch (e) {
+        // Ignore delete errors
+      }
+    }
+    
     // Step 3: Import to D1
     console.log('   📥 Importing to D1...');
     execSync(`npx tsx "${IMPORT_PATH}" "${exportPath}" ${TARGET_DB} --append`, {
+      cwd: resolve('.'),
       stdio: 'pipe'
     });
     
