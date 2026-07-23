@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-22
-**Status**: All planned expansion batches (1–28, 29–36) complete, 5475 chunks indexed
+**Last Updated**: 2026-07-25
+**Status**: All planned expansion batches (1–28, 29–36) complete, 5532 chunks indexed
 
 ---
 
@@ -10,15 +10,17 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (5475 chunks, 2962 vectors)
+- **D1 Database**: `sce-db` (5532 chunks, 3019 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 5475 chunks |
+| Keyword Search | ✅ | ~55ms response, 5532 chunks |
 | Semantic Search | ✅ | Vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
+| Ranking Boosts | ✅ | Filename +5, Heading +4, Snippet +2 |
+| Deduplication | ✅ | Max 2 hits per file |
 | Frontend UI | ✅ | RetroUI neobrutalist theme + Dot Matrix Core Rotor loader, dark, responsive, keyboard shortcuts |
 | Multi-Part Expansion | ✅ | Split chunks >7500 chars auto-expand in search results |
 
@@ -27,14 +29,14 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  5475
-Vectors: 2962 (2048-dim embeddings)
+Chunks:  5532
+Vectors: 3019 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~136
+Topics:  ~137
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 ```
 
-### Topics Indexed (~136)
+### Topics Indexed (~137)
 - **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
 - **Full-stack (Batch 24)**: TanStack Query (131 chunks), Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns
 - **Full-stack UI (Batch 25)**: Radix UI (303 chunks), Framer Motion, Drizzle ORM deep, Playwright, Caching Strategies
@@ -47,7 +49,7 @@ Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 - **Mobile**: Expo, React Native, Flutter, Dart, Firebase, AWS Amplify
 - **Unity (6000.3)**: Base, ECS, Cinemachine, Netcode, Shaders, UI Toolkit, Addressables, ScriptableObjects, Events, Coroutines, Async, Scene Management, Collisions, Joints, Primitives
 - **Unity Deep**: Particles/VFX, Post-Processing, Build Profiles, GPU Instancing/LOD, Camera, Input Interfaces, Editor Scripting, Player Settings, Graphics API
-- **Unity Packages**: Post-Processing Stack, Scriptable Build Pipeline, Test Framework, UI Test Framework, Localization, Platform Toolkit
+- **Unity Packages**: Post-Processing Stack, Scriptable Build Pipeline, Test Framework, UI Test Framework, Localization, Platform Toolkit, Addressables, Cinemachine 3, Netcode, Input System
 - **Unity UI**: UGUI, UI Toolkit, TextMeshPro (92 chunks)
 - **Unity Cloud**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer, Economy, Authentication (87 chunks)
 - **Unity Networking**: Photon PUN2/Fusion/Quantum, Mirror, FishNet, UTP, Nakama (72 chunks)
@@ -74,7 +76,7 @@ Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 | 29–33 | Unity Cloud, UI, Design Patterns, Minimalist CSS, ZLinq | ~800 | ✅ |
 | 34–35 | IAP/Ads/Networking, Figma/Canva, Payments, RetroUI, Splines | ~560 | ✅ |
 | Unity 10–23 | Particles, Post-Processing, Build, v6, Renderers, Camera, Interfaces, Editor, Player, Graphics | 202 | ✅ |
-| Unity Packages | Post-Processing, Build Pipeline, Test Framework, Localization, Platform Toolkit | 222 | ✅ |
+| Unity Packages | Post-Processing, Build Pipeline, Test Framework, Localization, Platform Toolkit, Addressables, Cinemachine 3, Netcode, Input System | 279 | ✅ |
 
 See `knowledge/EXPANSION-ROADMAP.md` for full details.
 
@@ -192,10 +194,10 @@ packages/
 2. **Show keyword search**: Type "D1 database"
 3. **Show search modes**: Click through Keyword → Semantic → Hybrid
 4. **Show response times**: Point out ~55ms keyword, semantic search
-5. **Show stats**: 5475 chunks of documentation indexed
+5. **Show stats**: 5532 chunks of documentation indexed
 
 ### Key Talking Points
-- "5475 chunks of documentation indexed in D1"
+- "5532 chunks of documentation indexed in D1"
 - "4 search modes: keyword, semantic, hybrid, AST"
 - "Sub-100ms keyword search, semantic search via OpenRouter"
 - "Built for AI coding agents as the primary consumer"
@@ -203,6 +205,22 @@ packages/
 - "Multi-part document splitting for long docs (auto-expands in search)"
 - "Unity 6000.3 full coverage: Scripting API, Manual, Packages, UI, Cloud, Networking"
 - "Full-stack web: React, Next.js, Vercel, Docker, Sentry, testing, deployment"
+
+---
+
+## 📈 Ranking Improvements (2026-07-25)
+
+Added SimpleRanker boosts and deduplication to all search modes:
+
+| Boost Type | Points | Description |
+|------------|--------|-------------|
+| Filename match | +5 | Query terms found in filename |
+| Heading match | +4 | Query terms found in heading path |
+| Snippet exact | +2 | Full query found in chunk text |
+
+**Deduplication**: Max 2 hits per file to improve result diversity.
+
+Applied to: keyword, semantic, and hybrid search modes.
 
 ---
 
