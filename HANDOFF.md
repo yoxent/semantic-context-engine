@@ -249,8 +249,15 @@ The knowledge base is now comprehensive across all planned topics.
 **Scripts:**
 - `scripts/rename-url-files.mjs` — Batch rename URL-based files
 - `scripts/re-index-all.mjs` — Re-index all topics after renaming
+- `scripts/fix-local-db-schema.mjs` — Fix missing columns in local databases
 
-**Note:** `knowledge/` is gitignored, so renames are local. Re-index when ready to update D1.
+**To re-index a topic:**
+```bash
+export OPENROUTER_API_KEY=$(grep OPENROUTER_API_KEY packages/web/.dev.vars | cut -d'"' -f2)
+node scripts/re-index-all.mjs --topic=<topic-name>
+```
+
+**Note:** `knowledge/` is gitignored, so renames are local.
 
 ### Optional Future Work
 - **Deepen specific topics**: More Unity packages (Timeline, ML-Agents, Shader Graph)
