@@ -165,7 +165,7 @@ async function semanticSearch(
     }
   }
 
-  return hits;
+  return applyKeywordBoosts(hits, query);
 }
 
 // ---------------------------------------------------------------------------
