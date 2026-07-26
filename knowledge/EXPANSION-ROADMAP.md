@@ -1,16 +1,16 @@
 # Knowledge Base Expansion Roadmap
 
 **Created**: 2026-07-18
-**Last Updated**: 2026-07-21
-**Total Topics Planned**: ~100+
-**Status**: Active indexing
+**Last Updated**: 2026-07-24
+**Total Topics Planned**: ~150+
+**Status**: All topics indexed, Impeccable added
 
 ---
 
 ## Current State
 
-- **D1 Live**: ~5532 chunks, ~3019 vectors, ~137 topics
-- **Indexed**: All batches 1–35, Unity packages (all planned batches complete)
+- **D1 Live**: ~6155 chunks, ~3500 vectors, ~150 topics
+- **Indexed**: All batches complete, Impeccable added
 - **Pending**: None
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
@@ -54,6 +54,7 @@
 | 26 | react-table (89), msw (35), testing-library (45), eslint-nextjs (25), sonner (32) | ✅ **Imported to D1** |
 | 27 | vercel-deep (39), docker-nextjs (202), github-actions-nextjs (69), sentry-nextjs (57), cloudflare-pages (81) | ✅ **Imported to D1** |
 | 28 | socket-io (58), server-sent-events (35), nextjs-image (74), nextjs-fonts (32), nextjs-metadata (40) | ✅ **Imported to D1** |
+| 37 | impeccable (53) — AI design skill | ✅ **Imported to D1** |
 
 ---
 

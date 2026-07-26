@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-07-25
-**D1 Live Total**: **~5532 chunks, ~3019 vectors** (added Unity++: unity-packages-complete 57)
+**D1 Live Total**: **6590 chunks, 3611 vectors** (~170 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All planned expansion batches (1–9, 14–16), Batch 24 (full-stack React/Next.js), Batch 34 (IAP/Ads/Networking/Figma/Canva/Payments), Unity 6000.3 Scripting API + Manual, RetroUI (124 chunks), and Unity Splines deep (25 chunks) are **imported to D1**. Batch 24 topics use chunk splitting for documents exceeding ~7500 chars, with multi-part search expansion in the API.
+All 149 knowledge topics + 3 own-repo corpora imported to D1. Re-imported after schema fix (snake_case columns).
 
 ## Batch 34 — IAP Deep, Ads, Unity Networking, Figma, Canva (**in D1**)
 
@@ -120,6 +120,25 @@ for topic in iap-deep ads-monetization unity-networking-deep figma canva; do
   npx tsx packages/web/import.ts knowledge/$topic-export sce-db --append
 done
 ```
+
+## Impeccable — AI Design Skill
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `impeccable` | 53 | 53 | ✅ Imported |
+
+### Impeccable Details
+
+**Impeccable** — AI design skill for coding tools (Claude Code, Cursor, Gemini CLI, Codex CLI):
+- 23 commands: polish, typeset, audit, distill, critique, live, document
+- AI slop detector (58 deterministic checks)
+- DESIGN.md / PRODUCT.md design context system
+- Worlds deck (177+ curated graphic systems)
+- Chrome extension for live detection
+- Works with all major AI coding harnesses
+
+### URL Sources
+- `knowledge/urls/impeccable.txt` — Official site + GitHub repo
 
 ## Topic Summary
 

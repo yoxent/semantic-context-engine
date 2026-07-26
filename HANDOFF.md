@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-25
-**Status**: All planned expansion batches (1–28, 29–36) complete, 5532 chunks indexed. File renaming complete (870 files).
+**Status**: All 149 knowledge topics re-imported to D1 after schema fix. Total: 6,590 chunks, 3,611 vectors.
 
 ---
 
@@ -10,12 +10,12 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (5532 chunks, 3019 vectors)
+- **D1 Database**: `sce-db` (6590 chunks, 3611 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 5532 chunks |
+| Keyword Search | ✅ | ~55ms response, 6590 chunks |
 | Semantic Search | ✅ | Vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
@@ -29,20 +29,20 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  5532
-Vectors: 3019 (2048-dim embeddings)
+Chunks:  6590
+Vectors: 3611 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~137
-Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
+Topics:  149 knowledge + 3 own-repo corpora
+Model:   nvidia/llama-nematic-embed-vl-1b-v2:free
+Size:    ~170 MB
 ```
 
-### Topics Indexed (~137)
+### Topics Indexed (~150)
 - **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
-- **Full-stack (Batch 24)**: TanStack Query (131 chunks), Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns
-- **Full-stack UI (Batch 25)**: Radix UI (303 chunks), Framer Motion, Drizzle ORM deep, Playwright, Caching Strategies
-- **Testing (Batch 26)**: TanStack Table, MSW, React Testing Library, ESLint, Sonner
-- **DevOps (Batch 27)**: Vercel deep, Docker+Next.js (202 chunks), GitHub Actions, Sentry, Cloudflare Pages
-- **Advanced (Batch 28)**: Socket.io, Server-Sent Events, next/image, next/font, Metadata API
+- **Full-stack**: TanStack Query, Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns, Radix UI, Framer Motion, Drizzle ORM, Playwright, Caching Strategies
+- **Testing**: TanStack Table, MSW, React Testing Library, ESLint, Sonner, Vitest
+- **DevOps**: Vercel, Docker+Next.js, GitHub Actions, Sentry, Cloudflare Pages
+- **Advanced**: Socket.io, Server-Sent Events, next/image, next/font, Metadata API
 - **Backend**: Node.js, Express, FastAPI, Python, tRPC, REST API patterns
 - **Cloud/DB**: Cloudflare Workers (full suite), D1, DO, KV, R2, Vectorize, Queues, Workers AI
 - **DB**: PostgreSQL, Redis, Prisma, Drizzle ORM, SQLite, Supabase, BigQuery
@@ -198,10 +198,10 @@ packages/
 4. **Show response times**: Point out ~55ms keyword, semantic search
 5. **Show result features**: Click card to expand, copy button, score display
 6. **Show search history**: Recent searches appear below suggestions
-7. **Show stats**: 5532 chunks of documentation indexed
+7. **Show stats**: 6590 chunks of documentation indexed
 
 ### Key Talking Points
-- "5532 chunks of documentation indexed in D1"
+- "6590 chunks of documentation indexed in D1"
 - "3 search modes: keyword, semantic, hybrid (AST for API/MCP)"
 - "Sub-100ms keyword search, semantic search via OpenRouter"
 - "Built for AI coding agents as the primary consumer"
@@ -287,6 +287,7 @@ node scripts/re-index-all.mjs --topic=<topic-name>
 1. **Import batch size**: Reduced to 2 to avoid SQLITE_TOOBIG errors with large chunks
 2. **wrangler.jsonc interference**: Must use `--config wrangler.toml` when deploying worker from `packages/web/worker/`
 3. **Free embedding rate limits**: OpenRouter free model occasionally rate-limits; batch size 2 mitigates this
+4. **D1 schema snake_case**: D1 uses `repository_id`, `relative_path`, etc. (snake_case) but export uses camelCase. Import scripts must map fields correctly.
 
 ---
 
@@ -297,4 +298,5 @@ node scripts/re-index-all.mjs --topic=<topic-name>
 - D1 import uses `INSERT OR REPLACE` for idempotent re-imports
 - Each vector is ~39KB as JSON (2048 floats), batch size = 2 to stay under D1's ~100KB statement limit
 - Cloudflare docs scraper available at `packages/web/cf-scraper.ts`
+- **Re-import (2026-07-25)**: All 149 knowledge topics re-imported after discovering D1 had only 3221 chunks (own-repo corpora). Used bulk SQL generation with correct snake_case schema. Total: 6590 chunks, 3611 vectors, ~170 MB.
 - Unity docs scraped via Context7 for better reliability (SPA JS rendering)
