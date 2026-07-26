@@ -55,11 +55,11 @@ interface ExportMeta {
 
 // --- Constants ---
 
-/** Chunk batch size — 10 to stay under SQLite statement size limit (some chunks are ~19KB). */
-const CHUNK_BATCH_SIZE = 2; // Split chunks are ~7500 chars, so 2 per batch is safe (~15KB < 100KB limit)
+/** Chunk batch size — 3 to stay well under SQLite statement size limit. */
+const CHUNK_BATCH_SIZE = 3;
 
-/** Vectors are large (2048 floats as JSON ~39KB each); D1 max statement is 100KB, so max 2 per batch. */
-const VECTOR_BATCH_SIZE = 2;
+/** Vectors are large (2048 floats as JSON ~39KB each); D1 max statement is 100KB, so max 1 per batch. */
+const VECTOR_BATCH_SIZE = 1;
 
 // --- Helpers ---
 
@@ -135,6 +135,12 @@ export async function importToD1(options: ImportOptions): Promise<void> {
     console.log("Clearing vectors only...");
     await dbCommand("DELETE FROM vectors");
     await dbCommand("DELETE FROM embedding_config");
+  }
+
+  // Disable foreign key checks for append mode to avoid constraint errors
+  if (append) {
+    console.log("Disabling foreign key checks for append mode...");
+    await dbCommand("PRAGMA foreign_keys = OFF");
   }
 
   // --- Import chunks in batches ---
@@ -218,6 +224,11 @@ export async function importToD1(options: ImportOptions): Promise<void> {
     `INSERT OR REPLACE INTO embedding_config (key, value) VALUES ('exported_at', '${escapeString(meta.exportedAt)}')`
   );
 
+  // Re-enable foreign keys after import
+  if (append) {
+    await dbCommand("PRAGMA foreign_keys = ON");
+  }
+
   console.log("Import complete.");
 }
 
@@ -243,7 +254,8 @@ async function main() {
 
   async function dbCommand(sql: string, retries = 3): Promise<void> {
     // Write SQL to a temp file to avoid Windows command line length limit
-    const tmpFile = join(tmpDir, `import-${String(fileCounter++).padStart(6, "0")}.sql`);
+    // Use a unique ID to avoid race conditions between concurrent calls
+    const tmpFile = join(tmpDir, `import-${Date.now()}-${fileCounter++}.sql`);
     writeFileSync(tmpFile, sql, "utf-8");
     try {
       for (let attempt = 1; attempt <= retries; attempt++) {
@@ -252,8 +264,46 @@ async function main() {
             `npx wrangler d1 execute ${databaseName} --remote --file="${tmpFile}"`,
             { stdio: "pipe" }
           );
+          // Small delay to avoid wrangler race conditions on Windows
+          await new Promise(r => setTimeout(r, 100));
           return; // success
-        } catch (err) {
+        } catch (err: any) {
+          const errMsg = err?.stderr?.toString() || err?.message || '';
+          // If SQLITE_TOOBIG, reduce batch size by splitting and retrying
+          if (errMsg.includes('SQLITE_TOOBIG') && sql.includes('VALUES')) {
+            console.log(`\n  Statement too large, splitting batch...`);
+            // Extract the VALUES part and split it
+            const valuesMatch = sql.match(/VALUES\s+([\s\S]+)$/m);
+            if (valuesMatch) {
+              const allValues = valuesMatch[1];
+              // Find individual value groups by splitting on ),\n followed by (
+              const valueGroups: string[] = [];
+              let depth = 0;
+              let current = '';
+              for (const ch of allValues) {
+                if (ch === '(') depth++;
+                if (ch === ')') depth--;
+                current += ch;
+                if (depth === 0 && ch === ',') {
+                  valueGroups.push(current.replace(/^,\s*/, ''));
+                  current = '';
+                }
+              }
+              if (current.trim()) valueGroups.push(current.replace(/^,\s*/, ''));
+              
+              if (valueGroups.length > 1) {
+                // Retry with half the values
+                const half = Math.ceil(valueGroups.length / 2);
+                const prefix = sql.split('VALUES')[0] + 'VALUES ';
+                for (const chunk of [valueGroups.slice(0, half), valueGroups.slice(half)]) {
+                  if (chunk.length > 0) {
+                    await dbCommand(prefix + chunk.join(',\n       '), retries);
+                  }
+                }
+                return;
+              }
+            }
+          }
           if (attempt < retries) {
             const delay = attempt * 2000; // 2s, 4s, 6s
             console.log(`\n  Retry ${attempt}/${retries} after ${delay}ms...`);
@@ -264,6 +314,8 @@ async function main() {
         }
       }
     } finally {
+      // Don't delete on error - wrangler might still be reading
+      // Cleanup happens in the main function's finally block
       try { unlinkSync(tmpFile); } catch { /* ignore */ }
     }
   }

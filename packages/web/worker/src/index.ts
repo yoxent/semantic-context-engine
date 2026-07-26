@@ -148,11 +148,21 @@ export default {
       const chunkId = chunkMatch[1];
       try {
         const chunk = await env.DB.prepare(
-          "SELECT id, repository_id, relative_path, heading_path, language, text FROM chunks WHERE id = ?"
+          "SELECT id, repository_id, relative_path, heading_path, language, text, part_index, total_parts FROM chunks WHERE id = ?"
         ).bind(chunkId).first();
 
         if (!chunk) {
           return jsonResponse({ error: "Chunk not found" }, 404, origin);
+        }
+
+        // If this is a multi-part chunk, fetch siblings
+        let siblings: { id: string; part_index: number }[] = [];
+        const totalParts = chunk.total_parts as number | null;
+        if (totalParts && totalParts > 1) {
+          const siblingRows = await env.DB.prepare(
+            "SELECT id, part_index FROM chunks WHERE relative_path = (SELECT relative_path FROM chunks WHERE id = ?) AND total_parts IS NOT NULL ORDER BY part_index"
+          ).bind(chunkId).all();
+          siblings = siblingRows.results as { id: string; part_index: number }[];
         }
 
         return jsonResponse(
@@ -162,6 +172,9 @@ export default {
             headingPath: chunk.heading_path,
             language: chunk.language,
             text: chunk.text,
+            partIndex: chunk.part_index ?? null,
+            totalParts: chunk.total_parts ?? null,
+            siblings: siblings.length > 0 ? siblings : undefined,
           },
           200,
           origin

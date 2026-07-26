@@ -18,8 +18,12 @@ const suggestions = document.querySelectorAll('.suggestion');
 // Mode selection
 modeButtons.forEach(btn => {
   btn.addEventListener('click', () => {
-    modeButtons.forEach(b => b.classList.remove('active'));
+    modeButtons.forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-pressed', 'false');
+    });
     btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
     currentMode = btn.dataset.mode;
     queryInput.focus();
 
@@ -101,6 +105,7 @@ async function performSearch() {
     }
 
     renderResults(data);
+    saveToHistory(query);
   } catch (error) {
     resultsDiv.innerHTML = `<div class="error">
       <strong>Search failed</strong><br>
@@ -130,13 +135,16 @@ function renderResults(data) {
   }
 
   const html = data.hits.map((hit, i) => `
-    <div class="result-card" data-chunk-id="${escapeHtml(hit.chunkId || '')}" style="animation: fadeIn 0.2s ease ${i * 0.03}s both">
+    <div class="result-card" data-chunk-id="${escapeHtml(hit.chunkId || '')}" data-full-text="${escapeHtml(hit.text)}" style="animation: fadeIn 0.2s ease ${i * 0.03}s both">
       <div class="result-header">
         <span class="result-path">${escapeHtml(hit.relativePath)}</span>
-        <span class="result-score">score: ${formatScore(hit.score)}</span>
+        <div class="result-actions">
+          <button class="copy-btn" title="Copy text" aria-label="Copy text to clipboard">📋</button>
+          <span class="result-score">score: ${formatScore(hit.score)}</span>
+        </div>
       </div>
       ${hit.headingPath ? `<div class="result-heading">${escapeHtml(hit.headingPath)}</div>` : ''}
-      <div class="result-text">${escapeHtml(truncateText(hit.text, 400))}</div>
+      <div class="result-text">${highlightText(truncateText(hit.text, 400), data.query)}</div>
       <div class="result-meta">
         ${hit.language ? `<span>📄 ${escapeHtml(hit.language)}</span>` : ''}
         ${hit.symbolKind ? `<span>🏷️ ${escapeHtml(hit.symbolKind)}</span>` : ''}
@@ -150,13 +158,34 @@ function renderResults(data) {
   searchTime.textContent = `${data.searchTimeMs}ms`;
   stopCoreRotor();
 
-  // Add click handlers to result cards
+  // Add click handlers to result cards — open modal
   resultsDiv.querySelectorAll('.result-card').forEach(card => {
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (e) => {
+      // Don't open modal if clicking copy button
+      if (e.target.closest('.copy-btn')) return;
+      
       const chunkId = card.dataset.chunkId;
       if (chunkId) {
         openModal(chunkId);
       }
+    });
+  });
+
+  // Copy button handlers
+  resultsDiv.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.result-card');
+      const text = card.dataset.fullText;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        btn.classList.add('copied');
+        btn.textContent = '✓';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.textContent = '📋';
+        }, 1500);
+      });
     });
   });
 
@@ -206,6 +235,20 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+function highlightText(text, query) {
+  if (!query || !text) return escapeHtml(text);
+  
+  const escaped = escapeHtml(text);
+  const terms = query.trim().split(/\s+/).filter(t => t.length >= 2);
+  
+  if (terms.length === 0) return escaped;
+  
+  const pattern = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+  const regex = new RegExp(`(${pattern})`, 'gi');
+  
+  return escaped.replace(regex, '<mark class="highlight">$1</mark>');
+}
+
 // Modal elements
 const modal = document.getElementById('doc-modal');
 const modalOverlay = modal.querySelector('.modal-overlay');
@@ -240,12 +283,44 @@ async function openModal(chunkId) {
     const metaItems = [];
     if (chunk.language) metaItems.push(`📄 ${chunk.language}`);
     if (chunk.symbolKind) metaItems.push(`🏷️ ${chunk.symbolKind}`);
+    if (chunk.totalParts) metaItems.push(`📄 Part ${chunk.partIndex + 1} of ${chunk.totalParts}`);
     metaItems.push(`ID: ${chunk.id}`);
     modalMeta.innerHTML = metaItems.map(m => `<span>${escapeHtml(m)}</span>`).join('');
+
+    // Handle multi-part documents — combine all parts
+    if (chunk.siblings && chunk.siblings.length > 1) {
+      const fullText = await fetchAllParts(chunk.siblings, chunkId, chunk.text);
+      modalBody.textContent = fullText;
+    }
   } catch (error) {
     modalBody.textContent = `Error: ${error.message}`;
   }
 }
+
+async function fetchAllParts(siblings, currentId, currentText) {
+  const parts = [];
+  
+  for (const sibling of siblings) {
+    if (sibling.id === currentId) {
+      parts.push({ index: sibling.part_index, text: currentText });
+    } else {
+      try {
+        const response = await fetch(`${API_BASE}/api/chunk/${sibling.id}`);
+        const data = await response.json();
+        if (data.text) {
+          parts.push({ index: sibling.part_index, text: data.text });
+        }
+      } catch (e) {
+        // Skip failed parts
+      }
+    }
+  }
+  
+  parts.sort((a, b) => a.index - b.index);
+  return parts.map(p => p.text).join('\n\n');
+}
+
+
 
 // Close modal
 function closeModal() {
@@ -274,8 +349,66 @@ async function loadStats() {
   }
 }
 
+// Search history
+const MAX_HISTORY = 8;
+const historyDiv = document.getElementById('search-history');
+const historyList = document.getElementById('history-list');
+const clearHistoryBtn = document.getElementById('clear-history');
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem('sce-search-history') || '[]');
+  } catch {
+    return [];
+  }
+}
+
+function saveToHistory(query) {
+  if (!query || query.length < 2) return;
+  
+  const history = getHistory();
+  const filtered = history.filter(h => h.toLowerCase() !== query.toLowerCase());
+  filtered.unshift(query);
+  
+  if (filtered.length > MAX_HISTORY) {
+    filtered.pop();
+  }
+  
+  localStorage.setItem('sce-search-history', JSON.stringify(filtered));
+  renderHistory();
+}
+
+function renderHistory() {
+  const history = getHistory();
+  
+  if (history.length === 0) {
+    historyDiv.style.display = 'none';
+    return;
+  }
+  
+  historyDiv.style.display = 'block';
+  historyList.innerHTML = history.map(q => 
+    `<button class="history-item" data-query="${escapeHtml(q)}">${escapeHtml(q)}</button>`
+  ).join('');
+  
+  historyList.querySelectorAll('.history-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      queryInput.value = btn.dataset.query;
+      performSearch();
+    });
+  });
+}
+
+function clearHistory() {
+  localStorage.removeItem('sce-search-history');
+  renderHistory();
+}
+
+clearHistoryBtn.addEventListener('click', clearHistory);
+
 // Initialize
 loadStats();
+renderHistory();
 queryInput.focus();
 
 // Core Rotor animation — cycles through 8 fan blade positions
