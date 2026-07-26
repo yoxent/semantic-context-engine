@@ -37,7 +37,7 @@ export class SimpleRanker implements IRanker {
           (heading) => heading === needle || heading.includes(needle) || terms.some((term) => heading === term || heading.includes(term))
         ).length;
         if (headingHits > 0) {
-          score += 4 + Math.min(headingHits - 1, 3);
+          score += 7 + Math.min(headingHits - 1, 3);
         }
 
         // === CONTENT/TEXT BOOSTS ===
