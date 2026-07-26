@@ -15,7 +15,7 @@
     "@cloudflare/workers-types": "^4.0.0",
     "tsx": "^4.0.0",
     "typescript": "^5.0.0",
-    "wrangler": "^3.0.0"
+    "wrangler": "^4.114.0"
   },
   "dependencies": {
     "@types/turndown": "^5.0.6",
