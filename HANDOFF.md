@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-26
-**Status**: Knowledge base expanded to 156 topics (7,086 chunks). PDF image descriptions partially processed (49/131).
+**Last Updated**: 2026-07-28
+**Status**: Knowledge base expanded to 173 topics (7,533 chunks). Search is now case-insensitive with word-based AND matching.
 
 ---
 
@@ -10,12 +10,12 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (7,086 chunks, 3,611 vectors)
+- **D1 Database**: `sce-db` (7,533 chunks, 3,667 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 7,086 chunks |
+| Keyword Search | ✅ | ~55ms response, 7,533 chunks, **case-insensitive, word-based AND** |
 | Semantic Search | ✅ | Vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
@@ -29,15 +29,15 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  7,086
-Vectors: 3,611 (2048-dim embeddings)
+Chunks:  7,533
+Vectors: 3,667 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  156 knowledge + 3 own-repo corpora
+Topics:  173 knowledge + 3 own-repo corpora
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 Size:    ~170 MB
 ```
 
-### Topics Indexed (~156)
+### Topics Indexed (~173)
 - **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
 - **Full-stack**: TanStack Query, Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns, Radix UI, Framer Motion, Drizzle ORM, Playwright, Caching Strategies
 - **Testing**: TanStack Table, MSW, React Testing Library, ESLint, Sonner, Vitest
@@ -54,6 +54,7 @@ Size:    ~170 MB
 - **Unity Cloud**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer, Economy, Authentication (87 chunks)
 - **Unity Networking**: Photon PUN2/Fusion/Quantum, Mirror, FishNet, UTP, Nakama (72 chunks)
 - **Unity Deepened**: Sampler State, Timeline, Game Juice/Microinteractions, Design Levers/Tuning, Game Designer Playbook (PDF)
+- **Unity Ebooks**: Level Design, UI Design, Tech Art (x2), 2D Art/Animation/Lighting, Animation, VR/MR, Dedicated Server
 - **Design Patterns**: Mobile UI, Material Design 3, Apple HIG (127 chunks)
 - **IAP/Ads**: Unity IAP, Google Play Billing, StoreKit 2, RevenueCat, AdMob, AppLovin MAX, LevelPlay
 - **Payment Platforms**: Stripe, PayPal, Paddle, Braintree, Lemon Squeezy
@@ -64,31 +65,32 @@ Size:    ~170 MB
 - **Google Cloud**: Compute, Cloud Run, Functions, Storage, SQL, Firestore, Bigtable, Pub/Sub, GKE, IAM, etc. (185 chunks)
 - **Python**: PyMuPDF (124 chunks) — PDF reading, image extraction, text search
 - **Game Dev**: Gem TD project (159 chunks) — architecture, combat, gems, pooling, TD inspirations
+- **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
-### Expansion Batches — ALL COMPLETE ✅
+---
 
-| Batch | Topics | Chunks | Status |
-|-------|--------|--------|--------|
-| 1–9, 14–16 | Mobile, portfolio, base corpus, Unity basics | ~600 | ✅ |
-| 24 | TanStack Query, Next.js deep, React Hook Form, Auth.js, TS patterns | 178 | ✅ |
-| 25 | Radix UI, Framer Motion, Drizzle deep, Playwright, Caching | 495 | ✅ |
-| 26 | TanStack Table, MSW, Testing Library, ESLint, Sonner | 226 | ✅ |
-| 27 | Vercel deep, Docker, GitHub Actions, Sentry, Cloudflare Pages | 448 | ✅ |
-| 28 | Socket.io, SSE, next/image, next/font, Metadata | 239 | ✅ |
-| 29–33 | Unity Cloud, UI, Design Patterns, Minimalist CSS, ZLinq | ~800 | ✅ |
-| 34–35 | IAP/Ads/Networking, Figma/Canva, Payments, RetroUI, Splines | ~560 | ✅ |
-| Unity 10–23 | Particles, Post-Processing, Build, v6, Renderers, Camera, Interfaces, Editor, Player, Graphics | 202 | ✅ |
-| Unity Packages | Post-Processing, Build Pipeline, Test Framework, Localization, Platform Toolkit, Addressables, Cinemachine 3, Netcode, Input System | 279 | ✅ |
-| 36 | Unity Sampler State | 34 | ✅ |
-| 37 | Gem TD + Inspirations (BTD5/6, Nordhold, Infinitode 2) | 159 | ✅ |
-| 38 | PyMuPDF | 124 | ✅ |
-| 39 | Unity Game Designer Playbook (PDF) | 140 | ✅ |
-| 40 | Unity Timeline | 47 | ✅ |
-| 41 | Unity Game Juice | 42 | ✅ |
-| 42 | Unity Design Levers | 35 | ✅ |
+## 🔍 Search Improvements
 
-See `knowledge/EXPANSION-ROADMAP.md` for full details.
+### Case-Insensitive, Word-Based Search (2026-07-28)
+**Before**: `LIKE '%query%'` — exact phrase, case-sensitive
+**After**: `LOWER(text) LIKE '%word1%' AND LOWER(text) LIKE '%word2%'` — word-based AND, case-insensitive
+
+**Impact**:
+- "level design synthesis" now finds results (was 0, now 2+)
+- "shader graph node" now finds results (was 0, now 2+)
+- All queries work regardless of case or word order
+
+**Implementation**:
+```typescript
+// Split query into words
+const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+
+// Build AND conditions for each word
+const wordConditions = words.map(() => 
+  "(LOWER(text) LIKE ? OR LOWER(relative_path) LIKE ? OR LOWER(heading_path) LIKE ?)"
+).join(" AND ");
+```
 
 ---
 
@@ -111,7 +113,7 @@ python -c "import pymupdf; doc=pymupdf.open('path/to/file.pdf'); [doc.extract_im
 
 ### Tested On
 - Unity Game Designer Playbook (103 pages, 149K chars, 131 images)
-- Output: `knowledge/unity-game-designer-playbook/pdf-extract.txt`
+- Unity Ebooks (7 PDFs, ~700 pages total)
 
 ### Image Description Progress
 - 49/131 images described (pages 1-44)
@@ -162,7 +164,7 @@ Any MCP-compatible agent can now use:
   - No bindings needed
 
 ### Search Modes
-1. **keyword**: SQL LIKE over text, path, heading (~55ms)
+1. **keyword**: SQL LIKE over text, path, heading (~55ms) — **case-insensitive, word-based AND**
 2. **semantic**: OpenRouter embedding → cosine similarity (needs vectors)
 3. **hybrid**: RRF fusion of keyword + semantic (k=60)
 4. **ast**: Symbol table lookup — exact match then prefix fallback
@@ -205,7 +207,7 @@ packages/
     worker/
       src/
         index.ts        # Worker entry point (routing)
-        search.ts       # Search implementation (4 modes)
+        search.ts       # Search implementation (4 modes, case-insensitive)
         embedding.ts    # OpenRouter embedding client
         cosine.ts       # Cosine similarity
         d1.ts           # D1 query builders
@@ -236,10 +238,10 @@ packages/
 4. **Show response times**: Point out ~55ms keyword, semantic search
 5. **Show result features**: Click card to expand, copy button, score display
 6. **Show search history**: Recent searches appear below suggestions
-7. **Show stats**: 7,086 chunks of documentation indexed
+7. **Show stats**: 7,533 chunks of documentation indexed
 
 ### Key Talking Points
-- "7,086 chunks of documentation indexed in D1"
+- "7,533 chunks of documentation indexed in D1"
 - "3 search modes: keyword, semantic, hybrid (AST for API/MCP)"
 - "Sub-100ms keyword search, semantic search via OpenRouter"
 - "Built for AI coding agents as the primary consumer"
@@ -249,6 +251,7 @@ packages/
 - "Full-stack web: React, Next.js, Vercel, Docker, Sentry, testing, deployment"
 - "Frontend: search highlighting, expandable cards, copy button, search history, ARAccessible"
 - "PDF reading pipeline: PyMuPDF extraction + vision model image descriptions"
+- "Case-insensitive, word-based search for better discoverability"
 
 ---
 
@@ -304,6 +307,7 @@ Applied to: keyword, semantic, and hybrid search modes.
 3. **Free embedding rate limits**: OpenRouter free model occasionally rate-limits; batch size 2 mitigates this
 4. **D1 schema snake_case**: D1 uses `repository_id`, `relative_path`, etc. (snake_case) but export uses camelCase. Import scripts must map fields correctly.
 5. **Free vision model limit**: 50 requests/day for image description; script saves progress and can resume
+6. **PDF chunking**: Large PDFs (100K+ chars) must be split into <50KB files before indexing to avoid SQL statement size limits
 
 ---
 
@@ -318,3 +322,5 @@ Applied to: keyword, semantic, and hybrid search modes.
 - Unity docs scraped via Context7 for better reliability (SPA JS rendering)
 - **PDF pipeline (2026-07-26)**: PyMuPDF installed for PDF text/image extraction. Test: Unity Game Designer Playbook (103 pages, 131 images). Vision model: google/gemma-4-26b-a4b-it:free (50 req/day limit)
 - **Knowledge expansion (2026-07-26)**: Added 7 new topics (Sampler State, Gem TD, PyMuPDF, Game Designer Playbook, Timeline, Game Juice, Design Levers). Total: 156 topics, 7,086 chunks
+- **Unity Ebooks (2026-07-28)**: Added 8 topics from Unity PDFs (Level Design, UI Design, Tech Art x2, 2D Art, Animation, VR/MR, Dedicated Server). Total: 173 topics, 7,533 chunks
+- **Search improvement (2026-07-28)**: Case-insensitive, word-based AND matching. Multi-word queries like "level design synthesis" now work. Deploy time: ~10 seconds.

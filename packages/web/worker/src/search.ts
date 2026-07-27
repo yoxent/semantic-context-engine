@@ -66,22 +66,31 @@ async function keywordSearch(
   const params: unknown[] = [];
   const filterClause = buildFilterClause(filters ?? {}, params);
 
-  const searchPattern = `%${query}%`;
+  // Split query into individual words for AND matching
+  const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+  
+  if (words.length === 0) {
+    return [];
+  }
+
+  // Build WHERE clause: all words must appear in text OR path OR heading
+  const wordConditions = words.map(() => "(LOWER(text) LIKE ? OR LOWER(relative_path) LIKE ? OR LOWER(heading_path) LIKE ?)").join(" AND ");
 
   const sql = `
     SELECT id, relative_path, heading_path, text, language, part_index, total_parts, 1.0 AS score
     FROM chunks
     ${filterClause}
-    ${filterClause ? "AND" : "WHERE"} (
-      text LIKE ?
-      OR relative_path LIKE ?
-      OR heading_path LIKE ?
-    )
+    ${filterClause ? "AND" : "WHERE"} ${wordConditions}
     ORDER BY score DESC
     LIMIT ?
   `;
 
-  params.push(searchPattern, searchPattern, searchPattern, limit);
+  // Each word needs 3 patterns (text, path, heading)
+  for (const word of words) {
+    const pattern = `%${word}%`;
+    params.push(pattern, pattern, pattern);
+  }
+  params.push(limit);
 
   const results = await db.prepare(sql).bind(...params).all();
 
