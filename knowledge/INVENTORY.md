@@ -1,12 +1,40 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-25
-**D1 Live Total**: **6590 chunks, 3611 vectors** (~170 MB)
+**Last Updated**: 2026-07-27
+**D1 Live Total**: **7533 chunks, 3667 vectors** (~170 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All 149 knowledge topics + 3 own-repo corpora imported to D1. Re-imported after schema fix (snake_case columns).
+All 173 knowledge topics + 3 own-repo corpora imported to D1. Re-imported after schema fix (snake_case columns).
+
+## Batch 35 — Unity Sampler State (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `unity-sampler-state` | 34 | 0 | ✅ Imported |
+
+### Batch 35 Details
+
+**Unity Sampler State (`unity-sampler-state`)** — Texture sampling, filtering, and wrapping:
+- Rendering.SamplerState (C# API) — filterMode, wrapMode, anisoLevel, mipMapBias
+- FilterMode enum — Point, Bilinear, Trilinear
+- TextureWrapMode enum — Repeat, Clamp, Mirror, MirrorOnce
+- AnisotropicFiltering — Disabled, Enable, ForceEnable
+- HLSL Inline Sampler Suffixes — point/linear/trilinear, clamp/repeat/mirror, aniso2-16, compare, per-axis (U/V/W)
+- Custom SamplerState declarations in HLSL shaders
+- Compute shader sampler conventions (sampler prefix, named samplers)
+- Mip map generation, bias, and sampling behavior
+- Texture properties: filterMode, wrapMode, anisoLevel, mipmapCount
+- Platform considerations (DX11/12, Metal, Vulkan support; OpenGL ES limitations)
+- Common patterns: pixel art (Point+Clamp), terrain (Trilinear+Repeat+Aniso8), UI (Bilinear+Clamp)
+- Performance tips
+
+### URL Sources
+- `knowledge/urls/unity-sampler-state.txt` — Unity 6000.3 ScriptReference + Manual pages
+- Context7 synthesis for SamplerState API and HLSL sampler suffixes
+
+---
 
 ## Batch 34 — IAP Deep, Ads, Unity Networking, Figma, Canva (**in D1**)
 
@@ -258,8 +286,40 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **Batch 9 — misc docs** | | | |
 | filestream | 58 | 58 | Node.js fs/streams/buffer, Python file I/O |
 | scientific-notation | 15 | 15 | BigInt, Number, float precision, Python decimal |
-| **Batch 14 — Unity Collisions** | | | |
+| **Batch 34 — Unity Collisions** | | | |
 | unity-collisions | 23 | 23 | Colliders, triggers, raycasting, physics queries |
+| **Batch 35 — Unity Sampler State** | | | |
+| unity-sampler-state | 34 | 0 | SamplerState, FilterMode, WrapMode, aniso, HLSL samplers, mip maps |
+| **Batch 36 — Gem TD Inspirations** | | | |
+| gem-td-inspirations | 159 | 0 | Gem TD project + BTD5/6, Nordhold, Infinitode 2 design principles |
+| **Batch 37 — PyMuPDF** | | | |
+| pymupdf | 124 | 0 | PDF processing: text/image/table extraction, annotations, rendering, CLI |
+| **Batch 38 — Unity Game Designer Playbook** | | | |
+| unity-game-designer-playbook | 140 | 0 | Game design fundamentals, prototyping, modular systems, design levers, input, physics, UI, level design, Cinemachine, Timeline, game juice, particles, post-processing + 49 image descriptions |
+| **Batch 39 — Unity Deepened Topics** | | | |
+| unity-timeline | 47 | 0 | Timeline editor, tracks, clips, signals, playable director, cutscenes, gameplay sequences |
+| unity-game-juice | 42 | 0 | Microinteractions, screen shake, hit stop, squash-stretch, easing, particle effects, audio feedback |
+| unity-design-levers | 35 | 0 | RangeAttribute, ScriptableObject profiles, prototyping workflow, tuning patterns |
+| **Batch 40 — scroll-world** | | | |
+| scroll-world | 46 | 0 | AI agent skill: scroll-scrubbed 3D world landing pages, Higgsfield pipeline, video encoding, camera architecture, scrub engine |
+| **Batch 41 — Previously Missing Topics** | | | |
+| ads-monetization | varies | 0 | AdMob, Unity Ads, LevelPlay, AdSense, mediation, eCPM optimization |
+| canva | varies | 0 | Canva API, plugins, design automation |
+| figma | varies | 0 | Figma REST API, Plugin API, Code Connect, dev mode |
+| iap-deep | varies | 0 | In-app purchases deep dive, paywall patterns, RevenueCat |
+| impeccable | varies | 0 | Impeccable UI framework |
+| payment-platforms | varies | 0 | Stripe, PayPal, Paddle, Braintree, Lemon Squeezy |
+| unity-networking-deep | varies | 0 | Photon PUN2/Fusion/Quantum, Mirror, FishNet comparison |
+| unity-packages-complete | varies | 0 | Addressables, Input System, Netcode, Cinemachine 3, Localization |
+| **Batch 42 — Unity Ebooks** | | | |
+| unity-level-design | 25 | 0 | Level design process, player flow, spatial design, Unity tools (Terrain, ProBuilder, Cinemachine) |
+| unity-ui-design | 26 | 0 | UI Toolkit, uGUI, Canvas, layout system, responsive design, animation, accessibility |
+| unity-tech-art | 24 | 0 | Shader Graph, VFX Graph, texture workflows, material system, optimization |
+| unity-tech-art-2 | 24 | 0 | Shader development, visual effects, animation tools, pipeline tools |
+| unity-2d-art | 26 | 0 | Sprite creation, Tilemap, 2D animation, 2D lighting, sorting layers |
+| unity-animation-deep | 26 | 0 | Mecanim, Animator Controller, Blend Trees, IK, Timeline, root motion |
+| unity-vr-mr | 26 | 0 | XR Interaction Toolkit, hand tracking, locomotion, 3D UI, performance |
+| unity-dedicated-server | 1 | 0 | Dedicated server builds, headless mode, server configuration |
 | **Batch 15 — Unity Joints** | | | |
 | unity-joints | 28 | 28 | Joints, springs, vehicle suspension, ragdoll |
 | **Batch 16 — Unity Primitives** | | | |
@@ -321,8 +381,8 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | mvp-css | 3 | 3 | Classless CSS for MVP landing pages |
 | new-css | 9 | 9 | Classless CSS framework |
 | radix-themes | 286 | 270 | Unstyled React primitives (button, card, dialog, tabs) |
-| **Local knowledge subtotal** | **~3430** | **~3350** | 136 doc topics under `knowledge/` |
-| **Local grand total (incl. corpora)** | **~4298** | **~4218** | |
+| **Local knowledge subtotal** | **~3922** | **~3350** | 143 doc topics under `knowledge/` |
+| **Local grand total (incl. corpora)** | **~4790** | **~4218** | |
 
 ## Expansion Queue
 
@@ -364,6 +424,13 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **31** | **design-patterns (NEW)** | ✅ **Imported to D1** |
 | **32** | **pico-css, watercss, mvp-css, new-css, radix-themes** | ✅ **Imported to D1** |
 | **33** | **zlinq (deep scrape from Cysharp/ZLinq GitHub)** | ✅ **Imported to D1** |
+| **35** | **unity-sampler-state (NEW)** | ✅ **Imported to D1** |
+| **36** | **gem-td-inspirations (NEW)** | ✅ **Imported to D1** |
+| **37** | **pymupdf (NEW)** | ✅ **Imported to D1** |
+| **38** | **unity-game-designer-playbook (NEW)** | ✅ **Imported to D1** |
+| **39** | **unity-timeline (NEW)** | ✅ **Imported to D1** |
+| **40** | **unity-game-juice (NEW)** | ✅ **Imported to D1** |
+| **41** | **unity-design-levers (NEW)** | ✅ **Imported to D1** |
 
 ## Expansion Roadmap
 
