@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-25
-**D1 Live Total**: **7166 chunks, 3611 vectors** (~170 MB)
+**Last Updated**: 2026-07-27
+**D1 Live Total**: **7533 chunks, 3667 vectors** (~170 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All 156 knowledge topics + 3 own-repo corpora imported to D1. Re-imported after schema fix (snake_case columns).
+All 173 knowledge topics + 3 own-repo corpora imported to D1. Re-imported after schema fix (snake_case columns).
 
 ## Batch 35 — Unity Sampler State (**in D1**)
 
@@ -300,6 +300,26 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-timeline | 47 | 0 | Timeline editor, tracks, clips, signals, playable director, cutscenes, gameplay sequences |
 | unity-game-juice | 42 | 0 | Microinteractions, screen shake, hit stop, squash-stretch, easing, particle effects, audio feedback |
 | unity-design-levers | 35 | 0 | RangeAttribute, ScriptableObject profiles, prototyping workflow, tuning patterns |
+| **Batch 40 — scroll-world** | | | |
+| scroll-world | 46 | 0 | AI agent skill: scroll-scrubbed 3D world landing pages, Higgsfield pipeline, video encoding, camera architecture, scrub engine |
+| **Batch 41 — Previously Missing Topics** | | | |
+| ads-monetization | varies | 0 | AdMob, Unity Ads, LevelPlay, AdSense, mediation, eCPM optimization |
+| canva | varies | 0 | Canva API, plugins, design automation |
+| figma | varies | 0 | Figma REST API, Plugin API, Code Connect, dev mode |
+| iap-deep | varies | 0 | In-app purchases deep dive, paywall patterns, RevenueCat |
+| impeccable | varies | 0 | Impeccable UI framework |
+| payment-platforms | varies | 0 | Stripe, PayPal, Paddle, Braintree, Lemon Squeezy |
+| unity-networking-deep | varies | 0 | Photon PUN2/Fusion/Quantum, Mirror, FishNet comparison |
+| unity-packages-complete | varies | 0 | Addressables, Input System, Netcode, Cinemachine 3, Localization |
+| **Batch 42 — Unity Ebooks** | | | |
+| unity-level-design | 25 | 0 | Level design process, player flow, spatial design, Unity tools (Terrain, ProBuilder, Cinemachine) |
+| unity-ui-design | 26 | 0 | UI Toolkit, uGUI, Canvas, layout system, responsive design, animation, accessibility |
+| unity-tech-art | 24 | 0 | Shader Graph, VFX Graph, texture workflows, material system, optimization |
+| unity-tech-art-2 | 24 | 0 | Shader development, visual effects, animation tools, pipeline tools |
+| unity-2d-art | 26 | 0 | Sprite creation, Tilemap, 2D animation, 2D lighting, sorting layers |
+| unity-animation-deep | 26 | 0 | Mecanim, Animator Controller, Blend Trees, IK, Timeline, root motion |
+| unity-vr-mr | 26 | 0 | XR Interaction Toolkit, hand tracking, locomotion, 3D UI, performance |
+| unity-dedicated-server | 1 | 0 | Dedicated server builds, headless mode, server configuration |
 | **Batch 15 — Unity Joints** | | | |
 | unity-joints | 28 | 28 | Joints, springs, vehicle suspension, ragdoll |
 | **Batch 16 — Unity Primitives** | | | |
