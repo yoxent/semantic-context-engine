@@ -341,4 +341,5 @@ See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 - **Knowledge expansion (2026-07-26)**: Added 7 new topics (Sampler State, Gem TD, PyMuPDF, Game Designer Playbook, Timeline, Game Juice, Design Levers). Total: 156 topics, 7,086 chunks
 - **Unity Ebooks (2026-07-28)**: Added 8 topics from Unity PDFs (Level Design, UI Design, Tech Art x2, 2D Art, Animation, VR/MR, Dedicated Server). Total: 173 topics, 7,533 chunks
 - **Search improvement (2026-07-28)**: Case-insensitive, word-based AND matching. Multi-word queries like "level design synthesis" now work. Deploy time: ~10 seconds.
-- **Pending batches (2026-07-28)**: 8 new game dev batches planned (42–49) — **Batch 42 now imported**. Remaining: anti-cheat, profiling/optimization, game settings/save-load, analytics/audio, multiplayer deepen, Unreal Engine foundation + advanced. See `knowledge/EXPANSION-ROADMAP.md` for full details.
+- **Pending batches (2026-07-28)**: 6 game dev batches remaining (44–49). See `knowledge/EXPANSION-ROADMAP.md` for full details.
+- **Gitignored source files**: `knowledge/` dir is in `.gitignore`. New knowledge source files (.md) are tracked only in D1, not git. Only HANDOFF.md, EXPANSION-ROADMAP.md, and INVENTORY.md are version-controlled.
