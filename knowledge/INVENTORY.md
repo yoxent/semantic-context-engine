@@ -1,12 +1,31 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-27
-**D1 Live Total**: **7533 chunks, 3667 vectors** (~170 MB)
+**Last Updated**: 2026-07-28
+**D1 Live Total**: **7967 chunks, 3826 vectors** (~180 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All 173 knowledge topics + 3 own-repo corpora imported to D1. Re-imported after schema fix (snake_case columns).
+**220 knowledge topics** + 3 own-repo corpora imported to D1. All deepen batches (44-53) complete with vectors. Unreal Engine deepens created via Context7-generated content (Epic Games docs block scraping).
+
+## Batches 44-53 — Game Dev & Deepens (in D1)
+
+| Batch | Topic | Chunks | Vectors | Notes |
+|-------|-------|--------|---------|-------|
+| 44 | Profiling & Performance | 50 | ? | Unity Profiler, Frame Debugger, GPU Optimization, Build Size, Mobile Optimization — original stubs (thin) |
+| 44-deep | Profiling Deepen | 33 | 33 | **Deepened**: unity-profiler-deep (12), frame-debugger-deep (7), gpu-optimization-deep (4), build-size-optimization-deep (6), mobile-optimization-deep (4) |
+| 45 | Game Settings/UI | 22 | ? | Save/Load, Responsive UI, Multi-Platform Input, UI Animation — original stubs |
+| 45-deep | Settings/UI Deepen | 21 | 21 | **Deepened**: game-settings-saveload-deep (6), responsive-game-ui-deep (7), multi-platform-input-deep (8) |
+| 46 | Analytics/Audio | 26 | ? | Achievements, Leaderboards, Analytics, Crash Reporting, Audio, Addressables — original stubs |
+| 46-deep | Audio/Achievements Deepen | 32 | 32 | **Deepened**: game-audio-deep (9), game-achievements-deep (12), game-leaderboards-deep (11) |
+| 47 | Multiplayer Deepen | 8 | ? | Session Management, Lag Compensation, Lockstep, State Sync — original stubs |
+| 47-deep | Multiplayer API Deepen | 5 | 5 | **Deepened**: session-management-deep (3), lag-compensation-deep (1), state-sync-patterns-deep (1) |
+| 48 | Unreal Foundation | 28 | ? | Blueprints, Game Framework, UMG UI, Animation — original stubs (Epic blocked) |
+| 49 | Unreal Advanced | 22 | ? | Niagara, Chaos, Networking, Optimization — original stubs (Epic blocked) |
+| 48/49-deep | Unreal Deepen | 69 | 69 | **Deepened**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9) |
+| **Total** | | **276** | **160** |
+
+---
 
 ## Batch 35 — Unity Sampler State (**in D1**)
 
@@ -466,16 +485,15 @@ See `knowledge/EXPANSION-ROADMAP.md` for full details.
 - **Batch 22**: Player Settings
 - **Batch 23**: Graphics API, CommandBuffer, Compute Shaders
 
-### Game Dev (Batches 42–49) — Pending
+### Game Dev (Batches 42–49) — All Completed
 - **Batch 42 — steamworks-platform** ✅ **Imported to D1**: Steamworks SDK (123 chunks), Windows GDK (16 chunks), cross-platform publishing (13 chunks)
 - **Batch 43 — anti-cheat-security** ✅ **Imported to D1**: EOS Anti-Cheat, BattlEye, anti-tamper, server authority (72 chunks)
-- **Batch 44 — profiling-optimization** ⏳ **Pending**: Unity Profiler, Frame Debugger, Memory Profiler, GPU optimization, build size, mobile optimization
-- **Batch 44 — profiling-optimization**: Unity Profiler, Frame Debugger, Memory Profiler, GPU optimization, build size, mobile optimization
-- **Batch 45 — game-settings-ui-input**: Save/Load systems, responsive UI (CanvasScaler/safe area/letterbox), multi-platform input, UI animation
-- **Batch 46 — game-analytics-audio**: Achievements/leaderboards, analytics, crash reporting, audio (FMOD/Wwise), Addressables deepen
-- **Batch 47 — multiplayer-deepen**: Session management (reconnect/lobby), lag compensation, deterministic lockstep, state sync
-- **Batch 48 — unreal-engine-core**: Blueprints, C++ GameFramework, GameplayAbilitySystem, UMG UI, Animation
-- **Batch 49 — unreal-engine-advanced**: Niagara VFX, Chaos physics, networking/replication, Nanite/Lumen optimization
+- **Batch 44 — profiling-optimization** ✅ **Imported to D1**: Unity Profiler, Frame Debugger, Memory Profiler, GPU optimization, build size, mobile optimization (8+4+1+3+1+2+1=20 chunks, 0 vectors)
+- **Batch 45 — game-settings-ui-input** ✅ **Imported to D1**: Save/Load, responsive UI, multi-platform input, UI animation (7 chunks, 0 vectors)
+- **Batch 46 — game-analytics-audio** ✅ **Imported to D1**: Achievements/leaderboards, analytics, crash reporting, audio, Addressables deepen (7 chunks, 0 vectors)
+- **Batch 47 — multiplayer-deepen** ✅ **Imported to D1**: Session management, lag compensation, lockstep, state sync (4 chunks, 0 vectors)
+- **Batch 48 — unreal-engine-core** ✅ **Imported to D1**: Blueprints, Game Framework, UMG UI, Animation (4 stubs, 0 vectors) ⚠️ Epic docs blocked scraper
+- **Batch 49 — unreal-engine-advanced** ✅ **Imported to D1**: Niagara, Chaos, Networking, Optimization (4 stubs, 0 vectors) ⚠️ Epic docs blocked scraper
 
 ## Deferred Topics — do not pull
 

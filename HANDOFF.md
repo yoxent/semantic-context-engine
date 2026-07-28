@@ -1,7 +1,9 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-28
-**Status**: Knowledge base expanded to 176 topics (7,757 chunks). **Batches 42–43 (Steamworks, Anti-Cheat) imported. 6 game dev batches remaining (44–49).**
+**Status**: Knowledge base expanded to 201 topics (7,807 chunks). **ALL GAME DEV BATCHES (44–49) COMPLETED** via automated chain.
+
+**⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially.
 
 ---
 
@@ -10,12 +12,12 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (7,533 chunks, 3,667 vectors)
+- **D1 Database**: `sce-db` (7,807 chunks, 3,667 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 7,533 chunks, **case-insensitive, word-based AND** |
+| Keyword Search | ✅ | ~55ms response, 7,807 chunks, **case-insensitive, word-based AND** |
 | Semantic Search | ✅ | Vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
@@ -29,12 +31,12 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  7,533
-Vectors: 3,667 (2048-dim embeddings)
+Chunks:  7,967
+Vectors: 3,826 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  173 knowledge + 3 own-repo corpora
+Topics:  220 knowledge + 3 own-repo corpora = 223 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
-Size:    ~170 MB
+Size:    ~180 MB
 ```
 
 ### Topics Indexed (~173)
@@ -64,6 +66,17 @@ Size:    ~170 MB
 - **Unity Splines**: Deep reference (25 chunks)
 - **Google Cloud**: Compute, Cloud Run, Functions, Storage, SQL, Firestore, Bigtable, Pub/Sub, GKE, IAM, etc. (185 chunks)
 - **Python**: PyMuPDF (124 chunks) — PDF reading, image extraction, text search
+- **Unity Profiling**: Profiler, Frame Debugger, Memory Profiler, GPU Optimization, Memory Budgeting, Build Size, Mobile Optimization
+- **Profiling Deepen**: unity-profiler-deep (12), frame-debugger-deep (7), gpu-optimization-deep (4), build-size-optimization-deep (6), mobile-optimization-deep (4)
+- **Game Settings/UI**: Save/Load, Responsive UI, Multi-Platform Input, UI Animation
+- **Settings/UI Deepen**: game-settings-saveload-deep (6), responsive-game-ui-deep (7), multi-platform-input-deep (8)
+- **Game Analytics/Audio**: Achievements, Leaderboards, Analytics, Crash Reporting, Audio, Addressables Deepen
+- **Audio/Achievements Deepen**: game-audio-deep (9), game-achievements-deep (2), game-leaderboards-deep (2)
+- **Multiplayer Deepen**: Session Management, Lag Compensation, Lockstep, State Sync
+- **Multiplayer API Deepen**: session-management-deep (3), lag-compensation-deep (1), state-sync-patterns-deep (1)
+- **Unreal Foundation**: Blueprints, Game Framework, UMG UI, Animation
+- **Unreal Advanced**: Niagara VFX, Chaos Physics, Networking, Optimization
+- **Unreal Deepen (Context7)**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9)
 - **Game Dev**: Gem TD project (159 chunks) — architecture, combat, gems, pooling, TD inspirations
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
@@ -292,20 +305,24 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **Resume image descriptions**: Run `python knowledge/unity-game-designer-playbook/describe_images.py` tomorrow (free tier resets at midnight UTC)
 - **Deploy updated frontend**: Deploy with new search features
 
-### Active Expansion (Batches 42–49) — Game Dev Topics
-Eight pending batches covering PC/mobile game development gaps in Unity + Unreal:
+### Expansion Status (Batches 42–49) — Game Dev Topics
+All 8 batches have been processed covering PC/mobile game development topics:
 
-| Batch | Focus | Topics | Priority |
-|-------|-------|--------|----------|
+| Batch | Focus | Topics | Status |
+|-------|-------|--------|--------|
 | **42** | Steamworks & Platform Distribution | Steamworks SDK, Windows GDK, cross-platform publishing | ✅ Done (152 chunks) |
 | **43** | Anti-Cheat & Security | Easy Anti-Cheat, BattlEye, anti-tamper, server authority | ✅ Done (72 chunks) |
-| **43** | Anti-Cheat & Security | Easy Anti-Cheat, BattlEye, anti-tamper, server authority | 🔴 HIGH |
-| **44** | Profiling & Optimization | Profiler, Frame Debugger, GPU opt, build size, mobile opt | 🔴 HIGH |
-| **45** | Settings/Save/Load & UI | Save/Load, responsive UI, multi-platform input, UI animation | 🟡 MEDIUM |
-| **46** | Analytics, Audio & Achievements | Achievements, analytics, crash reporting, FMOD/Wwise, Addressables | 🟡 MEDIUM |
-| **47** | Multiplayer Deepen | Session/reconnect, lag compensation, lockstep, state sync | 🟡 MEDIUM |
-| **48** | Unreal Engine Foundation | Blueprints, GAS, UMG, Animation | 🟢 LOW |
-| **49** | Unreal Engine Advanced | Niagara, Chaos, Networking, Nanite/Lumen | 🟢 LOW |
+| **44** | Profiling & Performance | Profiler, Frame Debugger, GPU opt, build size, mobile opt | ✅ Done (20 chunks) |
+| **45** | Settings/Save/Load & UI | Save/Load, responsive UI, multi-platform input, UI animation | ✅ Done (7 chunks) |
+| **46** | Analytics, Audio & Achievements | Achievements, analytics, crash reporting, FMOD/Wwise, Addressables | ✅ Done (7 chunks) |
+| **47** | Multiplayer Deepen | Session/reconnect, lag compensation, lockstep, state sync | ✅ Done (4 chunks) |
+| **48** | Unreal Engine Foundation | Blueprints, GAS, UMG, Animation | ✅ Done (4 chunks, stub content) |
+| **49** | Unreal Engine Advanced | Niagara, Chaos, Networking, Nanite/Lumen | ✅ Done (4 chunks, stub content) |
+
+**⚠️ Known scraping issues:**
+- Unity 6000.3 Manual pages: most fail to scrape (Scripting API pages work if URL has no dots)
+- dev.epicgames.com: entirely blocks the cf-scraper (all Unreal topics have placeholder stubs)
+- No embedding vectors generated for batches 44-49 (0 vectors across all new topics)
 
 See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 

@@ -1,7 +1,7 @@
 # Knowledge Base Expansion Roadmap
 
 **Created**: 2026-07-18
-**Last Updated**: 2026-07-24
+**Last Updated**: 2026-07-28
 **Total Topics Planned**: ~150+
 **Status**: All topics indexed, Impeccable added
 
@@ -9,9 +9,9 @@
 
 ## Current State
 
-- **D1 Live**: ~6155 chunks, ~3500 vectors, ~150 topics
-- **Indexed**: All batches complete, Impeccable added
-- **Pending**: None
+- **D1 Live**: ~7967 chunks, ~3826 vectors, ~220 topics
+- **Indexed**: All batches complete, deepens 44-53 done, Unreal deepens via Context7
+- **Pending**: None — 223 total topics indexed
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
 ---
@@ -397,11 +397,12 @@ https://learn.microsoft.com/en-us/gaming/gdk/
 
 ---
 
-## ⏳ Batch 44 — Profiling & Performance Optimization
+## ✅ Batch 44 — Profiling & Performance Optimization
 
 **Priority**: HIGH — Directly impacts game quality
-**Status**: ⏳ **Pending**
-**Estimated chunks**: ~100–140
+**Status**: ✅ **Completed**
+**Actual chunks**: 20 (scraping partial — Unity Manual pages mostly failed)
+**⚠️ Note**: Unity 6000.3 Manual URLs returned empty; only Scripting API pages without dots in the name succeeded. Vectors: 0.
 
 | Topic | Scope | Source |
 |-------|-------|--------|
@@ -415,11 +416,12 @@ https://learn.microsoft.com/en-us/gaming/gdk/
 
 ---
 
-## ⏳ Batch 45 — Game Settings, Save/Load & Responsive UI
+## ✅ Batch 45 — Game Settings, Save/Load & Responsive UI
 
 **Priority**: MEDIUM — Foundational for shipped games
-**Status**: ⏳ **Pending**
-**Estimated chunks**: ~80–110
+**Status**: ✅ **Completed**
+**Actual chunks**: 7 (4 topics, partial scrape)
+**⚠️ Note**: Unity Manual scraping continues to fail. 7 chunks imported to D1.
 
 | Topic | Scope | Source |
 |-------|-------|--------|
@@ -430,11 +432,12 @@ https://learn.microsoft.com/en-us/gaming/gdk/
 
 ---
 
-## ⏳ Batch 46 — Game Analytics, Audio & Achievements
+## ✅ Batch 46 — Game Analytics, Audio & Achievements
 
 **Priority**: MEDIUM — Player engagement and retention
-**Status**: ⏳ **Pending**
-**Estimated chunks**: ~80–110
+**Status**: ✅ **Completed**
+**Actual chunks**: 7 (6 topics, most scrapes failed)
+**⚠️ Note**: Apple GameKit docs and Unity Analytics pages failed to scrape. Steam docs partially worked.
 
 | Topic | Scope | Source |
 |-------|-------|--------|
@@ -447,11 +450,12 @@ https://learn.microsoft.com/en-us/gaming/gdk/
 
 ---
 
-## ⏳ Batch 47 — Multiplayer Deepen
+## ✅ Batch 47 — Multiplayer Deepen
 
 **Priority**: MEDIUM — Complements existing networking depth
-**Status**: ⏳ **Pending**
-**Estimated chunks**: ~60–80
+**Status**: ✅ **Completed**
+**Actual chunks**: 4 (all stub content)
+**⚠️ Note**: All Unity 6000.3 doc URLs failed to scrape. Topics have only placeholder entries in D1.
 
 | Topic | Scope | Source |
 |-------|-------|--------|
@@ -462,11 +466,12 @@ https://learn.microsoft.com/en-us/gaming/gdk/
 
 ---
 
-## ⏳ Batch 48 — Unreal Engine Foundation
+## ✅ Batch 48 — Unreal Engine Foundation
 
 **Priority**: LOW — Fills massive gap (currently 1 file)
-**Status**: ⏳ **Pending**
-**Estimated chunks**: ~80–120
+**Status**: ✅ **Completed**
+**Actual chunks**: 4 (stub content only)
+**⚠️ Note**: Epic Games docs (dev.epicgames.com) entirely blocked the scraper. Scraper crashed with STATUS_ACCESS_VIOLATION on unreal-game-framework.
 
 | Topic | Scope | Source |
 |-------|-------|--------|
@@ -477,11 +482,12 @@ https://learn.microsoft.com/en-us/gaming/gdk/
 
 ---
 
-## ⏳ Batch 49 — Unreal Engine Advanced
+## ✅ Batch 49 — Unreal Engine Advanced
 
 **Priority**: LOW — After foundation is covered
-**Status**: ⏳ **Pending**
-**Estimated chunks**: ~60–90
+**Status**: ✅ **Completed**
+**Actual chunks**: 4 (stub content only)
+**⚠️ Note**: Same Epic Games docs blocking issue as Batch 48 (21/22 URLs returned empty).
 
 | Topic | Scope | Source |
 |-------|-------|--------|
@@ -492,7 +498,68 @@ https://learn.microsoft.com/en-us/gaming/gdk/
 
 ---
 
-## Deferred / Parked Topics
+## ✅ Batch 50 — Unity Profiling Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 33 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `unity-profiler-deep` | Profiler window usage, CPU/GPU profiling, Memory Profiler, Profile Analyzer, Profiler markers, instrumentation | Unity Manual (corrected URLs) |
+| `frame-debugger-deep` | Frame Debugger events, draw calls, render passes, SRP Batcher, shader variants, overdraw | Unity Manual |
+| `gpu-optimization-deep` | Draw call batching (static/dynamic), SRP Batcher, GPU instancing, overdraw reduction, resolution scaling | Unity Manual |
+| `build-size-optimization-deep` | Build report, asset bundle packing, managed code stripping, texture compression, audio compression | Unity Manual |
+| `mobile-optimization-deep` | Mobile-specific profiling, platform settings, graphics API selection, battery/thermal considerations | Unity Manual |
+
+## ✅ Batch 51 — Game Settings & UI Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 22 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `game-settings-saveload-deep` | PlayerPrefs, JSON serialization, binary save formats, save game versioning, cloud saves, settings menu patterns | Unity Manual + Context7 |
+| `responsive-game-ui-deep` | Canvas Scaler, safe areas, aspect ratio handling, adaptive layouts, resolution independence | Unity Manual + Context7 |
+| `multi-platform-input-deep` | Input System package (actions, processors, interactions, devices), touch input, gamepad/keyboard bindings | Unity Input System package docs |
+
+## ✅ Batch 52 — Analytics & Audio Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 32 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `game-audio-deep` | Audio Mixer (groups, snapshots, effects, sends), spatial audio (doppler, attenuation), AudioClip loading, audio DSP, FMOD vs Wwise | Unity Manual + Context7 |
+| `game-achievements-deep` | Steamworks achievements API, unlock flow, stat tracking, achievement icons, progress bars, UI patterns | Steamworks partner docs |
+| `game-leaderboards-deep` | Steamworks leaderboards (global/friends), score upload/download, daily/weekly resets, entry count limits | Steamworks partner docs |
+
+## ✅ Batch 53 — Multiplayer API Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 5 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `session-management-deep` | Unity Netcode session lifecycle, connection approval, player joining/leaving, session hosting | Unity Netcode API docs |
+| `lag-compensation-deep` | Client-side prediction, server reconciliation, interpolation/extrapolation, state synchronization techniques | Unity Netcode API docs |
+| `state-sync-patterns-deep` | NetworkVariable types, custom serialization, delta compression, interest management, relevancy | Unity Netcode API docs |
+
+## ✅ Unreal Engine Deepen (Batches 48-49)
+
+**Status**: ✅ **Completed**
+**Total chunks**: 69 (all with vectors)
+**Note**: Epic Games docs (dev.epicgames.com) continues to block cf-scraper. Content was written from Context7 queries + author knowledge.
+
+| Topic | Chunks | Vectors | Scope |
+|-------|--------|---------|-------|
+| `unreal-blueprints-deep` | 10 | 10 | Blueprint types, Event Graph, Event Dispatchers, Function Libraries, Interfaces, Construction Script, Blueprint vs C++, best practices |
+| `unreal-game-framework-deep` | 8 | 8 | GameMode/GameState/PlayerController/Pawn/Character, GAS (AbilitySystemComponent, GameplayAbility, AttributeSet, GameplayEffect, GameplayTags), Ability Tasks |
+| `unreal-umg-ui-deep` | 10 | 10 | Widget types (Button, Image, Text, ListView, Overlay, Slider, SpinBox, TileView, TreeView), anchors, sizing, Slate vs UMG, Widget Animation |
+| `unreal-animation-deep` | 10 | 10 | Animation Blueprints, State Machines, Blend Spaces (1D/2D), IK, Control Rig, Sequencer, Root Motion, Animation Sharing |
+| `unreal-niagara-deep` | 7 | 7 | Emitters, Systems, GPU vs CPU particles, Data Interfaces, Event Handling, Scripting, Platform scalability |
+| `unreal-chaos-deep` | 7 | 7 | Rigid bodies, Destruction (Geometry Collection, Fracture), Vehicles, Cloth, Hair simulation |
+| `unreal-networking-deep` | 8 | 8 | Replication, RPCs, Relevancy, Connection handling, Dedicated server |
+| `unreal-optimization-deep` | 9 | 9 | World Partition, Nanite, Lumen, LODs, Culling, Unreal Insights, Rendering optimization |
 
 | Category | Topics | Why Deferred |
 |----------|--------|--------------|
