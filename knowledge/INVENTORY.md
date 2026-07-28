@@ -431,6 +431,14 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **39** | **unity-timeline (NEW)** | ✅ **Imported to D1** |
 | **40** | **unity-game-juice (NEW)** | ✅ **Imported to D1** |
 | **41** | **unity-design-levers (NEW)** | ✅ **Imported to D1** |
+| **42** | **steamworks-platform** — Steamworks SDK, Windows Store/Xbox GDK, cross-platform publishing | ✅ **Imported to D1** |
+| **43** | **anti-cheat-security** — Easy Anti-Cheat, BattlEye, anti-tamper, server authority | ✅ **Imported to D1** |
+| **44** | **profiling-optimization** — Unity Profiler, Frame Debugger, Memory Profiler, GPU opt, build size, mobile opt | ⏳ **Pending** |
+| **45** | **game-settings-ui-input** — Save/Load systems, responsive UI (CanvasScaler/safe area/letterbox), multi-platform input, UI animation deepen | ⏳ **Pending** |
+| **46** | **game-analytics-audio** — Achievements/leaderboards, analytics, crash reporting, audio (FMOD/Wwise), Addressables deepen | ⏳ **Pending** |
+| **47** | **multiplayer-deepen** — Session management (reconnect/lobby), lag compensation, deterministic lockstep, state sync patterns | ⏳ **Pending** |
+| **48** | **unreal-engine-core** — Blueprints, C++ GameFramework/GameplayAbilitySystem, UMG UI, Animation | ⏳ **Pending** |
+| **49** | **unreal-engine-advanced** — Niagara VFX, Chaos physics, networking/replication, optimization (Nanite/Lumen) | ⏳ **Pending** |
 
 ## Expansion Roadmap
 
@@ -457,6 +465,17 @@ See `knowledge/EXPANSION-ROADMAP.md` for full details.
 - **Batch 21**: Editor Scripting, Custom Inspectors
 - **Batch 22**: Player Settings
 - **Batch 23**: Graphics API, CommandBuffer, Compute Shaders
+
+### Game Dev (Batches 42–49) — Pending
+- **Batch 42 — steamworks-platform** ✅ **Imported to D1**: Steamworks SDK (123 chunks), Windows GDK (16 chunks), cross-platform publishing (13 chunks)
+- **Batch 43 — anti-cheat-security** ✅ **Imported to D1**: EOS Anti-Cheat, BattlEye, anti-tamper, server authority (72 chunks)
+- **Batch 44 — profiling-optimization** ⏳ **Pending**: Unity Profiler, Frame Debugger, Memory Profiler, GPU optimization, build size, mobile optimization
+- **Batch 44 — profiling-optimization**: Unity Profiler, Frame Debugger, Memory Profiler, GPU optimization, build size, mobile optimization
+- **Batch 45 — game-settings-ui-input**: Save/Load systems, responsive UI (CanvasScaler/safe area/letterbox), multi-platform input, UI animation
+- **Batch 46 — game-analytics-audio**: Achievements/leaderboards, analytics, crash reporting, audio (FMOD/Wwise), Addressables deepen
+- **Batch 47 — multiplayer-deepen**: Session management (reconnect/lobby), lag compensation, deterministic lockstep, state sync
+- **Batch 48 — unreal-engine-core**: Blueprints, C++ GameFramework, GameplayAbilitySystem, UMG UI, Animation
+- **Batch 49 — unreal-engine-advanced**: Niagara VFX, Chaos physics, networking/replication, Nanite/Lumen optimization
 
 ## Deferred Topics — do not pull
 

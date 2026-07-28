@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-28
-**Status**: Knowledge base expanded to 173 topics (7,533 chunks). Search is now case-insensitive with word-based AND matching.
+**Status**: Knowledge base expanded to 176 topics (7,757 chunks). **Batches 42–43 (Steamworks, Anti-Cheat) imported. 6 game dev batches remaining (44–49).**
 
 ---
 
@@ -292,6 +292,23 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **Resume image descriptions**: Run `python knowledge/unity-game-designer-playbook/describe_images.py` tomorrow (free tier resets at midnight UTC)
 - **Deploy updated frontend**: Deploy with new search features
 
+### Active Expansion (Batches 42–49) — Game Dev Topics
+Eight pending batches covering PC/mobile game development gaps in Unity + Unreal:
+
+| Batch | Focus | Topics | Priority |
+|-------|-------|--------|----------|
+| **42** | Steamworks & Platform Distribution | Steamworks SDK, Windows GDK, cross-platform publishing | ✅ Done (152 chunks) |
+| **43** | Anti-Cheat & Security | Easy Anti-Cheat, BattlEye, anti-tamper, server authority | ✅ Done (72 chunks) |
+| **43** | Anti-Cheat & Security | Easy Anti-Cheat, BattlEye, anti-tamper, server authority | 🔴 HIGH |
+| **44** | Profiling & Optimization | Profiler, Frame Debugger, GPU opt, build size, mobile opt | 🔴 HIGH |
+| **45** | Settings/Save/Load & UI | Save/Load, responsive UI, multi-platform input, UI animation | 🟡 MEDIUM |
+| **46** | Analytics, Audio & Achievements | Achievements, analytics, crash reporting, FMOD/Wwise, Addressables | 🟡 MEDIUM |
+| **47** | Multiplayer Deepen | Session/reconnect, lag compensation, lockstep, state sync | 🟡 MEDIUM |
+| **48** | Unreal Engine Foundation | Blueprints, GAS, UMG, Animation | 🟢 LOW |
+| **49** | Unreal Engine Advanced | Niagara, Chaos, Networking, Nanite/Lumen | 🟢 LOW |
+
+See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
+
 ### Optional Future Work
 - **Deepen specific topics**: More Unity packages (ML-Agents, Shader Graph)
 - **Add symbol data**: Index more codebases with AST extraction
@@ -324,3 +341,4 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **Knowledge expansion (2026-07-26)**: Added 7 new topics (Sampler State, Gem TD, PyMuPDF, Game Designer Playbook, Timeline, Game Juice, Design Levers). Total: 156 topics, 7,086 chunks
 - **Unity Ebooks (2026-07-28)**: Added 8 topics from Unity PDFs (Level Design, UI Design, Tech Art x2, 2D Art, Animation, VR/MR, Dedicated Server). Total: 173 topics, 7,533 chunks
 - **Search improvement (2026-07-28)**: Case-insensitive, word-based AND matching. Multi-word queries like "level design synthesis" now work. Deploy time: ~10 seconds.
+- **Pending batches (2026-07-28)**: 8 new game dev batches planned (42–49) — **Batch 42 now imported**. Remaining: anti-cheat, profiling/optimization, game settings/save-load, analytics/audio, multiplayer deepen, Unreal Engine foundation + advanced. See `knowledge/EXPANSION-ROADMAP.md` for full details.
