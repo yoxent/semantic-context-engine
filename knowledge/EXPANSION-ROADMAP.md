@@ -3,15 +3,15 @@
 **Created**: 2026-07-18
 **Last Updated**: 2026-07-30
 **Total Topics Planned**: ~150+
-**Status**: Batches 54-56 content ready; Tier 3 D1 re-import of 46 previously-exported topics complete (D1: 8,897 chunks, 4,693 vectors). Batches 55-56 still awaiting index/export/import.
+**Status**: Batches 54-56 content ready; Tiers 3+4 D1 re-imports complete (D1: 9,815 chunks, 5,576 vectors). Batches 55-56 still awaiting index/export/import.
 
 ---
 
 ## Current State
 
-- **D1 Live**: ~8,897 chunks, ~4,693 vectors, ~204 knowledge topics + 3 own-repo corpora
-- **Indexed**: Batch 54 (Random Number Algorithms) complete in D1. All 46 Tier 3 exported topics re-imported & verified (web/full-stack/Unity topics that were exported but missing from D1).
-- **Pending**: Batches 55 (Game Dev Infrastructure) and 56 (StS2 & Codex) — content files ready, awaiting index/export/import. Also `cpp` + `unreal-engine` (indexed locally, never exported) and 20 Tier 4 topics with partially-matched exports needing re-import.
+- **D1 Live**: ~9,815 chunks, ~5,576 vectors, ~204 knowledge topics + 3 own-repo corpora
+- **Indexed**: Batch 54 (Random Number Algorithms) complete in D1. Tiers 3+4 re-imports complete (46 exported + 20 partial topics verified).
+- **Pending**: Batches 55 (Game Dev Infrastructure) and 56 (StS2 & Codex) — content files ready, awaiting index/export/import. Also `cpp` + `unreal-engine` (indexed locally, never exported) + unity-ebooks-scraped (staging dir).
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
 ---

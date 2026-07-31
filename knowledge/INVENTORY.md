@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-07-30
-**D1 Live Total**: **8897 chunks, 4693 vectors** (~190 MB)
+**D1 Live Total**: **9815 chunks, 5576 vectors** (~220 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status

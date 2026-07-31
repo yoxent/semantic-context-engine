@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-07-30
-**Status**: D1 at **8,897 chunks, 4,693 vectors**. **TIER 3 IMPORT COMPLETE** — all 46 exported topics verified in D1.
+**Status**: D1 at **9,815 chunks, 5,576 vectors**. **TIERS 3 + 4 IMPORT COMPLETE** — all 46 exported + 20 partial topics verified in D1.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially.
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (8,897 chunks, 4,693 vectors)
+- **D1 Database**: `sce-db` (9,815 chunks, 5,576 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -31,8 +31,8 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  8,897
-Vectors: 4,693 (2048-dim embeddings)
+Chunks:  9,815
+Vectors: 5,576 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
 Topics:  ~204 knowledge + 3 own-repo corpora = ~207 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
@@ -303,8 +303,8 @@ Applied to: keyword, semantic, and hybrid search modes.
 ## 🔜 Next Steps
 
 ### Immediate — Tier 3 Import ✅ COMPLETE
-- **All 46 exported topics verified in D1** (8,897 chunks, 4,693 vectors).
-- Next: **Tier 4 re-imports** (20 topics partially in D1 with re-indexed exports) and **Tier 1/2** (raw content / indexed-but-unexported topics: cpp, unreal-engine, game-design-patterns, net-code, node-graphs, slay-the-spire-2, spire-codex, sprite-atlasing, storage-logic, sts2-enemies-ai-brain).
+- **Tiers 3 + 4 complete**: all 46 exported + 20 partial topics verified in D1 (9,815 chunks, 5,576 vectors).
+- Next: **Tier 1/2** (raw content / indexed-but-unexported topics): cpp, unreal-engine, game-design-patterns, net-code, node-graphs, slay-the-spire-2, spire-codex, sprite-atlasing, storage-logic, sts2-enemies-ai-brain, unity-ebooks-scraped.
 
 ### Expansion Status (Batches 42–56) — Game Dev & Infrastructure Topics
 
