@@ -1,17 +1,17 @@
 # Knowledge Base Expansion Roadmap
 
 **Created**: 2026-07-18
-**Last Updated**: 2026-07-28
+**Last Updated**: 2026-07-30
 **Total Topics Planned**: ~150+
-**Status**: All topics indexed, Impeccable added
+**Status**: Batches 54-56 content ready; Tier 3 D1 re-import of 46 previously-exported topics complete (D1: 8,897 chunks, 4,693 vectors). Batches 55-56 still awaiting index/export/import.
 
 ---
 
 ## Current State
 
-- **D1 Live**: ~7967 chunks, ~3826 vectors, ~220 topics
-- **Indexed**: All batches complete, deepens 44-53 done, Unreal deepens via Context7
-- **Pending**: None — 223 total topics indexed
+- **D1 Live**: ~8,897 chunks, ~4,693 vectors, ~204 knowledge topics + 3 own-repo corpora
+- **Indexed**: Batch 54 (Random Number Algorithms) complete in D1. All 46 Tier 3 exported topics re-imported & verified (web/full-stack/Unity topics that were exported but missing from D1).
+- **Pending**: Batches 55 (Game Dev Infrastructure) and 56 (StS2 & Codex) — content files ready, awaiting index/export/import. Also `cpp` + `unreal-engine` (indexed locally, never exported) and 20 Tier 4 topics with partially-matched exports needing re-import.
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
 ---
@@ -19,7 +19,7 @@
 ## ✅ Completed Batches
 
 | Batch | Topics | Status |
-|-------|--------|--------|
+| 54 | **Random Number Generation Algorithms** — megarandom, xoshiro256, splitmix64, pseudorandom, game-random-utils | ✅ **Imported to D1** (52 chunks, 52 vectors) |
 | 1 | Expo, Firebase, GCP thin, RN, Kotlin, IAP, Play Console, Game Center, RN tooling | ✅ Done |
 | 2 | Tailwind v4, Resend, Vercel, t3-env, Zod, Drizzle+Neon, FastAPI, Docker, ngrok | ✅ Done |
 | 3 | Wrangler, OpenRouter, MCP, SQLite deepen, own-repo corpora | ✅ Done |

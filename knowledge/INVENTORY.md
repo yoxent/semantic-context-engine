@@ -1,12 +1,73 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-28
-**D1 Live Total**: **7967 chunks, 3826 vectors** (~180 MB)
+**Last Updated**: 2026-07-30
+**D1 Live Total**: **8897 chunks, 4693 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**220 knowledge topics** + 3 own-repo corpora imported to D1. All deepen batches (44-53) complete with vectors. Unreal Engine deepens created via Context7-generated content (Epic Games docs block scraping).
+**225 knowledge topics** + 3 own-repo corpora imported to D1 (228 total). Batch 54 (Random Number Algorithms) complete with vectors. Unreal Engine deepens created via Context7-generated content (Epic Games docs block scraping). Batches 55-56 content ready for indexing.
+
+## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
+
+## Batch 54 — Random Number Generation Algorithms (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `megarandom` | 10 | 10 | ✅ Imported |
+| `xoshiro256` | 10 | 10 | ✅ Imported |
+| `splitmix64` | 9 | 9 | ✅ Imported |
+| `pseudorandom` | 13 | 13 | ✅ Imported |
+| `game-random-utils` | 10 | 10 | ✅ Imported |
+| **Total** | **52** | **52** | |
+
+### Batch 54 Details
+
+**Random Number Generation Algorithms** — PRNG algorithms and game random utilities with C# implementations:
+
+**MegaRandom (`megarandom`)** — Truncated LCG with 128-bit state, used in Terraria world generation:
+- 128-bit state (4 × uint32), period 2^128
+- C# implementation with seed initialization via SplitMix64
+- Use cases: world generation, dungeon layout, item placement, multiplayer determinism
+
+**xoshiro256**​** (`xoshiro256`)** — Modern fast PRNG by Blackman & Vigna (2018):
+- 256-bit state (4 × uint64), period 2^256
+- Passes BigCrush (TestU01), ~1.3 GB/s generation speed
+- Jump() method for 2^128 independent substreams
+- C# implementation with SplitMix64-based seeding
+
+**SplitMix64 (`splitmix64`)** — Fast splittable PRNG by Steele, Lea & Flood (2014):
+- 64-bit state, period 2^64, ~2 GB/s speed
+- Used for seeding larger PRNGs (xoshiro256**, MegaRandom)
+- Split() method creates independent child generators
+- C# implementation with golden ratio constant
+
+**Pseudorandom Generation (`pseudorandom`)** — General PRNG concepts for games:
+- Seed-based determinism for replays, lockstep multiplayer, procedural generation
+- PRNG family comparison (System.Random, SplitMix64, xoshiro256**, PCG, MT)
+- Cross-platform determinism pitfalls (float precision, LINQ OrderBy)
+- Choosing a PRNG by game type (turn-based, action, open world, multiplayer)
+
+**Game Random Utilities (`game-random-utils`)** — Higher-level random selection utilities:
+- Shuffle bag (fair non-repeating draws)
+- Weighted random selection (loot tables, rarity rolls)
+- Perlin/Simplex noise for procedural terrain generation
+- Poisson disc sampling (evenly distributed random points)
+- Markov chain for name/level generation
+- Shared entropy pool pattern
+
+### URL Sources
+- `knowledge/urls/megarandom.txt` — Wikipedia, GitHub
+- `knowledge/urls/xoshiro256.txt` — Wikipedia, original paper (prng.di.unimi.it)
+- `knowledge/urls/splitmix64.txt` — Wikipedia, original paper (gee.cs.oswego.edu)
+- `knowledge/urls/pseudorandom.txt` — Wikipedia (PRNG, LCG, MT, PCG)
+- `knowledge/urls/game-random-utils.txt` — Wikipedia (Fisher-Yates, Perlin, Simplex, Poisson)
+
+### Content Files
+- Written as comprehensive `.md` files with C# implementations, algorithm properties, and game-specific usage
+- Not scraped (conceptual algorithm topics with code examples)
+
+---
 
 ## Batches 44-53 — Game Dev & Deepens (in D1)
 

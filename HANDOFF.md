@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-28
-**Status**: Knowledge base expanded to 201 topics (7,807 chunks). **ALL GAME DEV BATCHES (44–49) COMPLETED** via automated chain.
+**Last Updated**: 2026-07-30
+**Status**: D1 at **8,897 chunks, 4,693 vectors**. **TIER 3 IMPORT COMPLETE** — all 46 exported topics verified in D1.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially.
 
@@ -12,12 +12,12 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (7,807 chunks, 3,667 vectors)
+- **D1 Database**: `sce-db` (8,897 chunks, 4,693 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 7,807 chunks, **case-insensitive, word-based AND** |
+| Keyword Search | ✅ | ~55ms response, 8,019 chunks, **case-insensitive, word-based AND** |
 | Semantic Search | ✅ | Vectors, 2048-dim |
 | Hybrid Search | ✅ | RRF fusion (k=60) |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
@@ -31,15 +31,15 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  7,967
-Vectors: 3,826 (2048-dim embeddings)
+Chunks:  8,897
+Vectors: 4,693 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  220 knowledge + 3 own-repo corpora = 223 total
+Topics:  ~204 knowledge + 3 own-repo corpora = ~207 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
-Size:    ~180 MB
+Size:    ~190 MB
 ```
 
-### Topics Indexed (~173)
+### Topics Indexed (~228)
 - **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
 - **Full-stack**: TanStack Query, Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns, Radix UI, Framer Motion, Drizzle ORM, Playwright, Caching Strategies
 - **Testing**: TanStack Table, MSW, React Testing Library, ESLint, Sonner, Vitest
@@ -78,6 +78,7 @@ Size:    ~180 MB
 - **Unreal Advanced**: Niagara VFX, Chaos Physics, Networking, Optimization
 - **Unreal Deepen (Context7)**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9)
 - **Game Dev**: Gem TD project (159 chunks) — architecture, combat, gems, pooling, TD inspirations
+- **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
@@ -301,12 +302,11 @@ Applied to: keyword, semantic, and hybrid search modes.
 
 ## 🔜 Next Steps
 
-### Immediate
-- **Resume image descriptions**: Run `python knowledge/unity-game-designer-playbook/describe_images.py` tomorrow (free tier resets at midnight UTC)
-- **Deploy updated frontend**: Deploy with new search features
+### Immediate — Tier 3 Import ✅ COMPLETE
+- **All 46 exported topics verified in D1** (8,897 chunks, 4,693 vectors).
+- Next: **Tier 4 re-imports** (20 topics partially in D1 with re-indexed exports) and **Tier 1/2** (raw content / indexed-but-unexported topics: cpp, unreal-engine, game-design-patterns, net-code, node-graphs, slay-the-spire-2, spire-codex, sprite-atlasing, storage-logic, sts2-enemies-ai-brain).
 
-### Expansion Status (Batches 42–49) — Game Dev Topics
-All 8 batches have been processed covering PC/mobile game development topics:
+### Expansion Status (Batches 42–56) — Game Dev & Infrastructure Topics
 
 | Batch | Focus | Topics | Status |
 |-------|-------|--------|--------|
@@ -318,11 +318,13 @@ All 8 batches have been processed covering PC/mobile game development topics:
 | **47** | Multiplayer Deepen | Session/reconnect, lag compensation, lockstep, state sync | ✅ Done (4 chunks) |
 | **48** | Unreal Engine Foundation | Blueprints, GAS, UMG, Animation | ✅ Done (4 chunks, stub content) |
 | **49** | Unreal Engine Advanced | Niagara, Chaos, Networking, Nanite/Lumen | ✅ Done (4 chunks, stub content) |
+| **54** | Random Number Algorithms | MegaRandom, xoshiro256**, SplitMix64, pseudorandom, game random utils | ✅ Done (52 chunks, 52 vectors) |
+| **55** | Game Dev Infrastructure | Sprite atlasing, node graphs, storage logic, design patterns, net code | 📝 Content ready |
+| **56** | StS2 & Codex | Slay the Spire 2 architecture, Spire Codex, sts2-enemies-ai-brain | 📝 Content ready |
 
 **⚠️ Known scraping issues:**
 - Unity 6000.3 Manual pages: most fail to scrape (Scripting API pages work if URL has no dots)
 - dev.epicgames.com: entirely blocks the cf-scraper (all Unreal topics have placeholder stubs)
-- No embedding vectors generated for batches 44-49 (0 vectors across all new topics)
 
 See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 
@@ -337,6 +339,7 @@ See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 ## 🐛 Known Issues
 
 1. **Import batch size**: Reduced to 2 to avoid SQLITE_TOOBIG errors with large chunks
+1a. **Vector import slow**: Each 2048-dim vector (~39KB) is inserted one-at-a-time via separate `wrangler d1 execute` call (~2-7s each). Topics with 100+ vectors take 10-20 minutes. Import sequentially (not parallel) to avoid temp file races.
 2. **wrangler.jsonc interference**: Must use `--config wrangler.toml` when deploying worker from `packages/web/worker/`
 3. **Free embedding rate limits**: OpenRouter free model occasionally rate-limits; batch size 2 mitigates this
 4. **D1 schema snake_case**: D1 uses `repository_id`, `relative_path`, etc. (snake_case) but export uses camelCase. Import scripts must map fields correctly.
@@ -358,5 +361,6 @@ See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 - **Knowledge expansion (2026-07-26)**: Added 7 new topics (Sampler State, Gem TD, PyMuPDF, Game Designer Playbook, Timeline, Game Juice, Design Levers). Total: 156 topics, 7,086 chunks
 - **Unity Ebooks (2026-07-28)**: Added 8 topics from Unity PDFs (Level Design, UI Design, Tech Art x2, 2D Art, Animation, VR/MR, Dedicated Server). Total: 173 topics, 7,533 chunks
 - **Search improvement (2026-07-28)**: Case-insensitive, word-based AND matching. Multi-word queries like "level design synthesis" now work. Deploy time: ~10 seconds.
-- **Pending batches (2026-07-28)**: 6 game dev batches remaining (44–49). See `knowledge/EXPANSION-ROADMAP.md` for full details.
+
+- **Batch 54 (Random Number Algorithms)**: 5 topics added — megarandom, xoshiro256**, SplitMix64, pseudorandom, game-random-utils (52 chunks, 52 vectors). Content includes C# implementations, algorithm properties, and game-specific usage patterns.
 - **Gitignored source files**: `knowledge/` dir is in `.gitignore`. New knowledge source files (.md) are tracked only in D1, not git. Only HANDOFF.md, EXPANSION-ROADMAP.md, and INVENTORY.md are version-controlled.
