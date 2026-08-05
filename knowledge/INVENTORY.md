@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-08-05
-**D1 Live Total**: **10032 chunks, 5793 vectors** (~190 MB)
+**D1 Live Total**: **10061 chunks, 5822 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**~214 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~219 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)** + GitHub `three-steer` (7c) added; **`swarm-intelligence` (32c) + GitHub `pso.js` (4c, +3 symbols)** added — GitHub open-source repos are now a standard source type. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**~215 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~220 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -193,6 +193,29 @@ Vetted GitHub open-source repos are now indexed as first-class sources: cloned u
 ### Sources
 - Hand-written content files (`knowledge/swarm-intelligence/*.md` + `sce.config.json`) — no URL scrape phase needed
 - GitHub clone `knowledge/github/pso.js/` (MIT, `adrianton3/pso.js`) — indexed via `**/*.js` + `**/*.md` include config (ignores examples/test/tools/lib)
+
+---
+
+## Crowd Simulation — Pedestrians, Lanes & Emergent Flow (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `crowd-simulation` | 29 | 29 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Crowd Simulation Details
+
+**Crowd Simulation — Pedestrians, Lanes & Emergent Flow** — hand-written (not scraped), the boids-family tool for people:
+
+- `crowd-simulation-core.md` (10c) — Helbing's social force model (desired-velocity / agent-repulsion / wall forces, fluctuation), emergent lanes/queues/arching/faster-is-slower/zipper, microscopic vs mesoscopic vs continuum vs CA spectrum, parameter table.
+- `crowd-simulation-implementation.md` (7c) — Unity C# social-force reference (Pedestrian struct, force accumulation, semi-implicit Euler), spatial-hash scaling, navmesh/flow-field routing layering, NavMeshAgent+RVO comparison, evacuation & faster-is-slower, gotchas (symmetry deadlock, oscillation, compression, tunneling).
+- `crowd-simulation-variants.md` (12c) — Tuning table, scenario recipes (street, concourse, queue, evacuation, melee, horde), RVO/ORCA vs social force, CA/continuum/PBD/RL variants, game applications, when *not* to use.
+
+### GitHub Open-Source Review — **no source added** (documented decision)
+
+Reviewed for this topic: sweriko/Horde (TS, MIT, 108★ — *crowd rendering* via octahedral impostors, not simulation → off-topic), lo-th/Crowd.lab (JS — no license), keijiro/unity-crowd-simulation (JS — no license), crowdedjs (JS — 2★, unclear license). All skipped. Authoritative implementations are unparseable (knowledge-only, distilled with attribution): pedsim_ros (C++, BSD-2, 587★), PySocialForce (Python, MIT), lightsfm (C++, BSD-3), SUMO (EPL-2.0, 4.1k★), Menge (C++, Apache-2.0), unity-pedestrian-sim (C#, MIT), TUM-MLCMS Unity DOTS crowd sim (C#, MIT).
+
+### Sources
+- Hand-written content files (`knowledge/crowd-simulation/*.md` + `sce.config.json`) — no URL scrape phase needed
 
 ---
 

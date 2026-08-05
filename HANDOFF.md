@@ -31,10 +31,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  10,032
-Vectors: 5,793 (2048-dim embeddings)
+Chunks:  10,061
+Vectors: 5,822 (2048-dim embeddings)
 Symbols: 290 (own-repo corpora + 3 from pso.js)
-Topics:  ~214 knowledge + 3 own-repo corpora + 2 GitHub sources = ~219 total
+Topics:  ~215 knowledge + 3 own-repo corpora + 2 GitHub sources = ~220 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 Size:    ~190 MB
 ```
