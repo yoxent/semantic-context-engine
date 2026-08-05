@@ -14,9 +14,11 @@ Add hand-written knowledge topics to the Semantic Context Engine in the same vei
 
 ## Current state (2026-08-05)
 
-- **D1**: 9,954 chunks / 5,715 vectors (2048-dim, `nvidia/llama-nemotron-embed-vl-1b-v2:free`)
+- **D1**: 10,061 chunks / 5,822 vectors (2048-dim, `nvidia/llama-nemotron-embed-vl-1b-v2:free`)
 - **Live**: frontend https://sce-web.pasttime.xyz/ · API https://sce-api.pasttime.xyz
-- **Done recently**: Batch 55 (71c) + batch 56 content topics (28c) + `cpp`/`unreal-engine` stragglers (5c) + `boids` (35c)
+- **Done recently**: Batch 55 (71c) + batch 56 content topics (28c) + `cpp`/`unreal-engine` stragglers (5c) + `boids` (35c) + **`steering-behaviors` (35c) + `three-steer` (7c)** + **`swarm-intelligence` (32c) + `pso.js` (4c, +3 symbols)** + **`crowd-simulation` (29c)**
+- **GitHub source convention (established this session)**: vetted GitHub repos are first-class sources — clone to `knowledge/github/<repo>/`, require MIT/Apache-2.0 license, index only TS/JS/MD (`include: ["**/*.js", "**/*.md"]`); C#/C++/Java/Python repos are knowledge-only (parser can't read them). Added so far: `three-steer`, `pso.js`. See HANDOFF.md Notes.
+- **Gotcha (embedding 502)**: transient OpenRouter 502 can leave chunks without vectors (export shows chunks ≠ vectors) — wipe `.sce` and re-index.
 - **Still pending** (do NOT touch unless user asks): `spire-codex` (3.6 GB codebase clone — needs include-config decision), `unity-ebooks-scraped` (staging only, no config)
 
 ## Task pattern (proven by `boids`)
@@ -26,10 +28,10 @@ Hand-write comprehensive `.md` files — do **not** scrape (same as the PRNG top
 ## Recommended topic queue (confirm each with user first)
 
 ### Tier A — direct boids family (highest priority)
-1. **steering-behaviors** — Reynolds' single-agent framework: seek, flee, arrive, pursue, evade, wander, obstacle avoidance, flow-field following; the "one agent with intent" complement to boids' "many agents, no intent".
-2. **swarm-intelligence** — PSO, ACO, bee/wasp colony, firefly; optimization algorithms + procedural-design applications (boids-variants.md already references these).
-3. **crowd-simulation** — Helbing social-force model, pedestrian dynamics, lane/queue emergence, evacuation; the game-industry descendant of boids.
-4. **flow-field-pathfinding** — vector fields for mass unit movement; bridges boids to RTS-style pathfinding (integration fields, dynamic obstacles).
+1. ~~**steering-behaviors**~~ ✅ DONE (35c + GitHub `three-steer` 7c) — Reynolds' single-agent framework: seek, flee, arrive, pursue, evade, wander, obstacle avoidance, flow-field following.
+2. ~~**swarm-intelligence**~~ ✅ DONE (32c + GitHub `pso.js` 4c) — PSO, ACO, ABC, firefly; optimization + procedural-design applications.
+3. ~~**crowd-simulation**~~ ✅ DONE (29c, no GitHub source — candidates off-topic/unlicensed) — Helbing social-force model, lanes/queues, evacuation.
+4. **flow-field-pathfinding** ⏳ NEXT — vector fields for mass unit movement; bridges boids to RTS-style pathfinding (integration fields, dynamic obstacles). GitHub angle: vonWolfehaus/flow-field (JS, 106★) has NO license — verify before adding; Unity flow-field tools are typically C# (knowledge-only).
 5. **cellular-automata** — Conway's Game of Life, Langton's ant, rule-based emergence; CA terrain/cave generation (direct game use).
 
 ### Tier B — adjacent game-AI foundations
