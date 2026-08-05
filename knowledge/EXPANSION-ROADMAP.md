@@ -1,17 +1,17 @@
 # Knowledge Base Expansion Roadmap
 
 **Created**: 2026-07-18
-**Last Updated**: 2026-07-30
+**Last Updated**: 2026-08-05
 **Total Topics Planned**: ~150+
-**Status**: Batches 54-56 content ready; Tiers 3+4 D1 re-imports complete (D1: 9,815 chunks, 5,576 vectors). Batches 55-56 still awaiting index/export/import.
+**Status**: Batch 55 complete in D1 (71 chunks). Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` stragglers cleared. D1 at **9,919 chunks, 5,680 vectors**. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ---
 
 ## Current State
 
-- **D1 Live**: ~9,815 chunks, ~5,576 vectors, ~204 knowledge topics + 3 own-repo corpora
-- **Indexed**: Batch 54 (Random Number Algorithms) complete in D1. Tiers 3+4 re-imports complete (46 exported + 20 partial topics verified).
-- **Pending**: Batches 55 (Game Dev Infrastructure) and 56 (StS2 & Codex) — content files ready, awaiting index/export/import. Also `cpp` + `unreal-engine` (indexed locally, never exported) + unity-ebooks-scraped (staging dir).
+- **D1 Live**: 9,919 chunks, 5,680 vectors, ~211 knowledge topics + 3 own-repo corpora
+- **Indexed**: Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure, 71c)** complete in D1. Batch 56 content topics (slay-the-spire-2 17c, sts2-enemies-ai-brain 11c) imported. `cpp` (4c) + `unreal-engine` (1c) re-indexed and imported.
+- **Pending**: `spire-codex` (3.6 GB source-code clone — backend `.py`, frontend `.ts/.tsx`, tools `.js/.mjs` in include list; recommend narrowing to markdown docs or confirming full-codebase intent before a long batchSize=1 embedding run). `unity-ebooks-scraped` (staging dir, no config).
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
 ---

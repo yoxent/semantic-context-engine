@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-30
-**Status**: D1 at **9,815 chunks, 5,576 vectors**. **TIERS 3 + 4 IMPORT COMPLETE** — all 46 exported + 20 partial topics verified in D1.
+**Last Updated**: 2026-08-05
+**Status**: D1 at **9,919 chunks, 5,680 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers imported. Remaining backlog: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially.
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (9,815 chunks, 5,576 vectors)
+- **D1 Database**: `sce-db` (9,919 chunks, 5,680 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -31,10 +31,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  9,815
-Vectors: 5,576 (2048-dim embeddings)
+Chunks:  9,919
+Vectors: 5,680 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~204 knowledge + 3 own-repo corpora = ~207 total
+Topics:  ~211 knowledge + 3 own-repo corpora = ~214 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 Size:    ~190 MB
 ```
@@ -302,9 +302,11 @@ Applied to: keyword, semantic, and hybrid search modes.
 
 ## 🔜 Next Steps
 
-### Immediate — Tier 3 Import ✅ COMPLETE
-- **Tiers 3 + 4 complete**: all 46 exported + 20 partial topics verified in D1 (9,815 chunks, 5,576 vectors).
-- Next: **Tier 1/2** (raw content / indexed-but-unexported topics): cpp, unreal-engine, game-design-patterns, net-code, node-graphs, slay-the-spire-2, spire-codex, sprite-atlasing, storage-logic, sts2-enemies-ai-brain, unity-ebooks-scraped.
+### Immediate — Tier 1/2 Import ✅ COMPLETE (except spire-codex)
+- **Batch 55 complete**: sprite-atlasing (13c), node-graphs (16c), storage-logic (14c), game-design-patterns (12c), net-code (16c) — 71 chunks, 71 vectors.
+- **Stragglers cleared**: `cpp` (4c) + `unreal-engine` (1c) — stale `.sce` had file records but 0 chunks (indexer skipped as "unchanged"); wiped and re-indexed.
+- **Batch 56 partial**: slay-the-spire-2 (17c) + sts2-enemies-ai-brain (11c) in D1.
+- Remaining: **spire-codex** (3.6 GB codebase clone — needs include-config decision before indexing; also `.gd`/GDScript files are unsupported by the parser), unity-ebooks-scraped (staging only, no config).
 
 ### Expansion Status (Batches 42–56) — Game Dev & Infrastructure Topics
 
@@ -319,8 +321,8 @@ Applied to: keyword, semantic, and hybrid search modes.
 | **48** | Unreal Engine Foundation | Blueprints, GAS, UMG, Animation | ✅ Done (4 chunks, stub content) |
 | **49** | Unreal Engine Advanced | Niagara, Chaos, Networking, Nanite/Lumen | ✅ Done (4 chunks, stub content) |
 | **54** | Random Number Algorithms | MegaRandom, xoshiro256**, SplitMix64, pseudorandom, game random utils | ✅ Done (52 chunks, 52 vectors) |
-| **55** | Game Dev Infrastructure | Sprite atlasing, node graphs, storage logic, design patterns, net code | 📝 Content ready |
-| **56** | StS2 & Codex | Slay the Spire 2 architecture, Spire Codex, sts2-enemies-ai-brain | 📝 Content ready |
+| **55** | Game Dev Infrastructure | Sprite atlasing, node graphs, storage logic, design patterns, net code | ✅ Done (71 chunks, 71 vectors) |
+| **56** | StS2 & Codex | Slay the Spire 2 architecture, Spire Codex, sts2-enemies-ai-brain | ⏳ Partial (2/3: slay-the-spire-2 17c, sts2-enemies-ai-brain 11c; spire-codex pending decision) |
 
 **⚠️ Known scraping issues:**
 - Unity 6000.3 Manual pages: most fail to scrape (Scripting API pages work if URL has no dots)

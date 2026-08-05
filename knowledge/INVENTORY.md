@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-30
-**D1 Live Total**: **9815 chunks, 5576 vectors** (~220 MB)
+**Last Updated**: 2026-08-05
+**D1 Live Total**: **9919 chunks, 5680 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**225 knowledge topics** + 3 own-repo corpora imported to D1 (228 total). Batch 54 (Random Number Algorithms) complete with vectors. Unreal Engine deepens created via Context7-generated content (Epic Games docs block scraping). Batches 55-56 content ready for indexing.
+**~211 knowledge topics** + 3 own-repo corpora imported to D1 (~214 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -66,6 +66,56 @@
 ### Content Files
 - Written as comprehensive `.md` files with C# implementations, algorithm properties, and game-specific usage
 - Not scraped (conceptual algorithm topics with code examples)
+
+---
+
+## Batch 55 — Game Dev Infrastructure (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `sprite-atlasing` | 13 | 13 | ✅ Imported |
+| `node-graphs` | 16 | 16 | ✅ Imported |
+| `storage-logic` | 14 | 14 | ✅ Imported |
+| `game-design-patterns` | 12 | 12 | ✅ Imported |
+| `net-code` | 16 | 16 | ✅ Imported |
+| **Total** | **71** | **71** | |
+
+### Batch 55 Details
+
+**Game Development Infrastructure** — hand-written `.md` topics (not scraped), each indexed/exported/imported individually:
+
+**Sprite Atlasing (`sprite-atlasing`)** — texture atlas packing, bin packing (shelf/maxrects), UV mapping, Unity SpriteAtlas, draw call batching, padding/bleeding, runtime atlasing.
+
+**Node Graphs (`node-graphs`)** — node-based systems: graph data structures, editor node graphs, execution graphs, UI node graphs, serialization, Unity GraphView.
+
+**Storage Logic (`storage-logic`)** — game storage architecture: save formats, atomic writes, versioning/migration, cloud vs local, encryption, slot management.
+
+**Game Design Patterns (`game-design-patterns`)** — gameplay programming patterns: singleton/service locator, observer/event bus, state machines, object pooling, command/undo, factory.
+
+**Net Code (`net-code`)** — networking fundamentals for games: client-server vs P2P, authority models, serialization, interpolation, RPCs, tick rate, NAT/punchthrough.
+
+### Sources
+- Hand-written content files (`knowledge/<topic>/<topic>.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Batch 56 — StS2 & Codex (**2/3 in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `slay-the-spire-2` | 17 | 17 | ✅ Imported |
+| `sts2-enemies-ai-brain` | 11 | 11 | ✅ Imported (md overview; `.gd` scripts skipped — no GDScript grammar) |
+| `spire-codex` | — | — | ⏳ Pending (3.6 GB codebase clone; include-config decision needed) |
+
+### Batch 56 Details
+
+**Slay the Spire 2 & Codex** — Slay the Spire 2 architecture notes and the Spire Codex project:
+
+**Slay the Spire 2 (`slay-the-spire-2`)** — game architecture analysis: deckbuilding loop, card system, combat flow, relic/progression design.
+
+**StS2 Enemies AI Brain (`sts2-enemies-ai-brain`)** — Godot-based enemy AI: `fabricator.gd`, `monster_ai.gd`, `monster_machine.gd`, `node.gd` + `sts2-ai-brain-overview.md`. ⚠️ Config includes `**/*.gd` but GDScript has no tree-sitter grammar (`detectLanguage` → `text`), so only the md overview was indexed (11 chunks). Adding `@tree-sitter-grammars/tree-sitter-gdscript` support is a separate parser task.
+
+**Spire Codex (`spire-codex`)** — NOT INDEXED. 3.6 GB cloned repo with `backend/**/*.py`, `tools/**/*.js|mjs`, `frontend/**/*.ts|tsx` in the include list. Recommend narrowing to `markdown-docs/**/*.md` or confirming full-codebase intent before a long batchSize=1 embedding run.
 
 ---
 
@@ -316,7 +366,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-scriptable-objects | 6 | 6 | Data containers, event channels |
 | unity-ui-toolkit | 2 | 2 | UI Toolkit, USS/UXML |
 | unreal-engine | 1 | 1 | Unreal Blueprints |
-| cpp | 3 | 3 | C++ getting started + cppreference |
+| cpp | 4 | 4 | C++ getting started + cppreference (re-indexed 2026-08-05) |
 | csharp | 4 | 4 | C# / .NET async, generics |
 | **Batch 6 — expanded topics** | | | |
 | rest-api | 12 | 12 | REST patterns, auth flows, retry, rate limits |
