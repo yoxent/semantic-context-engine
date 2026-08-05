@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-08-05
-**D1 Live Total**: **9996 chunks, 5757 vectors** (~190 MB)
+**D1 Live Total**: **10032 chunks, 5793 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**~213 knowledge topics** + 3 own-repo corpora + **1 GitHub open-source source** imported to D1 (~217 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (distributed behavioral models) added** (35 chunks); **`steering-behaviors` (single-agent game AI) added** (35 chunks) + **first GitHub source `three-steer` (MIT, 7 chunks)** — new source type going forward. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**~214 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~219 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)** + GitHub `three-steer` (7c) added; **`swarm-intelligence` (32c) + GitHub `pso.js` (4c, +3 symbols)** added — GitHub open-source repos are now a standard source type. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -165,6 +165,34 @@ Vetted GitHub open-source repos are now indexed as first-class sources: cloned u
 ### Sources
 - Hand-written content files (`knowledge/steering-behaviors/*.md` + `sce.config.json`) — no URL scrape phase needed
 - GitHub clone `knowledge/github/three-steer/` (MIT, `erosmarcon/three-steer`) — indexed via `**/*.js` + `**/*.md` include config (ignores libs/threejs/examples)
+
+---
+
+## Swarm Intelligence — Collective Optimization (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `swarm-intelligence` | 32 | 32 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Swarm Intelligence Details
+
+**Swarm Intelligence — Collective Problem-Solving** — hand-written (not scraped), the optimization branch of the boids family (PSO / ACO / ABC / firefly):
+
+- `swarm-intelligence-core.md` (13c) — Self-organization & stigmergy, PSO (velocity update, inertia/cognitive/social terms, gbest vs lbest topologies), ACO (pheromone transition rule, evaporation/deposit, AS/ACS/MMAS variants), artificial bee colony, firefly, the broader SI zoo, when SI is the right tool.
+- `swarm-intelligence-implementation.md` (7c) — Production C#: full PSO class (velocity clamp, boundary handling, seeding), ACO for TSP (τ^α·η^β transition, evaporation, best-tour deposit), ABC quick implementation, evaluation-cost budgeting, parallelism, the pso.js API shape (Optimizer/setObjectiveFunction/init/step).
+- `swarm-intelligence-variants.md` (12c) — PSO variants (inertia schedule, constriction, lbest ring, BPSO, MOPSO, niching), ACO variants (ACS, MMAS, ACOR, +local search), game applications (parameter tuning, path smoothing, procedural content, QA), practical playbook, when *not* to use SI.
+
+### GitHub Open-Source Source
+
+| Repo | Chunks | Vectors | Status |
+|------|--------|---------|--------|
+| `pso.js` (adrianton3, MIT, 45★) | 4 | 4 | ✅ Imported — `src/pso.js` (3c) + `README.md` (1c); **3 AST symbols** (first JS symbols in D1) |
+
+**Reviewed, not indexed** (documented decision): scikit-opt (Python, MIT, 6.6k★ — GA/PSO/SA/ACO mega-library), HaaLeo/swarmlib (Python, BSD-3), Akavall/AntColonyOptimization (Python, MIT), zoofs (Python, Apache-2.0) — Python is not parser-supported; their practical knowledge is distilled into the hand-written files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/swarm-intelligence/*.md` + `sce.config.json`) — no URL scrape phase needed
+- GitHub clone `knowledge/github/pso.js/` (MIT, `adrianton3/pso.js`) — indexed via `**/*.js` + `**/*.md` include config (ignores examples/test/tools/lib)
 
 ---
 
