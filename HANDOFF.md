@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-08-05
-**Status**: D1 at **9,954 chunks, 5,715 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **new `boids` topic** (35 chunks) imported. Remaining backlog: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**Status**: D1 at **9,996 chunks, 5,757 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **`boids` topic** (35 chunks) + **`steering-behaviors` topic** (35 chunks) + **first GitHub open-source source `three-steer`** (MIT, 7 chunks) imported. GitHub repos are now a first-class source type (see Notes). Remaining backlog: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially.
 
@@ -31,10 +31,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  9,954
-Vectors: 5,715 (2048-dim embeddings)
+Chunks:  9,996
+Vectors: 5,757 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~212 knowledge + 3 own-repo corpora = ~215 total
+Topics:  ~213 knowledge + 3 own-repo corpora + 1 GitHub source = ~217 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 Size:    ~190 MB
 ```
@@ -307,6 +307,8 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **Stragglers cleared**: `cpp` (4c) + `unreal-engine` (1c) — stale `.sce` had file records but 0 chunks (indexer skipped as "unchanged"); wiped and re-indexed.
 - **Batch 56 partial**: slay-the-spire-2 (17c) + sts2-enemies-ai-brain (11c) in D1.
 - **New topic**: `boids` (35c, 3 files) — Reynolds distributed behavioral model: core rules, implementation tiers (MonoBehaviour → spatial hash → ECS/Burst → compute shader), variants (herds/schools/swarms, PSO/ACO, crowds).
+- **New topic**: `steering-behaviors` (35c, 3 files) — Reynolds single-agent counterpart: vehicle model, desired-velocity steering loop, seek/flee/arrive/pursue/evade/wander/avoid/path-follow, weighted vs priority composition, Unity C# implementation (Vehicle + SteeringBehavior + Radar), tuning recipes, context steering & RVO.
+- **New GitHub source**: `three-steer` (7c, MIT, erosmarcon) — first GitHub open-source source; cloned to `knowledge/github/<repo>/`, indexed via JS/MD include config. Convention: review → verify license (MIT/Apache-2.0 only) → parser support (TS/JS/MD only) → clone/index/import; C#/C++/Java repos are knowledge-only (parser can't read them).
 - Remaining: **spire-codex** (3.6 GB codebase clone — needs include-config decision before indexing; also `.gd`/GDScript files are unsupported by the parser), unity-ebooks-scraped (staging only, no config).
 
 ### Expansion Status (Batches 42–56) — Game Dev & Infrastructure Topics
@@ -366,4 +368,5 @@ See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 - **Search improvement (2026-07-28)**: Case-insensitive, word-based AND matching. Multi-word queries like "level design synthesis" now work. Deploy time: ~10 seconds.
 
 - **Batch 54 (Random Number Algorithms)**: 5 topics added — megarandom, xoshiro256**, SplitMix64, pseudorandom, game-random-utils (52 chunks, 52 vectors). Content includes C# implementations, algorithm properties, and game-specific usage patterns.
-- **Gitignored source files**: `knowledge/` dir is in `.gitignore`. New knowledge source files (.md) are tracked only in D1, not git. Only HANDOFF.md, EXPANSION-ROADMAP.md, and INVENTORY.md are version-controlled.
+- **GitHub open-source sources (2026-08-05)**: GitHub repos are now a first-class source type. Clone to `knowledge/github/<repo>/` (gitignored), add `sce.config.json` with `include: ["**/*.js", "**/*.md"]` (ignore `libs/**`, `js/threejs/**`, `examples/**`), index/export/import like any topic. Only add permissively-licensed repos (MIT/Apache-2.0); skip no-license repos (copyright). Parser supports only TS/JS + MD — C#/C++/Java repos cannot be indexed directly; distill their knowledge into hand-written topic files instead (with attribution). First source added: `three-steer` (MIT).
+- **Gitignored source files**: `knowledge/` dir is in `.gitignore`. New knowledge source files (.md) and GitHub clones under `knowledge/github/` are tracked only in D1, not git. Only HANDOFF.md, EXPANSION-ROADMAP.md, and INVENTORY.md are version-controlled.

@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-08-05
-**D1 Live Total**: **9954 chunks, 5715 vectors** (~190 MB)
+**D1 Live Total**: **9996 chunks, 5757 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**~212 knowledge topics** + 3 own-repo corpora imported to D1 (~215 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (distributed behavioral models) added** (35 chunks). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**~213 knowledge topics** + 3 own-repo corpora + **1 GitHub open-source source** imported to D1 (~217 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (distributed behavioral models) added** (35 chunks); **`steering-behaviors` (single-agent game AI) added** (35 chunks) + **first GitHub source `three-steer` (MIT, 7 chunks)** — new source type going forward. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -135,6 +135,36 @@
 
 ### Sources
 - Hand-written content files (`knowledge/boids/*.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Steering Behaviors — Single-Agent Game AI (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `steering-behaviors` | 35 | 35 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Steering Behaviors Details
+
+**Steering Behaviors — One Agent with Intent** — hand-written (not scraped), Reynolds' single-agent counterpart to boids (the `boids`-vein follow-up):
+
+- `steering-behaviors-core.md` (17c) — The vehicle model (position/velocity/mass/maxForce/maxSpeed), the desired-velocity steering loop, seek/flee/arrive/pursue/evade/wander/obstacle-avoidance/path-follow/flow-field/leader-follow/interpose/queue, weighted vs priority composition, boids-vs-steering contrast, common failure modes.
+- `steering-behaviors-implementation.md` (7c) — Production Unity C#: Vehicle + SteeringBehavior components + Radar pattern (UnitySteer architecture), full reference implementations (seek/flee/arrive/pursue/wander/sphere-cast obstacle avoidance/path follow), blended + priority steering controller, implementation gotchas (fixed timestep, sqrMagnitude, AOT/LINQ, dead zones, NaN guards).
+- `steering-behaviors-variants.md` (11c) — Tuning table (maxSpeed/maxForce/mass/slowingRadius), behavior recipes (arrive+avoid+wander, pursue+avoid, flock+seek, leader-follow+queue), boids+steering+pathfinding division of labor, context steering & RVO/ORCA, formations, game applications, when *not* to use.
+
+### GitHub Open-Source Source (**new source type, from this topic onward**)
+
+Vetted GitHub open-source repos are now indexed as first-class sources: cloned under `knowledge/github/<repo>/` with their own `sce.config.json`; only permissively-licensed (MIT/Apache-2.0), parser-supported (TS/JS/MD) content is indexed.
+
+| Repo | Chunks | Vectors | Status |
+|------|--------|---------|--------|
+| `three-steer` (erosmarcon, MIT, 120★) | 7 | 7 | ✅ Imported — `js/ThreeSteer.js` (2c: seek/flee/arrive/pursue/evade/wander/interpose/queue/flock/followPath/avoid) + `README.md` (5c) |
+
+**Reviewed, not indexed** (documented decision): UnitySteer (C# — parser supports TS/JS/MD only), gdx-ai (Java), OpenSteer (C++), vonWolfehaus/flow-field (no license — skipped on copyright grounds). Their practical knowledge is distilled into the hand-written topic files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/steering-behaviors/*.md` + `sce.config.json`) — no URL scrape phase needed
+- GitHub clone `knowledge/github/three-steer/` (MIT, `erosmarcon/three-steer`) — indexed via `**/*.js` + `**/*.md` include config (ignores libs/threejs/examples)
 
 ---
 
