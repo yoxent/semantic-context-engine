@@ -3,14 +3,14 @@
 **Created**: 2026-07-18
 **Last Updated**: 2026-08-05
 **Total Topics Planned**: ~150+
-**Status**: Batch 55 complete in D1 (71 chunks). Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` stragglers cleared. D1 at **9,919 chunks, 5,680 vectors**. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**Status**: Batch 55 complete in D1 (71 chunks). Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` stragglers cleared; **new `boids` topic added** (35 chunks). D1 at **9,954 chunks, 5,715 vectors**. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ---
 
 ## Current State
 
-- **D1 Live**: 9,919 chunks, 5,680 vectors, ~211 knowledge topics + 3 own-repo corpora
-- **Indexed**: Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure, 71c)** complete in D1. Batch 56 content topics (slay-the-spire-2 17c, sts2-enemies-ai-brain 11c) imported. `cpp` (4c) + `unreal-engine` (1c) re-indexed and imported.
+- **D1 Live**: 9,954 chunks, 5,715 vectors, ~212 knowledge topics + 3 own-repo corpora
+- **Indexed**: Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure, 71c)** complete in D1. Batch 56 content topics (slay-the-spire-2 17c, sts2-enemies-ai-brain 11c) imported. `cpp` (4c) + `unreal-engine` (1c) re-indexed and imported. **`boids` (35c)** — Reynolds distributed behavioral model (core rules, implementation tiers, variants).
 - **Pending**: `spire-codex` (3.6 GB source-code clone — backend `.py`, frontend `.ts/.tsx`, tools `.js/.mjs` in include list; recommend narrowing to markdown docs or confirming full-codebase intent before a long batchSize=1 embedding run). `unity-ebooks-scraped` (staging dir, no config).
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 

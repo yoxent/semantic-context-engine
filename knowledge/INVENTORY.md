@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-08-05
-**D1 Live Total**: **9919 chunks, 5680 vectors** (~190 MB)
+**D1 Live Total**: **9954 chunks, 5715 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**~211 knowledge topics** + 3 own-repo corpora imported to D1 (~214 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**~212 knowledge topics** + 3 own-repo corpora imported to D1 (~215 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (distributed behavioral models) added** (35 chunks). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -116,6 +116,25 @@
 **StS2 Enemies AI Brain (`sts2-enemies-ai-brain`)** — Godot-based enemy AI: `fabricator.gd`, `monster_ai.gd`, `monster_machine.gd`, `node.gd` + `sts2-ai-brain-overview.md`. ⚠️ Config includes `**/*.gd` but GDScript has no tree-sitter grammar (`detectLanguage` → `text`), so only the md overview was indexed (11 chunks). Adding `@tree-sitter-grammars/tree-sitter-gdscript` support is a separate parser task.
 
 **Spire Codex (`spire-codex`)** — NOT INDEXED. 3.6 GB cloned repo with `backend/**/*.py`, `tools/**/*.js|mjs`, `frontend/**/*.ts|tsx` in the include list. Recommend narrowing to `markdown-docs/**/*.md` or confirming full-codebase intent before a long batchSize=1 embedding run.
+
+---
+
+## Boids — Distributed Behavioral Models (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `boids` | 35 | 35 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Boids Details
+
+**Boids — Flocks, Herds, Schools & Distributed Behavioral Models** — hand-written (not scraped), Craig Reynolds' 1987 distributed behavioral model:
+
+- `boids-core.md` (13c) — The three canonical rules (separation / alignment / cohesion), the steering loop, emergence, vision cones, metric vs topological (Couzin) neighborhoods, parameter sensitivities.
+- `boids-implementation.md` (10c) — Production code: MonoBehaviour reference, O(n²) → spatial hash/uniform grid, DOTS/ECS + Burst, GPU compute shader, frame-rate independence, tunneling, data-oriented layout.
+- `boids-variants.md` (12c) — Tuning table per use case (birds/fish/herds/swarms), herds/schools/flocks differences, PSO & ACO swarm intelligence, social-force crowd model, leader-following & herding, game applications, when *not* to use boids.
+
+### Sources
+- Hand-written content files (`knowledge/boids/*.md` + `sce.config.json`) — no URL scrape phase needed
 
 ---
 

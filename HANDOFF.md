@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-08-05
-**Status**: D1 at **9,919 chunks, 5,680 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers imported. Remaining backlog: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**Status**: D1 at **9,954 chunks, 5,715 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **new `boids` topic** (35 chunks) imported. Remaining backlog: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially.
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (9,919 chunks, 5,680 vectors)
+- **D1 Database**: `sce-db` (9,954 chunks, 5,715 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -31,10 +31,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  9,919
-Vectors: 5,680 (2048-dim embeddings)
+Chunks:  9,954
+Vectors: 5,715 (2048-dim embeddings)
 Symbols: 287 (own-repo corpora)
-Topics:  ~211 knowledge + 3 own-repo corpora = ~214 total
+Topics:  ~212 knowledge + 3 own-repo corpora = ~215 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 Size:    ~190 MB
 ```
@@ -306,6 +306,7 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **Batch 55 complete**: sprite-atlasing (13c), node-graphs (16c), storage-logic (14c), game-design-patterns (12c), net-code (16c) — 71 chunks, 71 vectors.
 - **Stragglers cleared**: `cpp` (4c) + `unreal-engine` (1c) — stale `.sce` had file records but 0 chunks (indexer skipped as "unchanged"); wiped and re-indexed.
 - **Batch 56 partial**: slay-the-spire-2 (17c) + sts2-enemies-ai-brain (11c) in D1.
+- **New topic**: `boids` (35c, 3 files) — Reynolds distributed behavioral model: core rules, implementation tiers (MonoBehaviour → spatial hash → ECS/Burst → compute shader), variants (herds/schools/swarms, PSO/ACO, crowds).
 - Remaining: **spire-codex** (3.6 GB codebase clone — needs include-config decision before indexing; also `.gd`/GDScript files are unsupported by the parser), unity-ebooks-scraped (staging only, no config).
 
 ### Expansion Status (Batches 42–56) — Game Dev & Infrastructure Topics
