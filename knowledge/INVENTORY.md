@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-08-14
-**D1 Live Total**: **10104 chunks, 5865 vectors** (~190 MB)
+**D1 Live Total**: **10142 chunks, 5903 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**~216 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~221 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**~217 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~222 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -239,6 +239,29 @@ Reviewed for this topic: **vonWolfehaus/flow-field** (JS, 106★, archived — *
 
 ### Sources
 - Hand-written content files (`knowledge/flow-field-pathfinding/*.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Cellular Automata — Rule-Based Emergence (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `cellular-automata` | 38 | 38 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Cellular Automata Details
+
+**Cellular Automata — Rule-Based Emergence on Grids** — hand-written (not scraped), Tier A completion of the boids-vein emergence family:
+
+- `cellular-automata-core.md` (14c) — CA formalism, Conway's Life (B3/S23), Wolfram 1D rules, Life-like totalistic rules, Langton's ant, cave/terrain CA, relationship to flow fields/boids/swarm intelligence.
+- `cellular-automata-implementation.md` (11c) — Unity C#: double-buffered grid, Game of Life, cave smoothing CA, Wolfram 1D stack, Langton's ant, tilemap export, Jobs/Burst/compute notes, gotchas.
+- `cellular-automata-variants.md` (13c) — Cave tuning table, Life-like rule variants, multi-state/continuous CA, CA vs noise/WFC/BSP, game applications, when *not* to use.
+
+### GitHub Open-Source Review — **no source added** (documented decision)
+
+Reviewed for this topic: **copy/life** (JS, 437★, BSD-2-Clause → skipped; outside MIT/Apache GitHub source policy), **Golly** (C++, GPL → knowledge-only). Concepts distilled into hand-written files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/cellular-automata/*.md` + `sce.config.json`) — no URL scrape phase needed
 
 ---
 

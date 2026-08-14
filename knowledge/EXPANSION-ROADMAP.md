@@ -3,14 +3,14 @@
 **Created**: 2026-07-18
 **Last Updated**: 2026-08-14
 **Total Topics Planned**: ~150+
-**Status**: Batch 55 complete in D1 (71 chunks). Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` stragglers cleared; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)** added; **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 symbols). D1 at **10,104 chunks, 5,865 vectors**. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**Status**: Batch 55 complete in D1 (71 chunks). Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` stragglers cleared; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** added; **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 symbols). D1 at **10,142 chunks, 5,903 vectors**. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ---
 
 ## Current State
 
-- **D1 Live**: 10,104 chunks, 5,865 vectors, ~216 knowledge topics + 3 own-repo corpora + 2 GitHub sources
-- **Indexed**: Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure, 71c)** complete in D1. Batch 56 content topics (slay-the-spire-2 17c, sts2-enemies-ai-brain 11c) imported. `cpp` (4c) + `unreal-engine` (1c) re-indexed and imported. **`boids` (35c)** — Reynolds distributed behavioral model (core rules, implementation tiers, variants). **`steering-behaviors` (35c)** — Reynolds single-agent framework (vehicle model, steering loop, behaviors, Unity C# implementation, tuning recipes). **`swarm-intelligence` (32c)** — PSO/ACO/ABC/firefly collective optimization (model, C# implementations, variants & game applications). **`crowd-simulation` (29c)** — Helbing social-force model, emergent lanes/queues/faster-is-slower, C# reference, scaling, scenarios. **`flow-field-pathfinding` (43c)** — integration fields, Dijkstra/BFS propagation, flow vectors, Unity C# grid implementation, dynamic obstacles, RTS mass movement. **GitHub sources `three-steer` (7c, MIT)** + **`pso.js` (4c, MIT, +3 AST symbols)** — permissively-licensed repos cloned under `knowledge/github/`, indexed for TS/JS/MD only.
+- **D1 Live**: 10,142 chunks, 5,903 vectors, ~217 knowledge topics + 3 own-repo corpora + 2 GitHub sources
+- **Indexed**: Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure, 71c)** complete in D1. Batch 56 content topics (slay-the-spire-2 17c, sts2-enemies-ai-brain 11c) imported. `cpp` (4c) + `unreal-engine` (1c) re-indexed and imported. **`boids` (35c)** — Reynolds distributed behavioral model (core rules, implementation tiers, variants). **`steering-behaviors` (35c)** — Reynolds single-agent framework (vehicle model, steering loop, behaviors, Unity C# implementation, tuning recipes). **`swarm-intelligence` (32c)** — PSO/ACO/ABC/firefly collective optimization (model, C# implementations, variants & game applications). **`crowd-simulation` (29c)** — Helbing social-force model, emergent lanes/queues/faster-is-slower, C# reference, scaling, scenarios. **`flow-field-pathfinding` (43c)** — integration fields, Dijkstra/BFS propagation, flow vectors, Unity C# grid implementation, dynamic obstacles, RTS mass movement. **`cellular-automata` (38c)** — Conway's Life, Wolfram 1D, Langton's ant, cave-generation CA, Unity C# grid pipeline. **GitHub sources `three-steer` (7c, MIT)** + **`pso.js` (4c, MIT, +3 AST symbols)** — permissively-licensed repos cloned under `knowledge/github/`, indexed for TS/JS/MD only.
 - **Pending**: `spire-codex` (3.6 GB source-code clone — backend `.py`, frontend `.ts/.tsx`, tools `.js/.mjs` in include list; recommend narrowing to markdown docs or confirming full-codebase intent before a long batchSize=1 embedding run). `unity-ebooks-scraped` (staging dir, no config).
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
@@ -19,6 +19,7 @@
 ## ✅ Completed Batches
 
 | Batch | Topics | Status |
+| 61 | **Boids-vein game AI (hand-written)** — cellular-automata (38c; no GitHub source — copy/life BSD-2 outside policy, Golly GPL) | ✅ **Imported to D1** (38 chunks, 38 vectors) |
 | 60 | **Boids-vein game AI (hand-written)** — flow-field-pathfinding (43c; no GitHub source — vonWolfehaus/flow-field unlicensed, Kristoff3r C# knowledge-only) | ✅ **Imported to D1** (43 chunks, 43 vectors) |
 | 59 | **Boids-vein game AI (hand-written)** — crowd-simulation (29c; no GitHub source — candidates off-topic/unlicensed) | ✅ **Imported to D1** (29 chunks, 29 vectors) |
 | 58 | **Boids-vein game AI (hand-written)** — swarm-intelligence (32c) + GitHub source pso.js (4c, +3 symbols) | ✅ **Imported to D1** (36 chunks, 36 vectors) |
