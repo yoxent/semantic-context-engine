@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-08-14
-**Status**: D1 at **10,032 chunks, 5,793 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **`boids` topic** (35 chunks) + **`steering-behaviors` topic** (35 chunks) + **`swarm-intelligence` topic** (32 chunks) + **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 AST symbols) imported. GitHub repos are now a first-class source type (see Notes). Remaining backlog: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**Status**: D1 at **10,104 chunks, 5,865 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **`boids` topic** (35 chunks) + **`steering-behaviors` topic** (35 chunks) + **`swarm-intelligence` topic** (32 chunks) + **`crowd-simulation` topic** (29 chunks) + **`flow-field-pathfinding` topic** (43 chunks) + **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 AST symbols) imported.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
@@ -31,10 +31,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  10,061
-Vectors: 5,822 (2048-dim embeddings)
+Chunks:  10,104
+Vectors: 5,865 (2048-dim embeddings)
 Symbols: 290 (own-repo corpora + 3 from pso.js)
-Topics:  ~215 knowledge + 3 own-repo corpora + 2 GitHub sources = ~220 total
+Topics:  ~216 knowledge + 3 own-repo corpora + 2 GitHub sources = ~221 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 Size:    ~190 MB
 ```
@@ -332,7 +332,10 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **Stragglers cleared**: `cpp` (4c) + `unreal-engine` (1c) — stale `.sce` had file records but 0 chunks (indexer skipped as "unchanged"); wiped and re-indexed.
 - **Batch 56 partial**: slay-the-spire-2 (17c) + sts2-enemies-ai-brain (11c) in D1.
 - **New topic**: `boids` (35c, 3 files) — Reynolds distributed behavioral model: core rules, implementation tiers (MonoBehaviour → spatial hash → ECS/Burst → compute shader), variants (herds/schools/swarms, PSO/ACO, crowds).
+- **New topic**: `steering-behaviors` (35c, 3 files) + GitHub `three-steer` (7c, MIT) — Reynolds single-agent framework: seek/flee/arrive/pursue/evade/wander, obstacle avoidance, path follow, flow-field following.
 - **New topic**: `swarm-intelligence` (32c, 3 files) — PSO (velocity update, inertia/cognitive/social, gbest/lbest), ACO (pheromone, evaporation, AS/ACS/MMAS), ABC, firefly; C# implementations (PSO class, TSP ACO, ABC), evaluation-budget playbook, game applications (parameter tuning, path smoothing, procedural content).
+- **New topic**: `crowd-simulation` (29c, 3 files) — Helbing social-force model, emergent lanes/queues, evacuation, RVO comparison.
+- **New topic**: `flow-field-pathfinding` (43c, 3 files) — integration fields, flow vector generation, RTS mass movement, dynamic obstacle updates; bridges boids/steering to shared-goal pathfinding.
 - **New GitHub source**: `pso.js` (4c, MIT, adrianton3) — second GitHub source; `src/pso.js` + README; **3 AST symbols** (first JS symbols in D1). Note: embedding API 502 mid-run can leave chunks without vectors — wipe `.sce` and re-index if export shows chunks ≠ vectors.
 - Remaining: **spire-codex** (3.6 GB codebase clone — needs include-config decision before indexing; also `.gd`/GDScript files are unsupported by the parser), unity-ebooks-scraped (staging only, no config).
 

@@ -1,12 +1,12 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-08-05
-**D1 Live Total**: **10061 chunks, 5822 vectors** (~190 MB)
+**Last Updated**: 2026-08-14
+**D1 Live Total**: **10104 chunks, 5865 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**~215 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~220 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**~216 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~221 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -216,6 +216,29 @@ Reviewed for this topic: sweriko/Horde (TS, MIT, 108★ — *crowd rendering* vi
 
 ### Sources
 - Hand-written content files (`knowledge/crowd-simulation/*.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Flow Field Pathfinding — Mass Unit Routing (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `flow-field-pathfinding` | 43 | 43 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Flow Field Pathfinding Details
+
+**Flow Field Pathfinding — Vector Fields for Mass Unit Movement** — hand-written (not scraped), the boids-family bridge from steering to RTS-style pathfinding:
+
+- `flow-field-pathfinding-core.md` (17c) — Field types (simple / integration+flow / hierarchical), cost heatmap generation, Dijkstra/BFS integration from goal, flow vector gradient, relationship to boids/steering/A*.
+- `flow-field-pathfinding-implementation.md` (15c) — Unity C#: FlowFieldGrid data layout, Dijkstra integration, flow generation with tie averaging, unit sampling + steering, dynamic obstacle stamps/dirty-region rebuild, performance table, navmesh hybrid, gotchas.
+- `flow-field-pathfinding-variants.md` (11c) — Tuning table, RTS recipes (attack wave, evacuation, lane push), dynamic/hierarchical fields, comparison vs A*/navmesh/boids, game applications, when *not* to use.
+
+### GitHub Open-Source Review — **no source added** (documented decision)
+
+Reviewed for this topic: **vonWolfehaus/flow-field** (JS, 106★, archived — **no license**, `license: null` on GitHub API → skipped on copyright grounds), **Kristoff3r/FlowFieldPathfinding** (Unity C#, MIT → knowledge-only, parser cannot index C#). Concepts distilled into hand-written files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/flow-field-pathfinding/*.md` + `sce.config.json`) — no URL scrape phase needed
 
 ---
 
