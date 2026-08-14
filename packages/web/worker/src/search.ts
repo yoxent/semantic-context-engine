@@ -2,7 +2,7 @@
  * Search implementation with four modes: keyword, semantic, hybrid, AST.
  *
  * - keyword  : SQL LIKE over text, path, and heading
- * - semantic : OpenRouter embedding → cosine similarity over all vectors
+ * - semantic : lexical candidates → OpenRouter embedding → cosine rerank
  * - hybrid   : keyword + semantic fused with Reciprocal Rank Fusion (k=60)
  * - ast      : symbol table lookup – exact match first, then prefix fallback
  *
@@ -10,13 +10,14 @@
  */
 
 import type { D1Database } from "@cloudflare/workers-types";
-import { cosineSimilarity } from "./cosine";
 import { embedQuery, type EmbeddingEnv } from "./embedding";
 import {
   type SearchFilters,
   buildFilterClause,
   buildSymbolFilterClause,
 } from "./d1";
+import { fetchCandidateChunkIds, queryWords } from "./candidates";
+import { scoreVectorsForIds } from "./vectorScan";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -67,7 +68,7 @@ async function keywordSearch(
   const filterClause = buildFilterClause(filters ?? {}, params);
 
   // Split query into individual words for AND matching
-  const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 0);
+  const words = queryWords(query);
   
   if (words.length === 0) {
     return [];
@@ -119,49 +120,39 @@ async function semanticSearch(
   limit: number,
   filters?: SearchFilters
 ): Promise<SearchHit[]> {
-  const queryEmbedding = await embedQuery(env, query);
-
-  const params: unknown[] = [];
-  const filterClause = buildFilterClause(filters ?? {}, params);
-
-  let sql: string;
-  let allParams: unknown[];
-
-  if (filterClause) {
-    sql = `
-      SELECT v.chunk_id, v.embedding
-      FROM vectors v
-      JOIN chunks c ON v.chunk_id = c.id
-      ${filterClause}
-    `;
-    allParams = params;
-  } else {
-    sql = "SELECT chunk_id, embedding FROM vectors";
-    allParams = [];
+  const candidateIds = await fetchCandidateChunkIds(db, query, undefined, filters);
+  if (candidateIds.length === 0) {
+    return [];
   }
 
-  const vectorRows = await db.prepare(sql).bind(...allParams).all();
-
-  const similarities = vectorRows.results.map(
-    (row: Record<string, unknown>) => {
-      const embedding = JSON.parse(row.embedding as string) as number[];
-      const score = cosineSimilarity(queryEmbedding, embedding);
-      return { chunkId: row.chunk_id as string, score };
-    }
-  );
+  const queryEmbedding = await embedQuery(env, query);
+  const similarities = await scoreVectorsForIds(db, queryEmbedding, candidateIds);
 
   similarities.sort((a, b) => b.score - a.score);
   const topK = similarities.slice(0, limit);
+  if (topK.length === 0) {
+    return [];
+  }
+
+  const ids = topK.map((sim) => sim.chunkId);
+  const placeholders = ids.map(() => "?").join(", ");
+  const chunkRows = await db
+    .prepare(
+      `SELECT id, relative_path, heading_path, text, language FROM chunks WHERE id IN (${placeholders})`
+    )
+    .bind(...ids)
+    .all();
+
+  const chunksById = new Map(
+    chunkRows.results.map((row: Record<string, unknown>) => [
+      row.id as string,
+      row,
+    ])
+  );
 
   const hits: SearchHit[] = [];
   for (const sim of topK) {
-    const chunk = await db
-      .prepare(
-        "SELECT id, relative_path, heading_path, text, language FROM chunks WHERE id = ?"
-      )
-      .bind(sim.chunkId)
-      .first();
-
+    const chunk = chunksById.get(sim.chunkId);
     if (chunk) {
       hits.push({
         chunkId: chunk.id as string,
@@ -266,10 +257,8 @@ async function hybridSearch(
 ): Promise<SearchHit[]> {
   const fetchCount = limit * 2;
 
-  const [keywordHits, semanticHits] = await Promise.all([
-    keywordSearch(db, query, fetchCount, filters),
-    semanticSearch(db, env, query, fetchCount, filters),
-  ]);
+  const keywordHits = await keywordSearch(db, query, fetchCount, filters);
+  const semanticHits = await semanticSearch(db, env, query, fetchCount, filters);
 
   const scores = new Map<string, number>();
 

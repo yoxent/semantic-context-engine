@@ -1,7 +1,7 @@
 /**
  * Cosine similarity between two equal-length number arrays.
  */
-export function cosineSimilarity(a: number[], b: number[]): number {
+export function cosineSimilarity(a: ArrayLike<number>, b: ArrayLike<number>): number {
   if (a.length !== b.length) {
     throw new Error(`Dimension mismatch: ${a.length} vs ${b.length}`);
   }

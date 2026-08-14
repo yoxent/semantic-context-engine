@@ -60,10 +60,16 @@ Batch helpers: `scripts/index-knowledge-batch.mjs`, `scripts/export-import-knowl
 
 ## Search Modes
 
-- `keyword` — SQL LIKE over text/path/heading (~55ms)
-- `semantic` — OpenRouter embedding → cosine similarity
-- `hybrid` — RRF fusion of keyword + semantic (k=60)
-- `ast` — Symbol table lookup (exact → prefix)
+| Mode | Local (`@sce/retrieval`) | Hosted demo (`sce-api`) |
+|------|--------------------------|-------------------------|
+| `keyword` | FTS/SQL LIKE, word AND | D1 LIKE, stopwords stripped |
+| `semantic` | Full corpus via `IVectorStore` | Lexical candidates (~24) → embed → cosine rerank |
+| `hybrid` | Full keyword + full semantic, RRF k=60 | Same fusion; semantic leg is candidate-limited |
+| `ast` | Symbol exact → prefix | Same (API/MCP; not in web UI) |
+
+Demo limits exist for Cloudflare Workers **Free** tier (10ms CPU, D1 result memory). Local-first SCE has no shortlist cap.
+
+Ranking on the worker: filename (+ up to 8) > heading (+ up to 7) > snippet (+ up to 4); max 2 hits per file. Web UI includes a collapsible glossary explaining modes and ranking.
 
 ## Deployment
 

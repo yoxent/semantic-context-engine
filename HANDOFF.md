@@ -1,9 +1,9 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-08-05
+**Last Updated**: 2026-08-14
 **Status**: D1 at **10,032 chunks, 5,793 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **`boids` topic** (35 chunks) + **`steering-behaviors` topic** (35 chunks) + **`swarm-intelligence` topic** (32 chunks) + **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 AST symbols) imported. GitHub repos are now a first-class source type (see Notes). Remaining backlog: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
-**⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially.
+**⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
 ---
 
@@ -17,13 +17,13 @@
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 8,019 chunks, **case-insensitive, word-based AND** |
-| Semantic Search | ✅ | Vectors, 2048-dim |
-| Hybrid Search | ✅ | RRF fusion (k=60) |
+| Keyword Search | ✅ | ~55ms, case-insensitive word AND, stopwords stripped |
+| Semantic Search | ✅ | Demo: lexical candidates → embed → cosine rerank. Local: full corpus |
+| Hybrid Search | ✅ | RRF fusion (k=60) of keyword + demo semantic leg |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
-| Ranking Boosts | ✅ | Filename +5, Heading +4, Snippet +2 |
+| Ranking Boosts | ✅ | Filename (up to +8) > heading (up to +7) > snippet (+ up to 4) |
 | Deduplication | ✅ | Max 2 hits per file |
-| Frontend UI | ✅ | RetroUI neobrutalist theme, dark, responsive, keyboard shortcuts, search highlighting, expandable cards, copy button, search history, ARIA accessible |
+| Frontend UI | ✅ | RetroUI theme + search-mode glossary, live hints, ranking explainer |
 | Multi-Part Expansion | ✅ | Split chunks >7500 chars auto-expand in search results |
 
 ---
@@ -85,6 +85,19 @@ Size:    ~190 MB
 ---
 
 ## 🔍 Search Improvements
+
+### Free-Plan Demo Semantic Fix (2026-08-14)
+
+**Problem:** Full-table `SELECT` of ~5.8k JSON embeddings (~40KB each) hit `D1_ERROR: Memory limit exceeded before EOF`. Loading and scoring the entire corpus in one Worker request also exceeded Workers Free CPU (10ms).
+
+**Fix (hosted demo only):**
+1. **Keyword candidates** — `fetchCandidateChunkIds()` picks up to ~24 chunk IDs via SQL (AND, then OR on distinctive terms; stopwords stripped; excludes `node_modules`).
+2. **Cosine rerank** — `scoreVectorsForIds()` embeds the query and scores only those IDs in small D1 batches.
+3. **Hybrid** — keyword list + candidate-limited semantic, fused with RRF (k=60).
+
+Local CLI/MCP still uses `@sce/retrieval` full-corpus semantic over SQLite.
+
+**Frontend:** Mode taglines (Exact terms / By meaning / Recommended), live hint panel, collapsible glossary with ranking steps.
 
 ### Case-Insensitive, Word-Based Search (2026-07-28)
 **Before**: `LIKE '%query%'` — exact phrase, case-sensitive
@@ -178,8 +191,18 @@ Any MCP-compatible agent can now use:
   - No bindings needed
 
 ### Search Modes
-1. **keyword**: SQL LIKE over text, path, heading (~55ms) — **case-insensitive, word-based AND**
-2. **semantic**: OpenRouter embedding → cosine similarity (needs vectors)
+
+| Mode | Tagline | Hosted demo | Local CLI/MCP |
+|------|---------|-------------|---------------|
+| **keyword** | Exact terms | SQL LIKE, word AND | Same |
+| **semantic** | By meaning | Candidates → embed → cosine rerank | Full vector store scan |
+| **hybrid** | Recommended | Keyword + demo semantic, RRF k=60 | Full keyword + full semantic, RRF |
+| **ast** | Symbols | API/MCP only | Exact then prefix symbol lookup |
+
+Ranking (keyword & semantic legs): filename boosts strongest, then heading, then snippet; max 2 hits per file. Hybrid final score is RRF sum (`1/(60+rank)` per list).
+
+1. **keyword**: SQL LIKE over text, path, heading (~55ms) — case-insensitive, word-based AND
+2. **semantic**: OpenRouter embedding → cosine similarity (demo: ~24 lexical candidates first)
 3. **hybrid**: RRF fusion of keyword + semantic (k=60)
 4. **ast**: Symbol table lookup — exact match then prefix fallback
 
@@ -221,7 +244,9 @@ packages/
     worker/
       src/
         index.ts        # Worker entry point (routing)
-        search.ts       # Search implementation (4 modes, case-insensitive)
+        search.ts       # Search implementation (4 modes)
+        candidates.ts   # Lexical candidate IDs for demo semantic
+        vectorScan.ts   # Batched embedding fetch + cosine for candidates
         embedding.ts    # OpenRouter embedding client
         cosine.ts       # Cosine similarity
         d1.ts           # D1 query builders
