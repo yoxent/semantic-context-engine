@@ -248,7 +248,7 @@ async function main() {
   if (append) console.log("Mode: append (skip clear)");
   console.log();
 
-  const tmpDir = join(process.cwd(), ".sce-import-tmp");
+  const tmpDir = join(process.cwd(), `.sce-import-tmp-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   mkdirSync(tmpDir, { recursive: true });
   let fileCounter = 0;
 

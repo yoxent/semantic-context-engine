@@ -1,7 +1,9 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-07-28
-**Status**: Knowledge base expanded to 173 topics (7,533 chunks). Search is now case-insensitive with word-based AND matching.
+**Last Updated**: 2026-08-14
+**Status**: D1 at **10,142 chunks, 5,903 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **`boids` topic** (35 chunks) + **`steering-behaviors` topic** (35 chunks) + **`swarm-intelligence` topic** (32 chunks) + **`crowd-simulation` topic** (29 chunks) + **`flow-field-pathfinding` topic** (43 chunks) + **`cellular-automata` topic** (38 chunks) + **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 AST symbols) imported.
+
+**⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
 ---
 
@@ -10,18 +12,18 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (7,533 chunks, 3,667 vectors)
+- **D1 Database**: `sce-db` (9,954 chunks, 5,715 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Keyword Search | ✅ | ~55ms response, 7,533 chunks, **case-insensitive, word-based AND** |
-| Semantic Search | ✅ | Vectors, 2048-dim |
-| Hybrid Search | ✅ | RRF fusion (k=60) |
+| Keyword Search | ✅ | ~55ms, case-insensitive word AND, stopwords stripped |
+| Semantic Search | ✅ | Demo: lexical candidates → embed → cosine rerank. Local: full corpus |
+| Hybrid Search | ✅ | RRF fusion (k=60) of keyword + demo semantic leg |
 | AST Search | ✅ | 287 symbols (own-repo corpora) |
-| Ranking Boosts | ✅ | Filename +5, Heading +4, Snippet +2 |
+| Ranking Boosts | ✅ | Filename (up to +8) > heading (up to +7) > snippet (+ up to 4) |
 | Deduplication | ✅ | Max 2 hits per file |
-| Frontend UI | ✅ | RetroUI neobrutalist theme, dark, responsive, keyboard shortcuts, search highlighting, expandable cards, copy button, search history, ARIA accessible |
+| Frontend UI | ✅ | RetroUI theme + search-mode glossary, live hints, ranking explainer |
 | Multi-Part Expansion | ✅ | Split chunks >7500 chars auto-expand in search results |
 
 ---
@@ -29,15 +31,15 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  7,533
-Vectors: 3,667 (2048-dim embeddings)
-Symbols: 287 (own-repo corpora)
-Topics:  173 knowledge + 3 own-repo corpora
+Chunks:  10,142
+Vectors: 5,903 (2048-dim embeddings)
+Symbols: 290 (own-repo corpora + 3 from pso.js)
+Topics:  ~217 knowledge + 3 own-repo corpora + 2 GitHub sources = ~222 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
-Size:    ~170 MB
+Size:    ~190 MB
 ```
 
-### Topics Indexed (~173)
+### Topics Indexed (~228)
 - **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
 - **Full-stack**: TanStack Query, Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns, Radix UI, Framer Motion, Drizzle ORM, Playwright, Caching Strategies
 - **Testing**: TanStack Table, MSW, React Testing Library, ESLint, Sonner, Vitest
@@ -64,13 +66,38 @@ Size:    ~170 MB
 - **Unity Splines**: Deep reference (25 chunks)
 - **Google Cloud**: Compute, Cloud Run, Functions, Storage, SQL, Firestore, Bigtable, Pub/Sub, GKE, IAM, etc. (185 chunks)
 - **Python**: PyMuPDF (124 chunks) — PDF reading, image extraction, text search
+- **Unity Profiling**: Profiler, Frame Debugger, Memory Profiler, GPU Optimization, Memory Budgeting, Build Size, Mobile Optimization
+- **Profiling Deepen**: unity-profiler-deep (12), frame-debugger-deep (7), gpu-optimization-deep (4), build-size-optimization-deep (6), mobile-optimization-deep (4)
+- **Game Settings/UI**: Save/Load, Responsive UI, Multi-Platform Input, UI Animation
+- **Settings/UI Deepen**: game-settings-saveload-deep (6), responsive-game-ui-deep (7), multi-platform-input-deep (8)
+- **Game Analytics/Audio**: Achievements, Leaderboards, Analytics, Crash Reporting, Audio, Addressables Deepen
+- **Audio/Achievements Deepen**: game-audio-deep (9), game-achievements-deep (2), game-leaderboards-deep (2)
+- **Multiplayer Deepen**: Session Management, Lag Compensation, Lockstep, State Sync
+- **Multiplayer API Deepen**: session-management-deep (3), lag-compensation-deep (1), state-sync-patterns-deep (1)
+- **Unreal Foundation**: Blueprints, Game Framework, UMG UI, Animation
+- **Unreal Advanced**: Niagara VFX, Chaos Physics, Networking, Optimization
+- **Unreal Deepen (Context7)**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9)
 - **Game Dev**: Gem TD project (159 chunks) — architecture, combat, gems, pooling, TD inspirations
+- **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
 
 ---
 
 ## 🔍 Search Improvements
+
+### Free-Plan Demo Semantic Fix (2026-08-14)
+
+**Problem:** Full-table `SELECT` of ~5.8k JSON embeddings (~40KB each) hit `D1_ERROR: Memory limit exceeded before EOF`. Loading and scoring the entire corpus in one Worker request also exceeded Workers Free CPU (10ms).
+
+**Fix (hosted demo only):**
+1. **Keyword candidates** — `fetchCandidateChunkIds()` picks up to ~24 chunk IDs via SQL (AND, then OR on distinctive terms; stopwords stripped; excludes `node_modules`).
+2. **Cosine rerank** — `scoreVectorsForIds()` embeds the query and scores only those IDs in small D1 batches.
+3. **Hybrid** — keyword list + candidate-limited semantic, fused with RRF (k=60).
+
+Local CLI/MCP still uses `@sce/retrieval` full-corpus semantic over SQLite.
+
+**Frontend:** Mode taglines (Exact terms / By meaning / Recommended), live hint panel, collapsible glossary with ranking steps.
 
 ### Case-Insensitive, Word-Based Search (2026-07-28)
 **Before**: `LIKE '%query%'` — exact phrase, case-sensitive
@@ -164,8 +191,18 @@ Any MCP-compatible agent can now use:
   - No bindings needed
 
 ### Search Modes
-1. **keyword**: SQL LIKE over text, path, heading (~55ms) — **case-insensitive, word-based AND**
-2. **semantic**: OpenRouter embedding → cosine similarity (needs vectors)
+
+| Mode | Tagline | Hosted demo | Local CLI/MCP |
+|------|---------|-------------|---------------|
+| **keyword** | Exact terms | SQL LIKE, word AND | Same |
+| **semantic** | By meaning | Candidates → embed → cosine rerank | Full vector store scan |
+| **hybrid** | Recommended | Keyword + demo semantic, RRF k=60 | Full keyword + full semantic, RRF |
+| **ast** | Symbols | API/MCP only | Exact then prefix symbol lookup |
+
+Ranking (keyword & semantic legs): filename boosts strongest, then heading, then snippet; max 2 hits per file. Hybrid final score is RRF sum (`1/(60+rank)` per list).
+
+1. **keyword**: SQL LIKE over text, path, heading (~55ms) — case-insensitive, word-based AND
+2. **semantic**: OpenRouter embedding → cosine similarity (demo: ~24 lexical candidates first)
 3. **hybrid**: RRF fusion of keyword + semantic (k=60)
 4. **ast**: Symbol table lookup — exact match then prefix fallback
 
@@ -207,7 +244,9 @@ packages/
     worker/
       src/
         index.ts        # Worker entry point (routing)
-        search.ts       # Search implementation (4 modes, case-insensitive)
+        search.ts       # Search implementation (4 modes)
+        candidates.ts   # Lexical candidate IDs for demo semantic
+        vectorScan.ts   # Batched embedding fetch + cosine for candidates
         embedding.ts    # OpenRouter embedding client
         cosine.ts       # Cosine similarity
         d1.ts           # D1 query builders
@@ -288,9 +327,40 @@ Applied to: keyword, semantic, and hybrid search modes.
 
 ## 🔜 Next Steps
 
-### Immediate
-- **Resume image descriptions**: Run `python knowledge/unity-game-designer-playbook/describe_images.py` tomorrow (free tier resets at midnight UTC)
-- **Deploy updated frontend**: Deploy with new search features
+### Immediate — Tier 1/2 Import ✅ COMPLETE (except spire-codex)
+- **Batch 55 complete**: sprite-atlasing (13c), node-graphs (16c), storage-logic (14c), game-design-patterns (12c), net-code (16c) — 71 chunks, 71 vectors.
+- **Stragglers cleared**: `cpp` (4c) + `unreal-engine` (1c) — stale `.sce` had file records but 0 chunks (indexer skipped as "unchanged"); wiped and re-indexed.
+- **Batch 56 partial**: slay-the-spire-2 (17c) + sts2-enemies-ai-brain (11c) in D1.
+- **New topic**: `boids` (35c, 3 files) — Reynolds distributed behavioral model: core rules, implementation tiers (MonoBehaviour → spatial hash → ECS/Burst → compute shader), variants (herds/schools/swarms, PSO/ACO, crowds).
+- **New topic**: `steering-behaviors` (35c, 3 files) + GitHub `three-steer` (7c, MIT) — Reynolds single-agent framework: seek/flee/arrive/pursue/evade/wander, obstacle avoidance, path follow, flow-field following.
+- **New topic**: `swarm-intelligence` (32c, 3 files) — PSO (velocity update, inertia/cognitive/social, gbest/lbest), ACO (pheromone, evaporation, AS/ACS/MMAS), ABC, firefly; C# implementations (PSO class, TSP ACO, ABC), evaluation-budget playbook, game applications (parameter tuning, path smoothing, procedural content).
+- **New topic**: `crowd-simulation` (29c, 3 files) — Helbing social-force model, emergent lanes/queues, evacuation, RVO comparison.
+- **New topic**: `flow-field-pathfinding` (43c, 3 files) — integration fields, flow vector generation, RTS mass movement, dynamic obstacle updates; bridges boids/steering to shared-goal pathfinding.
+- **New topic**: `cellular-automata` (38c, 3 files) — Conway's Life, Wolfram 1D rules, Langton's ant, cave-generation CA, tilemap pipeline.
+- **New GitHub source**: `pso.js` (4c, MIT, adrianton3) — second GitHub source; `src/pso.js` + README; **3 AST symbols** (first JS symbols in D1). Note: embedding API 502 mid-run can leave chunks without vectors — wipe `.sce` and re-index if export shows chunks ≠ vectors.
+- Remaining: **spire-codex** (3.6 GB codebase clone — needs include-config decision before indexing; also `.gd`/GDScript files are unsupported by the parser), unity-ebooks-scraped (staging only, no config).
+
+### Expansion Status (Batches 42–56) — Game Dev & Infrastructure Topics
+
+| Batch | Focus | Topics | Status |
+|-------|-------|--------|--------|
+| **42** | Steamworks & Platform Distribution | Steamworks SDK, Windows GDK, cross-platform publishing | ✅ Done (152 chunks) |
+| **43** | Anti-Cheat & Security | Easy Anti-Cheat, BattlEye, anti-tamper, server authority | ✅ Done (72 chunks) |
+| **44** | Profiling & Performance | Profiler, Frame Debugger, GPU opt, build size, mobile opt | ✅ Done (20 chunks) |
+| **45** | Settings/Save/Load & UI | Save/Load, responsive UI, multi-platform input, UI animation | ✅ Done (7 chunks) |
+| **46** | Analytics, Audio & Achievements | Achievements, analytics, crash reporting, FMOD/Wwise, Addressables | ✅ Done (7 chunks) |
+| **47** | Multiplayer Deepen | Session/reconnect, lag compensation, lockstep, state sync | ✅ Done (4 chunks) |
+| **48** | Unreal Engine Foundation | Blueprints, GAS, UMG, Animation | ✅ Done (4 chunks, stub content) |
+| **49** | Unreal Engine Advanced | Niagara, Chaos, Networking, Nanite/Lumen | ✅ Done (4 chunks, stub content) |
+| **54** | Random Number Algorithms | MegaRandom, xoshiro256**, SplitMix64, pseudorandom, game random utils | ✅ Done (52 chunks, 52 vectors) |
+| **55** | Game Dev Infrastructure | Sprite atlasing, node graphs, storage logic, design patterns, net code | ✅ Done (71 chunks, 71 vectors) |
+| **56** | StS2 & Codex | Slay the Spire 2 architecture, Spire Codex, sts2-enemies-ai-brain | ⏳ Partial (2/3: slay-the-spire-2 17c, sts2-enemies-ai-brain 11c; spire-codex pending decision) |
+
+**⚠️ Known scraping issues:**
+- Unity 6000.3 Manual pages: most fail to scrape (Scripting API pages work if URL has no dots)
+- dev.epicgames.com: entirely blocks the cf-scraper (all Unreal topics have placeholder stubs)
+
+See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 
 ### Optional Future Work
 - **Deepen specific topics**: More Unity packages (ML-Agents, Shader Graph)
@@ -303,6 +373,7 @@ Applied to: keyword, semantic, and hybrid search modes.
 ## 🐛 Known Issues
 
 1. **Import batch size**: Reduced to 2 to avoid SQLITE_TOOBIG errors with large chunks
+1a. **Vector import slow**: Each 2048-dim vector (~39KB) is inserted one-at-a-time via separate `wrangler d1 execute` call (~2-7s each). Topics with 100+ vectors take 10-20 minutes. Import sequentially (not parallel) to avoid temp file races.
 2. **wrangler.jsonc interference**: Must use `--config wrangler.toml` when deploying worker from `packages/web/worker/`
 3. **Free embedding rate limits**: OpenRouter free model occasionally rate-limits; batch size 2 mitigates this
 4. **D1 schema snake_case**: D1 uses `repository_id`, `relative_path`, etc. (snake_case) but export uses camelCase. Import scripts must map fields correctly.
@@ -324,3 +395,7 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **Knowledge expansion (2026-07-26)**: Added 7 new topics (Sampler State, Gem TD, PyMuPDF, Game Designer Playbook, Timeline, Game Juice, Design Levers). Total: 156 topics, 7,086 chunks
 - **Unity Ebooks (2026-07-28)**: Added 8 topics from Unity PDFs (Level Design, UI Design, Tech Art x2, 2D Art, Animation, VR/MR, Dedicated Server). Total: 173 topics, 7,533 chunks
 - **Search improvement (2026-07-28)**: Case-insensitive, word-based AND matching. Multi-word queries like "level design synthesis" now work. Deploy time: ~10 seconds.
+
+- **Batch 54 (Random Number Algorithms)**: 5 topics added — megarandom, xoshiro256**, SplitMix64, pseudorandom, game-random-utils (52 chunks, 52 vectors). Content includes C# implementations, algorithm properties, and game-specific usage patterns.
+- **GitHub open-source sources (2026-08-05)**: GitHub repos are now a first-class source type. Clone to `knowledge/github/<repo>/` (gitignored), add `sce.config.json` with `include: ["**/*.js", "**/*.md"]` (ignore `libs/**`, `js/threejs/**`, `examples/**`), index/export/import like any topic. Only add permissively-licensed repos (MIT/Apache-2.0); skip no-license repos (copyright). Parser supports only TS/JS + MD — C#/C++/Java/Python repos cannot be indexed directly; distill their knowledge into hand-written topic files instead (with attribution). Sources added so far: `three-steer` (MIT), `pso.js` (MIT, +3 AST symbols).
+- **Gitignored source files**: `knowledge/` dir is in `.gitignore`. New knowledge source files (.md) and GitHub clones under `knowledge/github/` are tracked only in D1, not git. Only HANDOFF.md, EXPANSION-ROADMAP.md, and INVENTORY.md are version-controlled.

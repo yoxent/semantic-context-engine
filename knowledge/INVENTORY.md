@@ -1,12 +1,288 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-07-27
-**D1 Live Total**: **7533 chunks, 3667 vectors** (~170 MB)
+**Last Updated**: 2026-08-14
+**D1 Live Total**: **10142 chunks, 5903 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-All 173 knowledge topics + 3 own-repo corpora imported to D1. Re-imported after schema fix (snake_case columns).
+**~217 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~222 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+
+## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
+
+## Batch 54 — Random Number Generation Algorithms (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `megarandom` | 10 | 10 | ✅ Imported |
+| `xoshiro256` | 10 | 10 | ✅ Imported |
+| `splitmix64` | 9 | 9 | ✅ Imported |
+| `pseudorandom` | 13 | 13 | ✅ Imported |
+| `game-random-utils` | 10 | 10 | ✅ Imported |
+| **Total** | **52** | **52** | |
+
+### Batch 54 Details
+
+**Random Number Generation Algorithms** — PRNG algorithms and game random utilities with C# implementations:
+
+**MegaRandom (`megarandom`)** — Truncated LCG with 128-bit state, used in Terraria world generation:
+- 128-bit state (4 × uint32), period 2^128
+- C# implementation with seed initialization via SplitMix64
+- Use cases: world generation, dungeon layout, item placement, multiplayer determinism
+
+**xoshiro256**​** (`xoshiro256`)** — Modern fast PRNG by Blackman & Vigna (2018):
+- 256-bit state (4 × uint64), period 2^256
+- Passes BigCrush (TestU01), ~1.3 GB/s generation speed
+- Jump() method for 2^128 independent substreams
+- C# implementation with SplitMix64-based seeding
+
+**SplitMix64 (`splitmix64`)** — Fast splittable PRNG by Steele, Lea & Flood (2014):
+- 64-bit state, period 2^64, ~2 GB/s speed
+- Used for seeding larger PRNGs (xoshiro256**, MegaRandom)
+- Split() method creates independent child generators
+- C# implementation with golden ratio constant
+
+**Pseudorandom Generation (`pseudorandom`)** — General PRNG concepts for games:
+- Seed-based determinism for replays, lockstep multiplayer, procedural generation
+- PRNG family comparison (System.Random, SplitMix64, xoshiro256**, PCG, MT)
+- Cross-platform determinism pitfalls (float precision, LINQ OrderBy)
+- Choosing a PRNG by game type (turn-based, action, open world, multiplayer)
+
+**Game Random Utilities (`game-random-utils`)** — Higher-level random selection utilities:
+- Shuffle bag (fair non-repeating draws)
+- Weighted random selection (loot tables, rarity rolls)
+- Perlin/Simplex noise for procedural terrain generation
+- Poisson disc sampling (evenly distributed random points)
+- Markov chain for name/level generation
+- Shared entropy pool pattern
+
+### URL Sources
+- `knowledge/urls/megarandom.txt` — Wikipedia, GitHub
+- `knowledge/urls/xoshiro256.txt` — Wikipedia, original paper (prng.di.unimi.it)
+- `knowledge/urls/splitmix64.txt` — Wikipedia, original paper (gee.cs.oswego.edu)
+- `knowledge/urls/pseudorandom.txt` — Wikipedia (PRNG, LCG, MT, PCG)
+- `knowledge/urls/game-random-utils.txt` — Wikipedia (Fisher-Yates, Perlin, Simplex, Poisson)
+
+### Content Files
+- Written as comprehensive `.md` files with C# implementations, algorithm properties, and game-specific usage
+- Not scraped (conceptual algorithm topics with code examples)
+
+---
+
+## Batch 55 — Game Dev Infrastructure (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `sprite-atlasing` | 13 | 13 | ✅ Imported |
+| `node-graphs` | 16 | 16 | ✅ Imported |
+| `storage-logic` | 14 | 14 | ✅ Imported |
+| `game-design-patterns` | 12 | 12 | ✅ Imported |
+| `net-code` | 16 | 16 | ✅ Imported |
+| **Total** | **71** | **71** | |
+
+### Batch 55 Details
+
+**Game Development Infrastructure** — hand-written `.md` topics (not scraped), each indexed/exported/imported individually:
+
+**Sprite Atlasing (`sprite-atlasing`)** — texture atlas packing, bin packing (shelf/maxrects), UV mapping, Unity SpriteAtlas, draw call batching, padding/bleeding, runtime atlasing.
+
+**Node Graphs (`node-graphs`)** — node-based systems: graph data structures, editor node graphs, execution graphs, UI node graphs, serialization, Unity GraphView.
+
+**Storage Logic (`storage-logic`)** — game storage architecture: save formats, atomic writes, versioning/migration, cloud vs local, encryption, slot management.
+
+**Game Design Patterns (`game-design-patterns`)** — gameplay programming patterns: singleton/service locator, observer/event bus, state machines, object pooling, command/undo, factory.
+
+**Net Code (`net-code`)** — networking fundamentals for games: client-server vs P2P, authority models, serialization, interpolation, RPCs, tick rate, NAT/punchthrough.
+
+### Sources
+- Hand-written content files (`knowledge/<topic>/<topic>.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Batch 56 — StS2 & Codex (**2/3 in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `slay-the-spire-2` | 17 | 17 | ✅ Imported |
+| `sts2-enemies-ai-brain` | 11 | 11 | ✅ Imported (md overview; `.gd` scripts skipped — no GDScript grammar) |
+| `spire-codex` | — | — | ⏳ Pending (3.6 GB codebase clone; include-config decision needed) |
+
+### Batch 56 Details
+
+**Slay the Spire 2 & Codex** — Slay the Spire 2 architecture notes and the Spire Codex project:
+
+**Slay the Spire 2 (`slay-the-spire-2`)** — game architecture analysis: deckbuilding loop, card system, combat flow, relic/progression design.
+
+**StS2 Enemies AI Brain (`sts2-enemies-ai-brain`)** — Godot-based enemy AI: `fabricator.gd`, `monster_ai.gd`, `monster_machine.gd`, `node.gd` + `sts2-ai-brain-overview.md`. ⚠️ Config includes `**/*.gd` but GDScript has no tree-sitter grammar (`detectLanguage` → `text`), so only the md overview was indexed (11 chunks). Adding `@tree-sitter-grammars/tree-sitter-gdscript` support is a separate parser task.
+
+**Spire Codex (`spire-codex`)** — NOT INDEXED. 3.6 GB cloned repo with `backend/**/*.py`, `tools/**/*.js|mjs`, `frontend/**/*.ts|tsx` in the include list. Recommend narrowing to `markdown-docs/**/*.md` or confirming full-codebase intent before a long batchSize=1 embedding run.
+
+---
+
+## Boids — Distributed Behavioral Models (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `boids` | 35 | 35 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Boids Details
+
+**Boids — Flocks, Herds, Schools & Distributed Behavioral Models** — hand-written (not scraped), Craig Reynolds' 1987 distributed behavioral model:
+
+- `boids-core.md` (13c) — The three canonical rules (separation / alignment / cohesion), the steering loop, emergence, vision cones, metric vs topological (Couzin) neighborhoods, parameter sensitivities.
+- `boids-implementation.md` (10c) — Production code: MonoBehaviour reference, O(n²) → spatial hash/uniform grid, DOTS/ECS + Burst, GPU compute shader, frame-rate independence, tunneling, data-oriented layout.
+- `boids-variants.md` (12c) — Tuning table per use case (birds/fish/herds/swarms), herds/schools/flocks differences, PSO & ACO swarm intelligence, social-force crowd model, leader-following & herding, game applications, when *not* to use boids.
+
+### Sources
+- Hand-written content files (`knowledge/boids/*.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Steering Behaviors — Single-Agent Game AI (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `steering-behaviors` | 35 | 35 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Steering Behaviors Details
+
+**Steering Behaviors — One Agent with Intent** — hand-written (not scraped), Reynolds' single-agent counterpart to boids (the `boids`-vein follow-up):
+
+- `steering-behaviors-core.md` (17c) — The vehicle model (position/velocity/mass/maxForce/maxSpeed), the desired-velocity steering loop, seek/flee/arrive/pursue/evade/wander/obstacle-avoidance/path-follow/flow-field/leader-follow/interpose/queue, weighted vs priority composition, boids-vs-steering contrast, common failure modes.
+- `steering-behaviors-implementation.md` (7c) — Production Unity C#: Vehicle + SteeringBehavior components + Radar pattern (UnitySteer architecture), full reference implementations (seek/flee/arrive/pursue/wander/sphere-cast obstacle avoidance/path follow), blended + priority steering controller, implementation gotchas (fixed timestep, sqrMagnitude, AOT/LINQ, dead zones, NaN guards).
+- `steering-behaviors-variants.md` (11c) — Tuning table (maxSpeed/maxForce/mass/slowingRadius), behavior recipes (arrive+avoid+wander, pursue+avoid, flock+seek, leader-follow+queue), boids+steering+pathfinding division of labor, context steering & RVO/ORCA, formations, game applications, when *not* to use.
+
+### GitHub Open-Source Source (**new source type, from this topic onward**)
+
+Vetted GitHub open-source repos are now indexed as first-class sources: cloned under `knowledge/github/<repo>/` with their own `sce.config.json`; only permissively-licensed (MIT/Apache-2.0), parser-supported (TS/JS/MD) content is indexed.
+
+| Repo | Chunks | Vectors | Status |
+|------|--------|---------|--------|
+| `three-steer` (erosmarcon, MIT, 120★) | 7 | 7 | ✅ Imported — `js/ThreeSteer.js` (2c: seek/flee/arrive/pursue/evade/wander/interpose/queue/flock/followPath/avoid) + `README.md` (5c) |
+
+**Reviewed, not indexed** (documented decision): UnitySteer (C# — parser supports TS/JS/MD only), gdx-ai (Java), OpenSteer (C++), vonWolfehaus/flow-field (no license — skipped on copyright grounds). Their practical knowledge is distilled into the hand-written topic files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/steering-behaviors/*.md` + `sce.config.json`) — no URL scrape phase needed
+- GitHub clone `knowledge/github/three-steer/` (MIT, `erosmarcon/three-steer`) — indexed via `**/*.js` + `**/*.md` include config (ignores libs/threejs/examples)
+
+---
+
+## Swarm Intelligence — Collective Optimization (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `swarm-intelligence` | 32 | 32 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Swarm Intelligence Details
+
+**Swarm Intelligence — Collective Problem-Solving** — hand-written (not scraped), the optimization branch of the boids family (PSO / ACO / ABC / firefly):
+
+- `swarm-intelligence-core.md` (13c) — Self-organization & stigmergy, PSO (velocity update, inertia/cognitive/social terms, gbest vs lbest topologies), ACO (pheromone transition rule, evaporation/deposit, AS/ACS/MMAS variants), artificial bee colony, firefly, the broader SI zoo, when SI is the right tool.
+- `swarm-intelligence-implementation.md` (7c) — Production C#: full PSO class (velocity clamp, boundary handling, seeding), ACO for TSP (τ^α·η^β transition, evaporation, best-tour deposit), ABC quick implementation, evaluation-cost budgeting, parallelism, the pso.js API shape (Optimizer/setObjectiveFunction/init/step).
+- `swarm-intelligence-variants.md` (12c) — PSO variants (inertia schedule, constriction, lbest ring, BPSO, MOPSO, niching), ACO variants (ACS, MMAS, ACOR, +local search), game applications (parameter tuning, path smoothing, procedural content, QA), practical playbook, when *not* to use SI.
+
+### GitHub Open-Source Source
+
+| Repo | Chunks | Vectors | Status |
+|------|--------|---------|--------|
+| `pso.js` (adrianton3, MIT, 45★) | 4 | 4 | ✅ Imported — `src/pso.js` (3c) + `README.md` (1c); **3 AST symbols** (first JS symbols in D1) |
+
+**Reviewed, not indexed** (documented decision): scikit-opt (Python, MIT, 6.6k★ — GA/PSO/SA/ACO mega-library), HaaLeo/swarmlib (Python, BSD-3), Akavall/AntColonyOptimization (Python, MIT), zoofs (Python, Apache-2.0) — Python is not parser-supported; their practical knowledge is distilled into the hand-written files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/swarm-intelligence/*.md` + `sce.config.json`) — no URL scrape phase needed
+- GitHub clone `knowledge/github/pso.js/` (MIT, `adrianton3/pso.js`) — indexed via `**/*.js` + `**/*.md` include config (ignores examples/test/tools/lib)
+
+---
+
+## Crowd Simulation — Pedestrians, Lanes & Emergent Flow (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `crowd-simulation` | 29 | 29 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Crowd Simulation Details
+
+**Crowd Simulation — Pedestrians, Lanes & Emergent Flow** — hand-written (not scraped), the boids-family tool for people:
+
+- `crowd-simulation-core.md` (10c) — Helbing's social force model (desired-velocity / agent-repulsion / wall forces, fluctuation), emergent lanes/queues/arching/faster-is-slower/zipper, microscopic vs mesoscopic vs continuum vs CA spectrum, parameter table.
+- `crowd-simulation-implementation.md` (7c) — Unity C# social-force reference (Pedestrian struct, force accumulation, semi-implicit Euler), spatial-hash scaling, navmesh/flow-field routing layering, NavMeshAgent+RVO comparison, evacuation & faster-is-slower, gotchas (symmetry deadlock, oscillation, compression, tunneling).
+- `crowd-simulation-variants.md` (12c) — Tuning table, scenario recipes (street, concourse, queue, evacuation, melee, horde), RVO/ORCA vs social force, CA/continuum/PBD/RL variants, game applications, when *not* to use.
+
+### GitHub Open-Source Review — **no source added** (documented decision)
+
+Reviewed for this topic: sweriko/Horde (TS, MIT, 108★ — *crowd rendering* via octahedral impostors, not simulation → off-topic), lo-th/Crowd.lab (JS — no license), keijiro/unity-crowd-simulation (JS — no license), crowdedjs (JS — 2★, unclear license). All skipped. Authoritative implementations are unparseable (knowledge-only, distilled with attribution): pedsim_ros (C++, BSD-2, 587★), PySocialForce (Python, MIT), lightsfm (C++, BSD-3), SUMO (EPL-2.0, 4.1k★), Menge (C++, Apache-2.0), unity-pedestrian-sim (C#, MIT), TUM-MLCMS Unity DOTS crowd sim (C#, MIT).
+
+### Sources
+- Hand-written content files (`knowledge/crowd-simulation/*.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Flow Field Pathfinding — Mass Unit Routing (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `flow-field-pathfinding` | 43 | 43 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Flow Field Pathfinding Details
+
+**Flow Field Pathfinding — Vector Fields for Mass Unit Movement** — hand-written (not scraped), the boids-family bridge from steering to RTS-style pathfinding:
+
+- `flow-field-pathfinding-core.md` (17c) — Field types (simple / integration+flow / hierarchical), cost heatmap generation, Dijkstra/BFS integration from goal, flow vector gradient, relationship to boids/steering/A*.
+- `flow-field-pathfinding-implementation.md` (15c) — Unity C#: FlowFieldGrid data layout, Dijkstra integration, flow generation with tie averaging, unit sampling + steering, dynamic obstacle stamps/dirty-region rebuild, performance table, navmesh hybrid, gotchas.
+- `flow-field-pathfinding-variants.md` (11c) — Tuning table, RTS recipes (attack wave, evacuation, lane push), dynamic/hierarchical fields, comparison vs A*/navmesh/boids, game applications, when *not* to use.
+
+### GitHub Open-Source Review — **no source added** (documented decision)
+
+Reviewed for this topic: **vonWolfehaus/flow-field** (JS, 106★, archived — **no license**, `license: null` on GitHub API → skipped on copyright grounds), **Kristoff3r/FlowFieldPathfinding** (Unity C#, MIT → knowledge-only, parser cannot index C#). Concepts distilled into hand-written files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/flow-field-pathfinding/*.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Cellular Automata — Rule-Based Emergence (**in D1**)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `cellular-automata` | 38 | 38 | ✅ Imported (3 files: core, implementation, variants) |
+
+### Cellular Automata Details
+
+**Cellular Automata — Rule-Based Emergence on Grids** — hand-written (not scraped), Tier A completion of the boids-vein emergence family:
+
+- `cellular-automata-core.md` (14c) — CA formalism, Conway's Life (B3/S23), Wolfram 1D rules, Life-like totalistic rules, Langton's ant, cave/terrain CA, relationship to flow fields/boids/swarm intelligence.
+- `cellular-automata-implementation.md` (11c) — Unity C#: double-buffered grid, Game of Life, cave smoothing CA, Wolfram 1D stack, Langton's ant, tilemap export, Jobs/Burst/compute notes, gotchas.
+- `cellular-automata-variants.md` (13c) — Cave tuning table, Life-like rule variants, multi-state/continuous CA, CA vs noise/WFC/BSP, game applications, when *not* to use.
+
+### GitHub Open-Source Review — **no source added** (documented decision)
+
+Reviewed for this topic: **copy/life** (JS, 437★, BSD-2-Clause → skipped; outside MIT/Apache GitHub source policy), **Golly** (C++, GPL → knowledge-only). Concepts distilled into hand-written files with attribution.
+
+### Sources
+- Hand-written content files (`knowledge/cellular-automata/*.md` + `sce.config.json`) — no URL scrape phase needed
+
+---
+
+## Batches 44-53 — Game Dev & Deepens (in D1)
+
+| Batch | Topic | Chunks | Vectors | Notes |
+|-------|-------|--------|---------|-------|
+| 44 | Profiling & Performance | 50 | ? | Unity Profiler, Frame Debugger, GPU Optimization, Build Size, Mobile Optimization — original stubs (thin) |
+| 44-deep | Profiling Deepen | 33 | 33 | **Deepened**: unity-profiler-deep (12), frame-debugger-deep (7), gpu-optimization-deep (4), build-size-optimization-deep (6), mobile-optimization-deep (4) |
+| 45 | Game Settings/UI | 22 | ? | Save/Load, Responsive UI, Multi-Platform Input, UI Animation — original stubs |
+| 45-deep | Settings/UI Deepen | 21 | 21 | **Deepened**: game-settings-saveload-deep (6), responsive-game-ui-deep (7), multi-platform-input-deep (8) |
+| 46 | Analytics/Audio | 26 | ? | Achievements, Leaderboards, Analytics, Crash Reporting, Audio, Addressables — original stubs |
+| 46-deep | Audio/Achievements Deepen | 32 | 32 | **Deepened**: game-audio-deep (9), game-achievements-deep (12), game-leaderboards-deep (11) |
+| 47 | Multiplayer Deepen | 8 | ? | Session Management, Lag Compensation, Lockstep, State Sync — original stubs |
+| 47-deep | Multiplayer API Deepen | 5 | 5 | **Deepened**: session-management-deep (3), lag-compensation-deep (1), state-sync-patterns-deep (1) |
+| 48 | Unreal Foundation | 28 | ? | Blueprints, Game Framework, UMG UI, Animation — original stubs (Epic blocked) |
+| 49 | Unreal Advanced | 22 | ? | Niagara, Chaos, Networking, Optimization — original stubs (Epic blocked) |
+| 48/49-deep | Unreal Deepen | 69 | 69 | **Deepened**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9) |
+| **Total** | | **276** | **160** |
+
+---
 
 ## Batch 35 — Unity Sampler State (**in D1**)
 
@@ -236,7 +512,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-scriptable-objects | 6 | 6 | Data containers, event channels |
 | unity-ui-toolkit | 2 | 2 | UI Toolkit, USS/UXML |
 | unreal-engine | 1 | 1 | Unreal Blueprints |
-| cpp | 3 | 3 | C++ getting started + cppreference |
+| cpp | 4 | 4 | C++ getting started + cppreference (re-indexed 2026-08-05) |
 | csharp | 4 | 4 | C# / .NET async, generics |
 | **Batch 6 — expanded topics** | | | |
 | rest-api | 12 | 12 | REST patterns, auth flows, retry, rate limits |
@@ -431,6 +707,14 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **39** | **unity-timeline (NEW)** | ✅ **Imported to D1** |
 | **40** | **unity-game-juice (NEW)** | ✅ **Imported to D1** |
 | **41** | **unity-design-levers (NEW)** | ✅ **Imported to D1** |
+| **42** | **steamworks-platform** — Steamworks SDK, Windows Store/Xbox GDK, cross-platform publishing | ✅ **Imported to D1** |
+| **43** | **anti-cheat-security** — Easy Anti-Cheat, BattlEye, anti-tamper, server authority | ✅ **Imported to D1** |
+| **44** | **profiling-optimization** — Unity Profiler, Frame Debugger, Memory Profiler, GPU opt, build size, mobile opt | ⏳ **Pending** |
+| **45** | **game-settings-ui-input** — Save/Load systems, responsive UI (CanvasScaler/safe area/letterbox), multi-platform input, UI animation deepen | ⏳ **Pending** |
+| **46** | **game-analytics-audio** — Achievements/leaderboards, analytics, crash reporting, audio (FMOD/Wwise), Addressables deepen | ⏳ **Pending** |
+| **47** | **multiplayer-deepen** — Session management (reconnect/lobby), lag compensation, deterministic lockstep, state sync patterns | ⏳ **Pending** |
+| **48** | **unreal-engine-core** — Blueprints, C++ GameFramework/GameplayAbilitySystem, UMG UI, Animation | ⏳ **Pending** |
+| **49** | **unreal-engine-advanced** — Niagara VFX, Chaos physics, networking/replication, optimization (Nanite/Lumen) | ⏳ **Pending** |
 
 ## Expansion Roadmap
 
@@ -457,6 +741,16 @@ See `knowledge/EXPANSION-ROADMAP.md` for full details.
 - **Batch 21**: Editor Scripting, Custom Inspectors
 - **Batch 22**: Player Settings
 - **Batch 23**: Graphics API, CommandBuffer, Compute Shaders
+
+### Game Dev (Batches 42–49) — All Completed
+- **Batch 42 — steamworks-platform** ✅ **Imported to D1**: Steamworks SDK (123 chunks), Windows GDK (16 chunks), cross-platform publishing (13 chunks)
+- **Batch 43 — anti-cheat-security** ✅ **Imported to D1**: EOS Anti-Cheat, BattlEye, anti-tamper, server authority (72 chunks)
+- **Batch 44 — profiling-optimization** ✅ **Imported to D1**: Unity Profiler, Frame Debugger, Memory Profiler, GPU optimization, build size, mobile optimization (8+4+1+3+1+2+1=20 chunks, 0 vectors)
+- **Batch 45 — game-settings-ui-input** ✅ **Imported to D1**: Save/Load, responsive UI, multi-platform input, UI animation (7 chunks, 0 vectors)
+- **Batch 46 — game-analytics-audio** ✅ **Imported to D1**: Achievements/leaderboards, analytics, crash reporting, audio, Addressables deepen (7 chunks, 0 vectors)
+- **Batch 47 — multiplayer-deepen** ✅ **Imported to D1**: Session management, lag compensation, lockstep, state sync (4 chunks, 0 vectors)
+- **Batch 48 — unreal-engine-core** ✅ **Imported to D1**: Blueprints, Game Framework, UMG UI, Animation (4 stubs, 0 vectors) ⚠️ Epic docs blocked scraper
+- **Batch 49 — unreal-engine-advanced** ✅ **Imported to D1**: Niagara, Chaos, Networking, Optimization (4 stubs, 0 vectors) ⚠️ Epic docs blocked scraper
 
 ## Deferred Topics — do not pull
 
