@@ -1,5 +1,29 @@
 const API_BASE = 'https://sce-api.pasttime.xyz';
 
+const SEARCH_MODES = {
+  keyword: {
+    title: 'Keyword · Exact terms',
+    expect: 'Matches query words in document text, file paths, and headings. All words must appear somewhere in the chunk.',
+    ranking: 'Equal base score, then boosts for filename → heading → snippet matches. Max 2 hits per file.',
+    bestFor: 'API names, symbols, filenames, and error messages you already know.',
+    example: 'Unity Addressables loading',
+  },
+  semantic: {
+    title: 'Semantic · By meaning',
+    expect: 'Embeds your question and ranks docs by conceptual similarity — useful when wording differs from the docs.',
+    ranking: 'Cosine similarity (embedding closeness), plus filename/heading boosts. Max 2 hits per file.',
+    bestFor: 'Natural-language questions with at least one topical word in the index.',
+    example: 'how do flocks move without a leader',
+  },
+  hybrid: {
+    title: 'Hybrid · Recommended',
+    expect: 'Combines exact-term search with meaning-based ranking, then merges the best of both lists.',
+    ranking: 'RRF fusion: keyword rank + semantic rank combined; strong in both lists wins. Max 2 hits per file.',
+    bestFor: 'Exploratory search when you are not sure which terms the docs use.',
+    example: 'React form validation patterns',
+  },
+};
+
 let currentMode = 'keyword';
 let searchTimeout = null;
 let isSearching = false;
@@ -13,7 +37,22 @@ const resultCount = document.getElementById('result-count');
 const searchTime = document.getElementById('search-time');
 const footerStats = document.getElementById('footer-stats');
 const modeButtons = document.querySelectorAll('.mode');
+const modeHint = document.getElementById('mode-hint');
 const suggestions = document.querySelectorAll('.suggestion');
+
+function renderModeHint(mode) {
+  const info = SEARCH_MODES[mode];
+  if (!info || !modeHint) return;
+  modeHint.innerHTML = `
+    <p class="mode-hint-title">${escapeHtml(info.title)}</p>
+    <p class="mode-hint-body"><strong>Expect:</strong> ${escapeHtml(info.expect)}</p>
+    <p class="mode-hint-body"><strong>Ranking:</strong> ${escapeHtml(info.ranking)}</p>
+    <p class="mode-hint-body"><strong>Best for:</strong> ${escapeHtml(info.bestFor)}</p>
+    <p class="mode-hint-example"><strong>Example:</strong> <code>${escapeHtml(info.example)}</code></p>
+  `;
+}
+
+renderModeHint(currentMode);
 
 // Mode selection
 modeButtons.forEach(btn => {
@@ -25,6 +64,7 @@ modeButtons.forEach(btn => {
     btn.classList.add('active');
     btn.setAttribute('aria-pressed', 'true');
     currentMode = btn.dataset.mode;
+    renderModeHint(currentMode);
     queryInput.focus();
 
     // Re-search if there's a query

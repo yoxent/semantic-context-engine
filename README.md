@@ -25,6 +25,8 @@ Third-party docs (Expo, Firebase, Hono, Drizzle, Cloudflare, etc.) sit alongside
 
 Local-first by design: each indexed root keeps `.sce/metadata.sqlite`. Production search is also mirrored to Cloudflare D1 for the live API/UI.
 
+**Live demo vs local:** Keyword search is full-strength on both. Semantic and hybrid on the **website** use a lexical candidate shortlist (~24 chunks) before embedding rerank, so the hosted API stays within Cloudflare Workers Free limits. CLI and MCP against local SQLite search the **full** indexed corpus. The web UI includes a glossary explaining modes and ranking.
+
 ## Status
 
 Branch: `develop` (implementation). `main` is for production releases.

@@ -1,17 +1,17 @@
 # Knowledge Base Expansion Roadmap
 
 **Created**: 2026-07-18
-**Last Updated**: 2026-07-24
+**Last Updated**: 2026-08-14
 **Total Topics Planned**: ~150+
-**Status**: All topics indexed, Impeccable added
+**Status**: Batch 55 complete in D1 (71 chunks). Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` stragglers cleared; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** added; **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 symbols). D1 at **10,142 chunks, 5,903 vectors**. Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
 
 ---
 
 ## Current State
 
-- **D1 Live**: ~6155 chunks, ~3500 vectors, ~150 topics
-- **Indexed**: All batches complete, Impeccable added
-- **Pending**: None
+- **D1 Live**: 10,142 chunks, 5,903 vectors, ~217 knowledge topics + 3 own-repo corpora + 2 GitHub sources
+- **Indexed**: Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure, 71c)** complete in D1. Batch 56 content topics (slay-the-spire-2 17c, sts2-enemies-ai-brain 11c) imported. `cpp` (4c) + `unreal-engine` (1c) re-indexed and imported. **`boids` (35c)** — Reynolds distributed behavioral model (core rules, implementation tiers, variants). **`steering-behaviors` (35c)** — Reynolds single-agent framework (vehicle model, steering loop, behaviors, Unity C# implementation, tuning recipes). **`swarm-intelligence` (32c)** — PSO/ACO/ABC/firefly collective optimization (model, C# implementations, variants & game applications). **`crowd-simulation` (29c)** — Helbing social-force model, emergent lanes/queues/faster-is-slower, C# reference, scaling, scenarios. **`flow-field-pathfinding` (43c)** — integration fields, Dijkstra/BFS propagation, flow vectors, Unity C# grid implementation, dynamic obstacles, RTS mass movement. **`cellular-automata` (38c)** — Conway's Life, Wolfram 1D, Langton's ant, cave-generation CA, Unity C# grid pipeline. **GitHub sources `three-steer` (7c, MIT)** + **`pso.js` (4c, MIT, +3 AST symbols)** — permissively-licensed repos cloned under `knowledge/github/`, indexed for TS/JS/MD only.
+- **Pending**: `spire-codex` (3.6 GB source-code clone — backend `.py`, frontend `.ts/.tsx`, tools `.js/.mjs` in include list; recommend narrowing to markdown docs or confirming full-codebase intent before a long batchSize=1 embedding run). `unity-ebooks-scraped` (staging dir, no config).
 - **Multi-part splitting**: Enabled for chunks >7500 chars; search API expands all parts of matched documents
 
 ---
@@ -19,7 +19,12 @@
 ## ✅ Completed Batches
 
 | Batch | Topics | Status |
-|-------|--------|--------|
+| 61 | **Boids-vein game AI (hand-written)** — cellular-automata (38c; no GitHub source — copy/life BSD-2 outside policy, Golly GPL) | ✅ **Imported to D1** (38 chunks, 38 vectors) |
+| 60 | **Boids-vein game AI (hand-written)** — flow-field-pathfinding (43c; no GitHub source — vonWolfehaus/flow-field unlicensed, Kristoff3r C# knowledge-only) | ✅ **Imported to D1** (43 chunks, 43 vectors) |
+| 59 | **Boids-vein game AI (hand-written)** — crowd-simulation (29c; no GitHub source — candidates off-topic/unlicensed) | ✅ **Imported to D1** (29 chunks, 29 vectors) |
+| 58 | **Boids-vein game AI (hand-written)** — swarm-intelligence (32c) + GitHub source pso.js (4c, +3 symbols) | ✅ **Imported to D1** (36 chunks, 36 vectors) |
+| 57 | **Boids-vein game AI (hand-written)** — steering-behaviors (35c) + GitHub source three-steer (7c) | ✅ **Imported to D1** (42 chunks, 42 vectors) |
+| 54 | **Random Number Generation Algorithms** — megarandom, xoshiro256, splitmix64, pseudorandom, game-random-utils | ✅ **Imported to D1** (52 chunks, 52 vectors) |
 | 1 | Expo, Firebase, GCP thin, RN, Kotlin, IAP, Play Console, Game Center, RN tooling | ✅ Done |
 | 2 | Tailwind v4, Resend, Vercel, t3-env, Zod, Drizzle+Neon, FastAPI, Docker, ngrok | ✅ Done |
 | 3 | Wrangler, OpenRouter, MCP, SQLite deepen, own-repo corpora | ✅ Done |
@@ -45,7 +50,7 @@
 | 24 | tanstack-query, nextjs-deep, react-hook-form, nextjs-auth, ts-patterns | ✅ Done |
 | 25 | radix-ui (303), framer-motion (49), drizzle-deep (37), playwright (55), caching-strategies (51) | ✅ **Imported to D1** |
 | Unity+ | unity-scripting-api (114 chunks), unity-manual-6000 (32 chunks) | ✅ Done |
-| Unity++ | unity-packages-complete (57 chunks) — Addressables, Cinemachine, Netcode, Input System | ⚠️ Scraped, needs import |
+| Unity++ | unity-packages-complete (57 chunks) — Addressables, Cinemachine, Netcode, Input System | ✅ **Imported to D1** |
 | 32 | pico-css, watercss, mvp-css, new-css, radix-themes | ✅ Done |
 | 33 | zlinq (deep scrape from GitHub) | ✅ Done |
 | 34 | iap-deep, ads-monetization, unity-networking-deep, figma, canva, payment-platforms | ✅ **Imported to D1** |
@@ -308,10 +313,10 @@ https://www.radix-ui.com/themes/docs/components/popover
 
 ---
 
-## ⏳ Batch 34 — IAP Deep, Ads, Unity Networking, Figma, Canva — PENDING IMPORT
+## ✅ Batch 34 — IAP Deep, Ads, Unity Networking, Figma, Canva
 
 **Priority**: HIGH — Monetization, networking, and design tools for cross-platform development
-**Status**: ⏳ Scraped, needs import to D1
+**Status**: ✅ **Imported to D1**
 **Estimated chunks**: ~210
 **Platforms**: Windows, Android, iOS (where applicable)
 
@@ -359,7 +364,207 @@ done
 
 ---
 
-## Deferred / Parked Topics
+## ✅ Batch 42 — Steamworks & PC/Mobile Platform Distribution
+
+**Priority**: HIGH — Essential for PC game publishing
+**Status**: ✅ **Imported to D1** (152 chunks)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `steamworks-sdk` | Store page (achievements, leaderboards, cloud saves), Steam Auth session tickets, Steam networking (P2P, game server), Steam overlay & DRM, Steam Input API, Workshop/UGC, microtransactions | Steamworks docs + Context7 |
+| `windows-gdk` | UWP vs Win32, Xbox Live integration, Game Pass submission, GDK setup for Unity/Unreal | Microsoft GDK docs + Context7 |
+| `cross-platform-publishing` | Console SDK considerations, platform certification, content rating (ESRB/PEGI) | Context7 |
+
+### URL Sources (Draft)
+```
+https://partner.steamgames.com/doc/home
+https://partner.steamgames.com/doc/api
+https://partner.steamgames.com/doc/features/achievements
+https://partner.steamgames.com/doc/features/leaderboards
+https://partner.steamgames.com/doc/features/cloud
+https://partner.steamgames.com/doc/features/multiplayer
+https://learn.microsoft.com/en-us/gaming/gdk/
+```
+
+---
+
+## ✅ Batch 43 — Anti-Cheat & Game Security
+
+**Priority**: HIGH — Required for competitive multiplayer
+**Status**: ✅ **Imported to D1** (72 chunks)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `easy-anti-cheat` | EAC SDK setup for Unity/Unreal, EOS integration, anti-cheat callbacks, authentication, kernel-mode protection | Epic/EAC docs + Context7 |
+| `battleye` | BattlEye SDK setup, server-side validation, configuration, anti-tamper | BattlEye docs + Context7 |
+| `custom-anti-tamper` | Code obfuscation (IL2CPP, coreeclipse), integrity checks (hash verification), anti-debug, memory protection, secure player prefs | Context7 |
+| `server-authority-patterns` | Server-authoritative movement, input validation, anticheat-friendly netcode, rate limiting, replay-based detection | Context7 |
+
+---
+
+## ✅ Batch 44 — Profiling & Performance Optimization
+
+**Priority**: HIGH — Directly impacts game quality
+**Status**: ✅ **Completed**
+**Actual chunks**: 20 (scraping partial — Unity Manual pages mostly failed)
+**⚠️ Note**: Unity 6000.3 Manual URLs returned empty; only Scripting API pages without dots in the name succeeded. Vectors: 0.
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `unity-profiler` | CPU/GPU profiler, deep profiler, profiling markers, scripting vs native calls, Profiler Window, Profiler API, custom counters | Unity docs + Context7 |
+| `frame-debugger` | Draw call debugging, render pass analysis, SRP Batcher events, shader variants | Unity docs + Context7 |
+| `memory-profiler` | Managed memory (GC alloc), native memory (textures, meshes, audio), memory leaks, fragmentation, Memory Profiler package | Unity docs + Context7 |
+| `gpu-optimization` | Draw call batching (static/dynamic), SRP Batcher, GPU instancing deepen, overdraw reduction, fill rate, resolution scaling | Unity docs + Context7 |
+| `memory-budgeting` | Asset budgeting, streaming (Texture Streaming, async loading), Object Pooling deepen, LOD for memory, Addressables memory management | Unity docs + Context7 |
+| `build-size-optimization` | Code stripping (Linker), texture compression (ASTC/ETC2/PVRTC), audio compression (Vorbis/ADPCM), Asset Bundle splitting, UnityLinker | Unity docs + Context7 |
+| `mobile-optimization` | Battery-aware workloads, thermal throttling, overdraw on mobile, resolution scaling, adaptive quality, V-Sync/frame rate targeting | Unity docs + Context7 |
+
+---
+
+## ✅ Batch 45 — Game Settings, Save/Load & Responsive UI
+
+**Priority**: MEDIUM — Foundational for shipped games
+**Status**: ✅ **Completed**
+**Actual chunks**: 7 (4 topics, partial scrape)
+**⚠️ Note**: Unity Manual scraping continues to fail. 7 chunks imported to D1.
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `game-settings-saveload` | Resolution/quality/volume presets, controls rebinding, graphics presets (Low/Med/High/Ultra), save slots, binary serialization, JSON, PlayerPrefs alternatives, save encryption, cross-platform save syncing | Unity docs + Context7 |
+| `responsive-game-ui` | CanvasScaler deepen (scale modes, match), safe areas (iOS notch, Android cutouts), letterbox/pillarbox for ultrawide, device orientation detection, adaptive layout | Unity docs + Context7 |
+| `multi-platform-input` | Touch gestures, controller mapping (Xbox/PlayStation), keyboard rebinding, Input Action Assets, action maps, device-specific feedback | Unity docs + Context7 |
+| `ui-animation-deepen` | DOTween deepen (sequences, callbacks, pooling), LitMotion zero-alloc for UI, PrimeTween (shakes, cycles), UI animation patterns (enter/exit, hover, selection) | DOTween/LitMotion/PrimeTween docs |
+
+---
+
+## ✅ Batch 46 — Game Analytics, Audio & Achievements
+
+**Priority**: MEDIUM — Player engagement and retention
+**Status**: ✅ **Completed**
+**Actual chunks**: 7 (6 topics, most scrapes failed)
+**⚠️ Note**: Apple GameKit docs and Unity Analytics pages failed to scrape. Steam docs partially worked.
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `game-achievements` | Cross-platform achievements (Steam, Game Center, Xbox, PlayStation), achievement progress, unlock patterns, secret achievements, stat tracking | Steam/Apple/Xbox docs + Context7 |
+| `game-leaderboards` | Cross-platform leaderboards (Steam, Game Center), friends-only vs global, seasonal leaderboards, percentile ranking, delta compression | Steam/Apple docs + Context7 |
+| `game-analytics` | Unity Analytics (events, funnels, retention), GameAnalytics SDK, custom event pipeline, player behavior tracking, A/B test instrumentation | Unity Analytics + Context7 |
+| `crash-reporting` | Unity Cloud Diagnostics (crash/exception reporting), Crashlytics for games, Sentry game SDK, symbol uploads, user feedback | Unity + Firebase + Sentry docs |
+| `game-audio` | Unity Audio Mixer (groups, snapshots, ducking), Audio Source optimization, spatial audio (Oculus Audio, Steam Audio), FMOD Studio, Wwise integration, audio compression per-platform | Unity docs + FMOD/Wwise + Context7 |
+| `addressables-deepen` | Asset lifecycle management (load/unload/refcount), remote content distribution (CDN), dependency caching, catalog management, memory profiling | Unity docs + Context7 |
+
+---
+
+## ✅ Batch 47 — Multiplayer Deepen
+
+**Priority**: MEDIUM — Complements existing networking depth
+**Status**: ✅ **Completed**
+**Actual chunks**: 4 (all stub content)
+**⚠️ Note**: All Unity 6000.3 doc URLs failed to scrape. Topics have only placeholder entries in D1.
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `session-management` | Session creation/join/resume, lobby systems, player slots, NAT punchthrough/relay, reconnection strategies (state recovery, snapshots), timeout handling | Context7 |
+| `lag-compensation` | Client-side prediction, server reconciliation, input buffering, interpolation vs extrapolation, rollback netcode patterns | Context7 |
+| `deterministic-lockstep` | Fixed timestep, deterministic math (fixed-point), input queues, peer-to-peer consistency, rollback for RTS/fighting games | Context7 |
+| `state-sync-patterns` | Delta compression, interest management (AoI, spatial hashing), relevance culling, bandwidth budgeting, tick rate optimization | Context7 |
+
+---
+
+## ✅ Batch 48 — Unreal Engine Foundation
+
+**Priority**: LOW — Fills massive gap (currently 1 file)
+**Status**: ✅ **Completed**
+**Actual chunks**: 4 (stub content only)
+**⚠️ Note**: Epic Games docs (dev.epicgames.com) entirely blocked the scraper. Scraper crashed with STATUS_ACCESS_VIOLATION on unreal-game-framework.
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `unreal-blueprints` | Blueprint types (Level, Class, DataOnly, Macro, Function), event graph, custom event dispatchers, function libraries, interfaces, construction scripts, Blueprint vs C++ decision guide | Epic docs + Context7 |
+| `unreal-game-framework` | GameMode/GameState, PlayerController/PlayerState, Pawn/Character, GameplayAbilitySystem (GAS), GameplayTags, GameplayEffects/Attributes, Ability Tasks | Epic docs + Context7 |
+| `unreal-umg-ui` | Widget Blueprint, widget types (Button, Image, Text, ListView, Overlay), anchors/sizing, animation (widget animations), retainer boxes, Slate vs UMG | Epic docs + Context7 |
+| `unreal-animation` | Animation Blueprints, State Machines, Blend Spaces (1D/2D), Blend Poses, IK (Full Body IK, Foot IK), Control Rig, Sequencer, root motion | Epic docs + Context7 |
+
+---
+
+## ✅ Batch 49 — Unreal Engine Advanced
+
+**Priority**: LOW — After foundation is covered
+**Status**: ✅ **Completed**
+**Actual chunks**: 4 (stub content only)
+**⚠️ Note**: Same Epic Games docs blocking issue as Batch 48 (21/22 URLs returned empty).
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `unreal-niagara` | Niagara VFX system (emitters, particles, modules), GPU vs CPU particles, data interfaces (mesh/collision/audio), event handling, scalability | Epic docs + Context7 |
+| `unreal-chaos` | Chaos physics (rigid bodies, constraints), destruction (geometry collection, fracture), vehicles, cloth simulation, hair | Epic docs + Context7 |
+| `unreal-networking` | Replication (actor/component/property), RPCs (Server/Client/Multicast), relevancy (distance culling), connection handling, dedicated server setup | Epic docs + Context7 |
+| `unreal-optimization` | World Partition, data layers, Nanite (virtualized geometry), Lumen (global illumination), LODs (static/skeletal mesh), culling, profiling tools | Epic docs + Context7 |
+
+---
+
+## ✅ Batch 50 — Unity Profiling Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 33 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `unity-profiler-deep` | Profiler window usage, CPU/GPU profiling, Memory Profiler, Profile Analyzer, Profiler markers, instrumentation | Unity Manual (corrected URLs) |
+| `frame-debugger-deep` | Frame Debugger events, draw calls, render passes, SRP Batcher, shader variants, overdraw | Unity Manual |
+| `gpu-optimization-deep` | Draw call batching (static/dynamic), SRP Batcher, GPU instancing, overdraw reduction, resolution scaling | Unity Manual |
+| `build-size-optimization-deep` | Build report, asset bundle packing, managed code stripping, texture compression, audio compression | Unity Manual |
+| `mobile-optimization-deep` | Mobile-specific profiling, platform settings, graphics API selection, battery/thermal considerations | Unity Manual |
+
+## ✅ Batch 51 — Game Settings & UI Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 22 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `game-settings-saveload-deep` | PlayerPrefs, JSON serialization, binary save formats, save game versioning, cloud saves, settings menu patterns | Unity Manual + Context7 |
+| `responsive-game-ui-deep` | Canvas Scaler, safe areas, aspect ratio handling, adaptive layouts, resolution independence | Unity Manual + Context7 |
+| `multi-platform-input-deep` | Input System package (actions, processors, interactions, devices), touch input, gamepad/keyboard bindings | Unity Input System package docs |
+
+## ✅ Batch 52 — Analytics & Audio Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 32 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `game-audio-deep` | Audio Mixer (groups, snapshots, effects, sends), spatial audio (doppler, attenuation), AudioClip loading, audio DSP, FMOD vs Wwise | Unity Manual + Context7 |
+| `game-achievements-deep` | Steamworks achievements API, unlock flow, stat tracking, achievement icons, progress bars, UI patterns | Steamworks partner docs |
+| `game-leaderboards-deep` | Steamworks leaderboards (global/friends), score upload/download, daily/weekly resets, entry count limits | Steamworks partner docs |
+
+## ✅ Batch 53 — Multiplayer API Deepen
+
+**Status**: ✅ **Completed**
+**Total chunks**: 5 (all with vectors)
+
+| Topic | Scope | Source |
+|-------|-------|--------|
+| `session-management-deep` | Unity Netcode session lifecycle, connection approval, player joining/leaving, session hosting | Unity Netcode API docs |
+| `lag-compensation-deep` | Client-side prediction, server reconciliation, interpolation/extrapolation, state synchronization techniques | Unity Netcode API docs |
+| `state-sync-patterns-deep` | NetworkVariable types, custom serialization, delta compression, interest management, relevancy | Unity Netcode API docs |
+
+## ✅ Unreal Engine Deepen (Batches 48-49)
+
+**Status**: ✅ **Completed**
+**Total chunks**: 69 (all with vectors)
+**Note**: Epic Games docs (dev.epicgames.com) continues to block cf-scraper. Content was written from Context7 queries + author knowledge.
+
+| Topic | Chunks | Vectors | Scope |
+|-------|--------|---------|-------|
+| `unreal-blueprints-deep` | 10 | 10 | Blueprint types, Event Graph, Event Dispatchers, Function Libraries, Interfaces, Construction Script, Blueprint vs C++, best practices |
+| `unreal-game-framework-deep` | 8 | 8 | GameMode/GameState/PlayerController/Pawn/Character, GAS (AbilitySystemComponent, GameplayAbility, AttributeSet, GameplayEffect, GameplayTags), Ability Tasks |
+| `unreal-umg-ui-deep` | 10 | 10 | Widget types (Button, Image, Text, ListView, Overlay, Slider, SpinBox, TileView, TreeView), anchors, sizing, Slate vs UMG, Widget Animation |
+| `unreal-animation-deep` | 10 | 10 | Animation Blueprints, State Machines, Blend Spaces (1D/2D), IK, Control Rig, Sequencer, Root Motion, Animation Sharing |
+| `unreal-niagara-deep` | 7 | 7 | Emitters, Systems, GPU vs CPU particles, Data Interfaces, Event Handling, Scripting, Platform scalability |
+| `unreal-chaos-deep` | 7 | 7 | Rigid bodies, Destruction (Geometry Collection, Fracture), Vehicles, Cloth, Hair simulation |
+| `unreal-networking-deep` | 8 | 8 | Replication, RPCs, Relevancy, Connection handling, Dedicated server |
+| `unreal-optimization-deep` | 9 | 9 | World Partition, Nanite, Lumen, LODs, Culling, Unreal Insights, Rendering optimization |
 
 | Category | Topics | Why Deferred |
 |----------|--------|--------------|
