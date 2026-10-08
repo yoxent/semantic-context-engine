@@ -1,12 +1,22 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-08-14
-**D1 Live Total**: **10142 chunks, 5903 vectors** (~190 MB)
+**Last Updated**: 2026-10-08
+**D1 Live Total**: **~11,139 chunks, 5,939 vectors** (~190 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
 **~217 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~222 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+
+## Content Directories (`content-directories`) — **in D1** (2026-10-08)
+
+Unity 6.6 content build system (not in the 6000.3 manual). 26 sources, **38 chunks, 36 vectors**.
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `content-directories` | 38 | 36 | ✅ Imported |
+
+Sources: Unity 6.6 Manual (`content-directories*.html`, asset duplication), Addressables 4.0 (`content-build-systems`, `convert-content-directories`), Scripting API (`BuildPipeline.BuildContentDirectory`, `ContentLoadManager`, `Loadable<T>`), [Unity blog](https://unity.com/blog/content-directories-beyond-the-assetbundle), UnityDataTools `contentdirectory-format.md`. URL list: `knowledge/urls/content-directories.txt`.
 
 ## Batches 44-56 — Game Dev, Deepens & Random Algorithms (in D1)
 
@@ -454,6 +464,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | SCE packages | 290 | 290 | `packages/` |
 | word-guess | 423 | 423 | `E:\Projects\Indie\word-guess` |
 | web-portfolio | 155 | 155 | `E:\Projects\Web\web-portfolio` |
+| unity-gem-td | 959 | 0 | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` (GDD/ARCHITECTURE/UI-SPEC/planning; excludes `sources/`) |
 | **Batch 1 — mobile / word-guess** | | | |
 | expo | 23 | 23 | Expo + EAS |
 | firebase | 20 | 18 | Auth, Firestore, Remote Config, rules |
@@ -505,6 +516,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | openai-api | 3 | 3 | OpenAI API / embeddings |
 | unity | 6 | 6 | Unity Manual, Components, GameObjects, MonoBehaviours |
 | unity-addressables | 2 | 2 | Addressables system |
+| content-directories | 38 | 36 | Unity 6.6 content directories (manual, Addressables 4.0, scripting API, blog) |
 | unity-async | 11 | 11 | Async/Await, UniTask, CancellationToken |
 | unity-coroutines | 6 | 6 | IEnumerator, yield patterns |
 | unity-events | 6 | 6 | UnityEvent, UnityAction, C# events |
@@ -567,7 +579,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | **Batch 35 — Unity Sampler State** | | | |
 | unity-sampler-state | 34 | 0 | SamplerState, FilterMode, WrapMode, aniso, HLSL samplers, mip maps |
 | **Batch 36 — Gem TD Inspirations** | | | |
-| gem-td-inspirations | 159 | 0 | Gem TD project + BTD5/6, Nordhold, Infinitode 2 design principles |
+| gem-td-inspirations | 159 | 0 | TD inspirations only (BTD5/6, Nordhold, Infinitode 2) — project docs live in `unity-gem-td` |
 | **Batch 37 — PyMuPDF** | | | |
 | pymupdf | 124 | 0 | PDF processing: text/image/table extraction, annotations, rendering, CLI |
 | **Batch 38 — Unity Game Designer Playbook** | | | |
@@ -1356,10 +1368,13 @@ Local index stats (chunks / vectors exported):
 | SCE packages | `packages/` | 290 | 290 | 265 |
 | word-guess | `E:\Projects\Indie\word-guess` | 423 | 423 | 287 |
 | web-portfolio | `E:\Projects\Web\web-portfolio` | 155 | 155 | 61 |
-| **Subtotal** | | **868** | **868** | **613** |
+| unity-gem-td | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` | 959 | 0 | 0 |
+| **Subtotal** | | **1,827** | **868** | **613** |
 
-Configs: `packages/sce.config.json`, `word-guess/sce.config.json`, `web-portfolio/sce.config.json`  
+Configs: `packages/sce.config.json`, `word-guess/sce.config.json`, `web-portfolio/sce.config.json`, docs `sce.config.json` on unity-gem-td  
 Local indexes live in each project’s `.sce/` (gitignored in SCE; add `.sce/` to the other repos if not already).
+
+**unity-gem-td notes (2026-08-21):** Indexed 102 markdown files (959 chunks) from design docs; `sources/` excluded. Unity game repo (`E:\Projects\Unity\unity-gem-td`) not indexed (C# skipped by SCE language filter). Keyword-only until vector backfill. Export: `knowledge/unity-gem-td-export`.
 
 ---
 

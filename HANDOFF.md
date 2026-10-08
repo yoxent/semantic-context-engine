@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-08-14
-**Status**: D1 at **10,142 chunks, 5,903 vectors**. **BATCH 55 COMPLETE** (71 chunks) + batch 56 content topics + `cpp`/`unreal-engine` stragglers + **`boids` topic** (35 chunks) + **`steering-behaviors` topic** (35 chunks) + **`swarm-intelligence` topic** (32 chunks) + **`crowd-simulation` topic** (29 chunks) + **`flow-field-pathfinding` topic** (43 chunks) + **`cellular-automata` topic** (38 chunks) + **GitHub sources `three-steer`** (MIT, 7c) **and `pso.js`** (MIT, 4c, +3 AST symbols) imported.
+**Last Updated**: 2026-10-08
+**Status**: D1 at **~11,139 chunks, 5,939 vectors**. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (959 chunks, keyword-only; 0 vectors — backfill later) imported from `E:\Projects\Docs\project-docs\Unity\unity-gem-td`. **`content-directories`** (Unity 6.6, 38 chunks / 36 vectors) imported 2026-10-08.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (9,954 chunks, 5,715 vectors)
+- **D1 Database**: `sce-db` (~11,139 chunks, 5,939 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -31,15 +31,15 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  10,142
-Vectors: 5,903 (2048-dim embeddings)
+Chunks:  ~11,139
+Vectors: 5,939 (2048-dim embeddings)
 Symbols: 290 (own-repo corpora + 3 from pso.js)
-Topics:  ~217 knowledge + 3 own-repo corpora + 2 GitHub sources = ~222 total
+Topics:  ~218 knowledge + 4 own-repo corpora + 2 GitHub sources = ~224 total
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
-Size:    ~190 MB
+Size:    ~190 MB+
 ```
 
-### Topics Indexed (~228)
+### Topics Indexed (~229)
 - **Web stack**: HTML, CSS, jQuery, React, Next.js, Hono, shadcn/ui, shieldcn, Tailwind CSS, NativeWind, bolt.new, RetroUI, Dot Matrix
 - **Full-stack**: TanStack Query, Next.js deep, React Hook Form, Auth.js v5, TypeScript patterns, Radix UI, Framer Motion, Drizzle ORM, Playwright, Caching Strategies
 - **Testing**: TanStack Table, MSW, React Testing Library, ESLint, Sonner, Vitest
@@ -52,6 +52,7 @@ Size:    ~190 MB
 - **Unity (6000.3)**: Base, ECS, Cinemachine, Netcode, Shaders, UI Toolkit, Addressables, ScriptableObjects, Events, Coroutines, Async, Scene Management, Collisions, Joints, Primitives
 - **Unity Deep**: Particles/VFX, Post-Processing, Build Profiles, GPU Instancing/LOD, Camera, Input Interfaces, Editor Scripting, Player Settings, Graphics API
 - **Unity Packages**: Post-Processing Stack, Scriptable Build Pipeline, Test Framework, UI Test Framework, Localization, Platform Toolkit, Addressables, Cinemachine 3, Netcode, Input System
+- **Unity 6.6 Content Directories** (`content-directories`, 38 chunks / 36 vectors): Manual + Scripting API, Addressables 4.0 conversion, Unity blog, UnityDataTools on-disk format. Not in the 6000.3 manual.
 - **Unity UI**: UGUI, UI Toolkit, TextMeshPro (92 chunks)
 - **Unity Cloud**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer, Economy, Authentication (87 chunks)
 - **Unity Networking**: Photon PUN2/Fusion/Quantum, Mirror, FishNet, UTP, Nakama (72 chunks)
@@ -77,10 +78,10 @@ Size:    ~190 MB
 - **Unreal Foundation**: Blueprints, Game Framework, UMG UI, Animation
 - **Unreal Advanced**: Niagara VFX, Chaos Physics, Networking, Optimization
 - **Unreal Deepen (Context7)**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9)
-- **Game Dev**: Gem TD project (159 chunks) — architecture, combat, gems, pooling, TD inspirations
+- **Game Dev**: Gem TD project docs (`unity-gem-td`, 959 chunks) — GDD / ARCHITECTURE / UI-SPEC / planning / SDD; plus `gem-td-inspirations` (159 chunks, BTD5/6 Nordhold Infinitode)
 - **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
-- Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155)
+- Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155), unity-gem-td docs (959)
 
 ---
 
@@ -399,3 +400,4 @@ See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 - **Batch 54 (Random Number Algorithms)**: 5 topics added — megarandom, xoshiro256**, SplitMix64, pseudorandom, game-random-utils (52 chunks, 52 vectors). Content includes C# implementations, algorithm properties, and game-specific usage patterns.
 - **GitHub open-source sources (2026-08-05)**: GitHub repos are now a first-class source type. Clone to `knowledge/github/<repo>/` (gitignored), add `sce.config.json` with `include: ["**/*.js", "**/*.md"]` (ignore `libs/**`, `js/threejs/**`, `examples/**`), index/export/import like any topic. Only add permissively-licensed repos (MIT/Apache-2.0); skip no-license repos (copyright). Parser supports only TS/JS + MD — C#/C++/Java/Python repos cannot be indexed directly; distill their knowledge into hand-written topic files instead (with attribution). Sources added so far: `three-steer` (MIT), `pso.js` (MIT, +3 AST symbols).
 - **Gitignored source files**: `knowledge/` dir is in `.gitignore`. New knowledge source files (.md) and GitHub clones under `knowledge/github/` are tracked only in D1, not git. Only HANDOFF.md, EXPANSION-ROADMAP.md, and INVENTORY.md are version-controlled.
+- **unity-gem-td docs (2026-08-21)**: Indexed live design docs from `E:\Projects\Docs\project-docs\Unity\unity-gem-td` (102 files → 959 chunks, 0 vectors). Excluded `sources/`. Did **not** index Unity `Assets/` C# (unsupported language). Context Mode `GemTD-docs` also refreshed (106 files / 754 sections). Re-index: `node packages/cli/dist/src/main.js index .` from docs root → export → `import.ts … --append`. Vector backfill via `scripts/backfill-vectors.mjs` when ready.
