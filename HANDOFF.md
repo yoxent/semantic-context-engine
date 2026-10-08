@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
 **Last Updated**: 2026-10-08
-**Status**: D1 at **~11,139 chunks, 5,939 vectors**. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (959 chunks, keyword-only; 0 vectors — backfill later) imported from `E:\Projects\Docs\project-docs\Unity\unity-gem-td`. **`content-directories`** (Unity 6.6, 38 chunks / 36 vectors) imported 2026-10-08.
+**Status**: D1 at **12,542 chunks, 5,939 vectors** (~268 MB). Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08 from `E:\Projects\Docs\project-docs\Unity\unity-gem-td`. **`content-directories`** (Unity 6.6, 38 chunks / 36 vectors) imported 2026-10-08.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
@@ -78,10 +78,10 @@ Size:    ~190 MB+
 - **Unreal Foundation**: Blueprints, Game Framework, UMG UI, Animation
 - **Unreal Advanced**: Niagara VFX, Chaos Physics, Networking, Optimization
 - **Unreal Deepen (Context7)**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9)
-- **Game Dev**: Gem TD project docs (`unity-gem-td`, 959 chunks) — GDD / ARCHITECTURE / UI-SPEC / planning / SDD; plus `gem-td-inspirations` (159 chunks, BTD5/6 Nordhold Infinitode)
+- **Game Dev**: Gem TD project docs (`unity-gem-td`, 2,362 chunks) — GDD / ARCHITECTURE / UI-SPEC / planning / SDD / wiki catalog; plus `gem-td-inspirations` (159 chunks, BTD5/6 Nordhold Infinitode)
 - **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
-- Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155), unity-gem-td docs (959)
+- Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155), unity-gem-td docs (2,362)
 
 ---
 
@@ -400,4 +400,5 @@ See `knowledge/EXPANSION-ROADMAP.md` for full batch details and URL sources.
 - **Batch 54 (Random Number Algorithms)**: 5 topics added — megarandom, xoshiro256**, SplitMix64, pseudorandom, game-random-utils (52 chunks, 52 vectors). Content includes C# implementations, algorithm properties, and game-specific usage patterns.
 - **GitHub open-source sources (2026-08-05)**: GitHub repos are now a first-class source type. Clone to `knowledge/github/<repo>/` (gitignored), add `sce.config.json` with `include: ["**/*.js", "**/*.md"]` (ignore `libs/**`, `js/threejs/**`, `examples/**`), index/export/import like any topic. Only add permissively-licensed repos (MIT/Apache-2.0); skip no-license repos (copyright). Parser supports only TS/JS + MD — C#/C++/Java/Python repos cannot be indexed directly; distill their knowledge into hand-written topic files instead (with attribution). Sources added so far: `three-steer` (MIT), `pso.js` (MIT, +3 AST symbols).
 - **Gitignored source files**: `knowledge/` dir is in `.gitignore`. New knowledge source files (.md) and GitHub clones under `knowledge/github/` are tracked only in D1, not git. Only HANDOFF.md, EXPANSION-ROADMAP.md, and INVENTORY.md are version-controlled.
-- **unity-gem-td docs (2026-08-21)**: Indexed live design docs from `E:\Projects\Docs\project-docs\Unity\unity-gem-td` (102 files → 959 chunks, 0 vectors). Excluded `sources/`. Did **not** index Unity `Assets/` C# (unsupported language). Context Mode `GemTD-docs` also refreshed (106 files / 754 sections). Re-index: `node packages/cli/dist/src/main.js index .` from docs root → export → `import.ts … --append`. Vector backfill via `scripts/backfill-vectors.mjs` when ready.
+- **unity-gem-td docs (2026-08-21)**: Indexed live design docs from `E:\Projects\Docs\project-docs\Unity\unity-gem-td` (102 files → 959 chunks, 0 vectors). Excluded `sources/`. Did **not** index Unity `Assets/` C# (unsupported language). Context Mode `GemTD-docs` also refreshed (106 files / 754 sections). Re-index: `node packages/cli/dist/src/main.js index .` from docs root → export → delete `repository_id` `941f4e5d1369477d` from D1 → `import.ts … --append`. Vector backfill via `scripts/backfill-vectors.mjs` when ready.
+- **unity-gem-td docs (2026-10-08)**: Re-indexed the same docs root (237 files → 2,362 chunks, 0 vectors). Replaced the previous 959 D1 rows for that repository. Context Mode `GemTD-docs` refreshed (237 files / 1,813 sections). Keyword search confirmed on `planning/2026-10-08-display-naming-catalog.md`. Still keyword-only until vector backfill.

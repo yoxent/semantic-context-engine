@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-10-08
-**D1 Live Total**: **~11,139 chunks, 5,939 vectors** (~190 MB)
+**D1 Live Total**: **12,542 chunks, 5,939 vectors** (~268 MB)
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
@@ -464,7 +464,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | SCE packages | 290 | 290 | `packages/` |
 | word-guess | 423 | 423 | `E:\Projects\Indie\word-guess` |
 | web-portfolio | 155 | 155 | `E:\Projects\Web\web-portfolio` |
-| unity-gem-td | 959 | 0 | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` (GDD/ARCHITECTURE/UI-SPEC/planning; excludes `sources/`) |
+| unity-gem-td | 2362 | 0 | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` (GDD/ARCHITECTURE/UI-SPEC/planning/wiki; excludes `sources/`) |
 | **Batch 1 — mobile / word-guess** | | | |
 | expo | 23 | 23 | Expo + EAS |
 | firebase | 20 | 18 | Auth, Firestore, Remote Config, rules |
@@ -1368,13 +1368,13 @@ Local index stats (chunks / vectors exported):
 | SCE packages | `packages/` | 290 | 290 | 265 |
 | word-guess | `E:\Projects\Indie\word-guess` | 423 | 423 | 287 |
 | web-portfolio | `E:\Projects\Web\web-portfolio` | 155 | 155 | 61 |
-| unity-gem-td | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` | 959 | 0 | 0 |
-| **Subtotal** | | **1,827** | **868** | **613** |
+| unity-gem-td | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` | 2362 | 0 | 0 |
+| **Subtotal** | | **3,230** | **868** | **613** |
 
 Configs: `packages/sce.config.json`, `word-guess/sce.config.json`, `web-portfolio/sce.config.json`, docs `sce.config.json` on unity-gem-td  
 Local indexes live in each project’s `.sce/` (gitignored in SCE; add `.sce/` to the other repos if not already).
 
-**unity-gem-td notes (2026-08-21):** Indexed 102 markdown files (959 chunks) from design docs; `sources/` excluded. Unity game repo (`E:\Projects\Unity\unity-gem-td`) not indexed (C# skipped by SCE language filter). Keyword-only until vector backfill. Export: `knowledge/unity-gem-td-export`.
+**unity-gem-td notes (2026-10-08):** Re-indexed 237 markdown/text files (2,362 chunks, 0 vectors) from design docs; `sources/` excluded. Replaced the 2026-08-21 corpus (102 files, 959 chunks) in D1. Unity game repo (`E:\Projects\Unity\unity-gem-td`) not indexed (C# skipped by SCE language filter). Keyword-only until vector backfill. Export: `knowledge/unity-gem-td-export`. Context Mode source: `GemTD-docs` (237 files / 1,813 sections).
 
 ---
 
