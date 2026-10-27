@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-10-08
-**Status**: D1 at **12,542 chunks, 5,939 vectors** (~268 MB). Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08 from `E:\Projects\Docs\project-docs\Unity\unity-gem-td`. **`content-directories`** (Unity 6.6, 38 chunks / 36 vectors) imported 2026-10-08.
+**Last Updated**: 2026-10-27
+**Status**: D1 at **12,604 chunks, 5,959 vectors** (~269 MB), verified 2026-10-27. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08. **`content-directories`** (38 chunks / 36 vectors) imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (~11,139 chunks, 5,939 vectors)
+- **D1 Database**: `sce-db` (12,604 chunks, 5,959 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -31,12 +31,12 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  ~11,139
-Vectors: 5,939 (2048-dim embeddings)
+Chunks:  12,604
+Vectors: 5,959 (2048-dim embeddings)
 Symbols: 290 (own-repo corpora + 3 from pso.js)
-Topics:  ~218 knowledge + 4 own-repo corpora + 2 GitHub sources = ~224 total
+Topics:  ~218 knowledge + 4 own-repo corpora + 2 GitHub sources, plus game-design-method and gem-td-poe1-typed-damage
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
-Size:    ~190 MB+
+Size:    ~269 MB
 ```
 
 ### Topics Indexed (~229)
@@ -78,7 +78,7 @@ Size:    ~190 MB+
 - **Unreal Foundation**: Blueprints, Game Framework, UMG UI, Animation
 - **Unreal Advanced**: Niagara VFX, Chaos Physics, Networking, Optimization
 - **Unreal Deepen (Context7)**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9)
-- **Game Dev**: Gem TD project docs (`unity-gem-td`, 2,362 chunks) — GDD / ARCHITECTURE / UI-SPEC / planning / SDD / wiki catalog; plus `gem-td-inspirations` (159 chunks, BTD5/6 Nordhold Infinitode)
+- **Game Dev**: Gem TD project docs (`unity-gem-td`, 2,362 chunks) — GDD / ARCHITECTURE / UI-SPEC / planning / SDD / wiki catalog; plus `gem-td-inspirations` (159 chunks, BTD5/6 Nordhold Infinitode). **`gem-td-poe1-typed-damage`** (42 chunks, 0 vectors): PoE 1 inspired Gem TD. Gem TD adopted some mechanics and interpreted them as a tower defense — a tower plus gems, not an active skill gem plus support gems. PoE rules, Gem TD design, and the greybox stay separate. Number differences are expected. **`game-design-method`** (20 chunks, 20 vectors): paraphrase of the usable design method from Reactorcore's book; competition, rewards, and shops stay with the game pillars.
 - **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
 - Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155), unity-gem-td docs (2,362)
@@ -339,7 +339,8 @@ Applied to: keyword, semantic, and hybrid search modes.
 - **New topic**: `flow-field-pathfinding` (43c, 3 files) — integration fields, flow vector generation, RTS mass movement, dynamic obstacle updates; bridges boids/steering to shared-goal pathfinding.
 - **New topic**: `cellular-automata` (38c, 3 files) — Conway's Life, Wolfram 1D rules, Langton's ant, cave-generation CA, tilemap pipeline.
 - **New GitHub source**: `pso.js` (4c, MIT, adrianton3) — second GitHub source; `src/pso.js` + README; **3 AST symbols** (first JS symbols in D1). Note: embedding API 502 mid-run can leave chunks without vectors — wipe `.sce` and re-index if export shows chunks ≠ vectors.
-- Remaining: **spire-codex** (3.6 GB codebase clone — needs include-config decision before indexing; also `.gd`/GDScript files are unsupported by the parser), unity-ebooks-scraped (staging only, no config).
+- **`game-design-method`** (20c / 20v, 2026-10-26) and **`gem-td-poe1-typed-damage`** (42c / 0v, 2026-10-27) are in D1. Typed damage is keyword-only until a vector backfill. PoE 1 is an inspiration: tower plus gems, not an active skill gem plus support gems. Numeric differences are expected.
+- Remaining: **spire-codex** (3.6 GB codebase clone — needs include-config decision before indexing; also `.gd`/GDScript files are unsupported by the parser), unity-ebooks-scraped (staging only, no config). Vector backfill for keyword-only corpora (`unity-gem-td` docs, `gem-td-poe1-typed-damage`).
 
 ### Expansion Status (Batches 42–56) — Game Dev & Infrastructure Topics
 

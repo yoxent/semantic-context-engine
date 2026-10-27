@@ -1,12 +1,34 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-10-08
-**D1 Live Total**: **12,542 chunks, 5,939 vectors** (~268 MB)
+**Last Updated**: 2026-10-27
+**D1 Live Total**: **12,604 chunks, 5,959 vectors** (~269 MB), verified 2026-10-27. Baseline 12,542 chunks / 5,939 vectors (2026-10-08), plus `game-design-method` (20 chunks, 20 vectors) and `gem-td-poe1-typed-damage` (42 chunks, 0 vectors).
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
-**~217 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~222 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only).
+**~217 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~222 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only). **`game-design-method` (20c / 20v)** imported 2026-10-26.
+
+## Game Design Method (`game-design-method`) — **in D1** (2026-10-26)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `game-design-method` | 20 | 20 | ✅ Imported |
+
+Hand-written paraphrase of the usable design method in Reactorcore's *Game Design Technology: The Holy Grail of Fun* (https://reactorcoregames.github.io/game-design-showcase-portfolio/book/). Not a copy of the book.
+
+Kept: purpose test, foundations before content, forces instead of set pieces, multiplicative content, believable limits, world-logic balance, pacing as modules, padding review, feedback versus a lever, and the line on why a player pays.
+
+Left out on purpose: the book's ban on competition, and its ban on rewards, progression, and shops. Gem TD and Battle Royale Idle pillars stay the authority for those games. Source file: `knowledge/game-design-method/game-design-method.md`.
+
+## Gem TD / PoE 1 typed damage (`gem-td-poe1-typed-damage`) — **in D1** (2026-10-27)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `gem-td-poe1-typed-damage` | 42 | 0 | ✅ Imported, keyword only |
+
+Repository id `1f13bbbafa8a17a3`. Hand-written paraphrase. PoE pages were not stored verbatim. Fandom and poewiki.net returned 403 to a direct fetch; gem cards, Chill, and Freeze came from search snapshots, and the 2012 staff thread was fetched directly. URL list: `knowledge/urls/gem-td-poe1-typed-damage.txt`.
+
+Three layers stay separate: external PoE 1, Gem TD design (`DAMAGE-MODEL.md` and the 2026-09-23 ailment backlog), and the current Unity greybox. PoE 1 is an inspiration. Gem TD adopted some mechanics and interpreted them as a tower defense: a tower plus gems, not an active skill gem plus support gems. It is not an equal copy of the data, so differences in the numbers are expected and are not treated as conflicts. No Added Physical Damage Support gem was found. PoE Added Fire, in PoE, is extra fire from physical damage. Gem TD interpreted Added Fire as a flat typed component on a tower's hit, with its own amount. Vectors were not generated on this pass.
 
 ## Content Directories (`content-directories`) — **in D1** (2026-10-08)
 
