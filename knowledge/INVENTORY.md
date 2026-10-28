@@ -1,12 +1,35 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-10-27
-**D1 Live Total**: **12,604 chunks, 5,959 vectors** (~269 MB), verified 2026-10-27. Baseline 12,542 chunks / 5,939 vectors (2026-10-08), plus `game-design-method` (20 chunks, 20 vectors) and `gem-td-poe1-typed-damage` (42 chunks, 0 vectors).
+**Last Updated**: 2026-10-28
+**D1 Live Total**: **12,685 chunks, 5,959 vectors** (~272 MB), verified after importing the curated design-agent batch. Baseline 12,604 chunks / 5,959 vectors (2026-10-27), plus 81 keyword-only chunks from the 2026-10-28 design-agent review.
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
 **~217 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~222 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only). **`game-design-method` (20c / 20v)** imported 2026-10-26.
+The 2026-10-28 design-agent batch adds **81 keyword-only chunks** across `design-agent-candidates`, `design-md`, `ui-ux-pro-max`, `taste-skill`, `open-design`, `emilkowalski-skills`, `gsap-skills`, `magic-ui`, `react-bits`, `canvas-ui`, `dimensional-drawing`, `threejs-web`, `webgpu`, and `react-native-motion`. `impeccable` and `scroll-world` were reviewed and retained without duplicate imports. Vector backfill is deferred until an embedding key is explicitly available.
+
+## Design-agent candidates (`design-agent-candidates`) — **in D1** (2026-10-28)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `design-agent-candidates` | 8 | 0 | ✅ Imported, keyword-only review and licensing record |
+| `design-md` | 7 | 0 | ✅ Imported, keyword-only Google DESIGN.md contract |
+| `ui-ux-pro-max` | 6 | 0 | ✅ Imported, keyword-only curated design-intelligence guidance |
+| `taste-skill` | 6 | 0 | ✅ Imported, keyword-only art-direction and browser QA guidance |
+| `open-design` | 6 | 0 | ✅ Imported, keyword-only design workspace and handoff model |
+| `emilkowalski-skills` | 5 | 0 | ✅ Imported, keyword-only motion and review principles |
+| `gsap-skills` | 6 | 0 | ✅ Imported, keyword-only GSAP lifecycle guidance |
+| `magic-ui` | 5 | 0 | ✅ Imported, keyword-only source-owned component guidance |
+| `react-bits` | 5 | 0 | ✅ Imported, keyword-only effect integration and license guidance |
+| `canvas-ui` | 5 | 0 | ✅ Imported, keyword-only WebGL/WebGPU overlay patterns |
+| `dimensional-drawing` | 8 | 0 | ✅ Imported, keyword-only UI measurement and motion specification |
+| `threejs-web` | 5 | 0 | ✅ Imported, keyword-only browser 3D lifecycle notes |
+| `webgpu` | 5 | 0 | ✅ Imported, keyword-only compatibility and fallback notes |
+| `react-native-motion` | 4 | 0 | ✅ Imported, keyword-only Reanimated/Expo motion boundary |
+| **Total** | **81** | **0** | |
+
+Source record: `knowledge/urls/design-agent-candidates.txt`; curated files retain links and license boundaries. `awesome-design-md` was not bulk-indexed because it is a brand snapshot catalog; its neutral DESIGN.md structure is represented by `design-md`. `impeccable` and `scroll-world` were already present.
 
 ## Game Design Method (`game-design-method`) — **in D1** (2026-10-26)
 
