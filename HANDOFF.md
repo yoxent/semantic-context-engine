@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-10-28
-**Status**: D1 at **12,685 chunks, 5,959 vectors** (~272 MB), verified after the curated design-agent batch import. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08. **`content-directories`** (38 chunks / 36 vectors) imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
+**Last Updated**: 2026-11-03
+**Status**: D1 at **17,235 chunks, 5,959 vectors** (~272 MB), verified after the ORK recovery import. **`ork-framework`** (4,550 chunks / 0 vectors, keyword only) imported 2026-11-03. Missing `/api/class_*.html` pages have no Wayback capture; the live ORK 4 API classes were stored instead, along with ORK 3 system pages that ORK 4 does not duplicate. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08. **`content-directories`** (38 chunks / 36 vectors) imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (12,685 chunks, 5,959 vectors)
+- **D1 Database**: `sce-db` (17,235 chunks, 5,959 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -31,10 +31,10 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  12,685
+Chunks:  17,235
 Vectors: 5,959 (2048-dim embeddings)
 Symbols: 290 (own-repo corpora + 3 from pso.js)
-Topics:  ~218 knowledge + 4 own-repo corpora + 2 GitHub sources, plus game-design-method, gem-td-poe1-typed-damage, and the curated design-agent topics
+Topics:  ~219 knowledge + 4 own-repo corpora + 2 GitHub sources, plus game-design-method, gem-td-poe1-typed-damage, the curated design-agent topics, and ork-framework
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
 Size:    ~272 MB (approximate)
 ```
@@ -78,6 +78,7 @@ Size:    ~272 MB (approximate)
 - **Unreal Foundation**: Blueprints, Game Framework, UMG UI, Animation
 - **Unreal Advanced**: Niagara VFX, Chaos Physics, Networking, Optimization
 - **Unreal Deepen (Context7)**: unreal-blueprints-deep (10), unreal-game-framework-deep (8), unreal-umg-ui-deep (10), unreal-animation-deep (10), unreal-niagara-deep (7), unreal-chaos-deep (7), unreal-networking-deep (8), unreal-optimization-deep (9)
+- **ORK 4 RPG Framework** (`ork-framework`, 4,550 chunks, keyword only): public ORK 4 system docs as a blueprint for our own Unity systems, plus ORK 3 pages with no ORK 4 counterpart and the runtime class cards whose old `/api/` URLs 404 with no Wayback capture. Not the tutorials or ORK 2 hub. Vectors deferred.
 - **Game Dev**: Gem TD project docs (`unity-gem-td`, 2,362 chunks) — GDD / ARCHITECTURE / UI-SPEC / planning / SDD / wiki catalog; plus `gem-td-inspirations` (159 chunks, BTD5/6 Nordhold Infinitode). **`gem-td-poe1-typed-damage`** (42 chunks, 0 vectors): PoE 1 inspired Gem TD. Gem TD adopted some mechanics and interpreted them as a tower defense — a tower plus gems, not an active skill gem plus support gems. PoE rules, Gem TD design, and the greybox stay separate. Number differences are expected. **`game-design-method`** (20 chunks, 20 vectors): paraphrase of the usable design method from Reactorcore's book; competition, rewards, and shops stay with the game pillars.
 - **Design-agent skills and browser graphics**: `design-agent-candidates` (8), `design-md` (7), `ui-ux-pro-max` (6), `taste-skill` (6), `open-design` (6), `emilkowalski-skills` (5), `gsap-skills` (6), `magic-ui` (5), `react-bits` (5), `canvas-ui` (5), `dimensional-drawing` (8), `threejs-web` (5), `webgpu` (5), and `react-native-motion` (4) — all keyword-only, curated notes with source/license boundaries. `impeccable` and `scroll-world` were already indexed and not duplicated.
 - **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)

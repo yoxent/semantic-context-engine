@@ -1,13 +1,25 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-10-28
-**D1 Live Total**: **12,685 chunks, 5,959 vectors** (~272 MB), verified after importing the curated design-agent batch. Baseline 12,604 chunks / 5,959 vectors (2026-10-27), plus 81 keyword-only chunks from the 2026-10-28 design-agent review.
+**Last Updated**: 2026-11-03
+**D1 Live Total**: **17,235 chunks, 5,959 vectors** (~272 MB), verified after the ORK recovery import. Baseline 12,685 chunks / 5,959 vectors (2026-10-28), plus 4,550 keyword-only ORK chunks.
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Status
 
 **~217 knowledge topics** + 3 own-repo corpora + **2 GitHub open-source sources** imported to D1 (~222 total). Batch 54 (Random Number Algorithms) + **Batch 55 (Game Dev Infrastructure)** complete with vectors. Batch 56 content topics (slay-the-spire-2, sts2-enemies-ai-brain) imported; `cpp` + `unreal-engine` re-indexed and imported; **`boids` (35c)**, **`steering-behaviors` (35c)**, **`swarm-intelligence` (32c)**, **`crowd-simulation` (29c)**, **`flow-field-pathfinding` (43c)**, **`cellular-automata` (38c)** + GitHub sources `three-steer` (7c) & `pso.js` (4c, +3 symbols) added. GitHub open-source repos are a standard source type (reviewed per topic; added when licensed + parseable). Remaining: `spire-codex` (needs include-config decision), `unity-ebooks-scraped` (staging only). **`game-design-method` (20c / 20v)** imported 2026-10-26.
 The 2026-10-28 design-agent batch adds **81 keyword-only chunks** across `design-agent-candidates`, `design-md`, `ui-ux-pro-max`, `taste-skill`, `open-design`, `emilkowalski-skills`, `gsap-skills`, `magic-ui`, `react-bits`, `canvas-ui`, `dimensional-drawing`, `threejs-web`, `webgpu`, and `react-native-motion`. `impeccable` and `scroll-world` were reviewed and retained without duplicate imports. Vector backfill is deferred until an embedding key is explicitly available.
+
+## ORK 4 RPG Framework (`ork-framework`) — **in D1** (2026-11-03)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `ork-framework` | 4550 | 0 | ✅ Imported, keyword only |
+
+Repository id `a8b006f35e584d97`. Public ORK 4 system documentation from https://orkframework.com/guide/ork4/ork4-documentation/, plus ORK 3 system pages that have no ORK 4 counterpart (formula nodes, battle AI nodes, action results, grid battles, status conditions, game over, inventory overview, combatant scripting). Kept as a blueprint for our own Unity gameplay systems. Tutorials, the blog, and the ORK 2 hub are not included. URL list: `knowledge/urls/ork-framework.txt`.
+
+The scripting guide links to `orkframework.com/api/class_*.html`. Those URLs return 404. The Wayback Machine has no capture of them (CDX and the availability API are empty; `/api/` in the archive is only the landing page and Doxygen icons). The same classes are on the live ORK 4 API at `resources/api/api_ork_4/`, stored as `ork4-api-*.md`. The ORK 3 API folder `resources/api/api_ork_3/` also 404s and has no archive snapshot.
+
+Unity 6000.3 primitives these systems sit on are already indexed (`unity-scriptable-objects`, `game-design-patterns`, events, coroutines, scene management, UI) and are named from the blueprint. Vectors were not generated. Keyword search is live on the API.
 
 ## Design-agent candidates (`design-agent-candidates`) — **in D1** (2026-10-28)
 

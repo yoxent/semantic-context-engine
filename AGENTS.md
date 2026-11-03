@@ -5,7 +5,7 @@
 1. `README.md` — Project overview, setup, CLI usage, package map
 2. `HANDOFF.md` — Live state, deployment commands, known issues
 3. `GOAL.md` — Full product vision and design principles
-4. `knowledge/INVENTORY.md` — What's indexed in D1 (~1249 chunks)
+4. `knowledge/INVENTORY.md` — What's indexed in D1 (~17,235 chunks)
 
 ## Architecture
 
