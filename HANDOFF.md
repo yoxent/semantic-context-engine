@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-11-03
-**Status**: D1 at **17,235 chunks, 5,959 vectors** (~272 MB), verified after the ORK recovery import. **`ork-framework`** (4,550 chunks / 0 vectors, keyword only) imported 2026-11-03. Missing `/api/class_*.html` pages have no Wayback capture; the live ORK 4 API classes were stored instead, along with ORK 3 system pages that ORK 4 does not duplicate. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08. **`content-directories`** (38 chunks / 36 vectors) imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
+**Last Updated**: 2026-11-07
+**Status**: D1 at **17,321 chunks, 5,943 vectors** (~272 MB). `unity-ui-toolkit` is 86 chunks / 9 vectors (repository `f875ed6a8ea804b9`). `unity-ui` is 93 chunks / 66 vectors after syncing the deep UI Toolkit note. The new notes are keyword-searchable. Embedding the rest hit the OpenRouter free-tier daily cap (HTTP 429). Backfill with `scripts/backfill-vectors.mjs` after the reset. **`ork-framework`** (4,550 chunks / 0 vectors, keyword only) imported 2026-11-03. Missing `/api/class_*.html` pages have no Wayback capture; the live ORK 4 API classes were stored instead, along with ORK 3 system pages that ORK 4 does not duplicate. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08. **`content-directories`** (38 chunks / 36 vectors) imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
 
 **⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (17,235 chunks, 5,959 vectors)
+- **D1 Database**: `sce-db` (17,321 chunks, 5,943 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -31,8 +31,8 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  17,235
-Vectors: 5,959 (2048-dim embeddings)
+Chunks:  17,321
+Vectors: 5,943 (2048-dim embeddings)
 Symbols: 290 (own-repo corpora + 3 from pso.js)
 Topics:  ~219 knowledge + 4 own-repo corpora + 2 GitHub sources, plus game-design-method, gem-td-poe1-typed-damage, the curated design-agent topics, and ork-framework
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
@@ -53,7 +53,7 @@ Size:    ~272 MB (approximate)
 - **Unity Deep**: Particles/VFX, Post-Processing, Build Profiles, GPU Instancing/LOD, Camera, Input Interfaces, Editor Scripting, Player Settings, Graphics API
 - **Unity Packages**: Post-Processing Stack, Scriptable Build Pipeline, Test Framework, UI Test Framework, Localization, Platform Toolkit, Addressables, Cinemachine 3, Netcode, Input System
 - **Unity 6.6 Content Directories** (`content-directories`, 38 chunks / 36 vectors): Manual + Scripting API, Addressables 4.0 conversion, Unity blog, UnityDataTools on-disk format. Not in the 6000.3 manual.
-- **Unity UI**: UGUI, UI Toolkit, TextMeshPro (92 chunks)
+- **Unity UI**: UGUI, UI Toolkit, TextMeshPro (93 chunks / 66 vectors). Dedicated `unity-ui-toolkit` expanded 2026-11-07 (86 chunks / 9 vectors) for 6000.3 architecture, lists, styling, performance, troubleshooting, game-UI patterns, and `IBinding` / `CustomBinding`. The deep UI Toolkit note is synced to those contracts. Keyword search is live. Vector backfill is waiting on the embedding quota.
 - **Unity Cloud**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer, Economy, Authentication (87 chunks)
 - **Unity Networking**: Photon PUN2/Fusion/Quantum, Mirror, FishNet, UTP, Nakama (72 chunks)
 - **Unity Deepened**: Sampler State, Timeline, Game Juice/Microinteractions, Design Levers/Tuning, Game Designer Playbook (PDF)

@@ -1,8 +1,18 @@
 # D1 Knowledgebase Inventory
 
-**Last Updated**: 2026-11-03
-**D1 Live Total**: **17,235 chunks, 5,959 vectors** (~272 MB), verified after the ORK recovery import. Baseline 12,685 chunks / 5,959 vectors (2026-10-28), plus 4,550 keyword-only ORK chunks.
+**Last Updated**: 2026-11-07
+**D1 Live Total**: **17,321 chunks, 5,943 vectors** (~272 MB), verified after syncing `context7-ui-toolkit-deep.md` to the 6000.3 binding text. Prior total 17,320 chunks / 5,968 vectors the same day.
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
+
+## Unity UI Toolkit (`unity-ui-toolkit`) — refreshed (2026-11-07)
+
+| Topic | Chunks | Vectors | Status |
+|-------|--------|---------|--------|
+| `unity-ui-toolkit` | 86 | 9 | ✅ Includes `IBinding` and `CustomBinding` contracts. Keyword-complete. Vectors partial |
+
+Repository id `f875ed6a8ea804b9`. Unity 6000.3 notes checked against `docs.unity.com/en-us/engine/6000.3` and Context7 `/websites/unity_en-us_engine_6000_6`. Covers uGUI comparison, runtime architecture, USS specificity and transitions, ListView virtualization, performance (`usageHints`, `translate`), troubleshooting, a game-UI cookbook, and the `IBinding` / `CustomBinding` contracts in `unity-ui-toolkit-binding-interfaces.md`. URL list: `knowledge/urls/unity-ui-toolkit.txt`. Retrieval log: `unity-ui-toolkit-retrieval-eval.md`.
+
+9 vectors remain on the notes embedded before the free-tier cap. The other 77 chunks are keyword-searchable. `context7-ui-toolkit-deep.md` is synced to the same `IBinding` and `CustomBinding` contracts. Run `node scripts/backfill-vectors.mjs knowledge/unity-ui-toolkit` after the daily embedding reset. The deep file also needs a vector backfill. `PanelRenderer.RegisterUIReloadCallback` appears in 6000.6 Context7 pages and was not in the 6000.3 script reference checked here. 6000.3 still queries the tree in `OnEnable`.
 
 ## Status
 
@@ -579,7 +589,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | unity-events | 6 | 6 | UnityEvent, UnityAction, C# events |
 | unity-scene-management | 7 | 7 | Scene loading, transitions, additive scenes |
 | unity-scriptable-objects | 6 | 6 | Data containers, event channels |
-| unity-ui-toolkit | 2 | 2 | UI Toolkit, USS/UXML |
+| unity-ui-toolkit | 86 | 9 | UI Toolkit 6000.3, including `IBinding` and `CustomBinding`. Keyword-complete; vectors partial |
 | unreal-engine | 1 | 1 | Unreal Blueprints |
 | cpp | 4 | 4 | C++ getting started + cppreference (re-indexed 2026-08-05) |
 | csharp | 4 | 4 | C# / .NET async, generics |
@@ -599,7 +609,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | object-pooling | 6 | 6 | Generic pool pattern, Unity usage |
 | vector-math | 5 | 5 | Vector2/3, quaternions, formulas |
 | unity-cloud | 87 | 75 | **NEW**: Cloud Save, Analytics, Remote Config, Leaderboards, Multiplayer, Economy, Authentication, Vivox, LevelPlay, Deployment |
-| unity-ui | 92 | 92 | **NEW**: UGUI (Canvas, RectTransform, Image, Text, Button, Toggle, Slider, ScrollRect, EventSystem), UI Toolkit (VisualElement, USS, UXML, UI Builder, manipulators), TextMeshPro (fonts, rich text, input field, mesh modifiers) |
+| unity-ui | 93 | 66 | UGUI, UI Toolkit, TextMeshPro. Deep UI Toolkit note synced to 6000.3 `IBinding` and `CustomBinding`. Its 26 chunks are keyword-only until vector backfill |
 | design-patterns | 127 | 127 | **NEW**: Mobile UI screen patterns (onboarding, login, feed, settings, etc.), Material Design 3 components (buttons, cards, chips, navigation, input), Apple HIG iOS patterns, UI-Patterns.com catalog |
 | spline | 6 | 6 | **Deepened**: Unity Splines package (knots, evaluation, SplineContainer, Animate, Instantiate, Mesh, Extrude, Jobs) + generic Bezier/Catmull-Rom formulas |
 | unity-splines | 25 | 25 | **NEW**: Unity Splines deep reference — SplineContainer, BezierKnot, CatmullRomKnot, LinearKnot, SplineAnimate, SplineInstantiate, SplineMesh, SplineExtrude, evaluation, distance, Jobs |
