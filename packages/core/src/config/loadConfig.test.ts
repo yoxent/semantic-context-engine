@@ -25,7 +25,7 @@ describe("loadConfig", () => {
         JSON.stringify({ search: { defaultLimit: 3 }, logging: { level: "debug" } })
       );
       const config = await loadConfig(dir);
-      expect(config.indexing.ignore).toContain(".git/**");
+      expect(config.indexing.ignore).toContain("**/.git/**");
       expect(config.search.defaultLimit).toBe(3);
       expect(config.logging.level).toBe("debug");
     } finally {
