@@ -14,7 +14,7 @@ Add hand-written knowledge topics to the Semantic Context Engine in the same vei
 
 ## Current state (2026-08-14)
 
-- **D1**: 10,142 chunks / 5,903 vectors (2048-dim, `nvidia/llama-nemotron-embed-vl-1b-v2:free`)
+- **D1**: 14,417 chunks / 5,313 vectors — SCE repo re-imported cleaned 2026-11-07 (317 chunks). Embedding model migrating to `nvidia/nemotron-3-embed-1b:free`; existing vectors still on `nvidia/llama-nemotron-embed-vl-1b-v2:free`. Resume: `docs/RESUME-embedding-migration.md`
 - **Live**: frontend https://sce-web.pasttime.xyz/ · API https://sce-api.pasttime.xyz
 - **Done recently**: Batch 55 (71c) + batch 56 content topics (28c) + `cpp`/`unreal-engine` stragglers (5c) + `boids` (35c) + **`steering-behaviors` (35c) + `three-steer` (7c)** + **`swarm-intelligence` (32c) + `pso.js` (4c, +3 symbols)** + **`crowd-simulation` (29c)** + **`flow-field-pathfinding` (43c)** + **`cellular-automata` (38c)**
 - **GitHub source convention (established this session)**: vetted GitHub repos are first-class sources — clone to `knowledge/github/<repo>/`, require MIT/Apache-2.0 license, index only TS/JS/MD (`include: ["**/*.js", "**/*.md"]`); C#/C++/Java/Python repos are knowledge-only (parser can't read them). Added so far: `three-steer`, `pso.js`. See HANDOFF.md Notes.
@@ -47,7 +47,7 @@ Hand-write comprehensive `.md` files — do **not** scrape (same as the PRNG top
 # 0. create topic
 mkdir knowledge/<topic>        # write <topic>-*.md files + sce.config.json
 #   config template: copy knowledge/boids/sce.config.json verbatim
-#   (embedding: openai-compatible, OpenRouter, nvidia/llama-nemotron-embed-vl-1b-v2:free,
+#   (embedding: openai-compatible, OpenRouter, nvidia/nemotron-3-embed-1b:free,
 #    2048 dims, batchSize=1; indexing.include ["**/*.md"])
 
 # 1. index (from the topic dir)

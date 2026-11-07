@@ -1,9 +1,9 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-11-07
-**Status**: D1 at **17,321 chunks, 5,943 vectors** (~272 MB). `unity-ui-toolkit` is 86 chunks / 9 vectors (repository `f875ed6a8ea804b9`). `unity-ui` is 93 chunks / 66 vectors after syncing the deep UI Toolkit note. The new notes are keyword-searchable. Embedding the rest hit the OpenRouter free-tier daily cap (HTTP 429). Backfill with `scripts/backfill-vectors.mjs` after the reset. **`ork-framework`** (4,550 chunks / 0 vectors, keyword only) imported 2026-11-03. Missing `/api/class_*.html` pages have no Wayback capture; the live ORK 4 API classes were stored instead, along with ORK 3 system pages that ORK 4 does not duplicate. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only; 0 vectors — backfill later) re-imported 2026-10-08. **`content-directories`** (38 chunks / 36 vectors) imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
+**Last Updated**: 2026-11-07 (session 2: index hygiene + embedding model migration)
+**Status**: D1 at **14,417 chunks, 5,313 vectors** after removing 2,904 junk chunks (`node_modules`/`.pi-subagents`) from the SCE repo corpus and re-importing it cleaned (317 chunks). **Embedding model changed** to `nvidia/nemotron-3-embed-1b:free` (2048-dim, ~12 points better on RTEB/MMTEB, 100% uptime vs the retiring `llama-nemotron-embed-vl-1b-v2`). **Local migration is incomplete** — 239 chunks / 187 vectors; 14 files / 200 chunks still need embedding. Resume after the daily reset via `docs/RESUME-embedding-migration.md`. **D1 still holds old-model vectors** for the SCE repo (146), so a worker guard now fails loudly on model mismatch instead of returning garbage scores. `unity-ui-toolkit` is 86 chunks / 9 vectors (repository `f875ed6a8ea804b9`). **`ork-framework`** (4,550 chunks / 0 vectors, keyword only) imported 2026-11-03. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only) re-imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
 
-**⚠️ Known issues:** Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Unreal deepen topics created via Context7-generated markdown + written content. Backfill script (`scripts/backfill-vectors.mjs`) available to regenerate embedding vectors for topics indexed without an embedding config. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
+**⚠️ Known issues:** OpenRouter free tier is capped at **50 requests/day account-wide across all free models** (not per-model — verified on both models). Resets 08:00 UTC+8. This makes full-corpus re-embeds impractical (D1's 5,313 vectors ≈ 1,063 requests ≈ 21 days). Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
 ---
 
@@ -12,7 +12,7 @@
 ### Live Demo
 - **Frontend**: https://sce-web.pasttime.xyz/
 - **API**: https://sce-api.pasttime.xyz/api/
-- **D1 Database**: `sce-db` (17,321 chunks, 5,943 vectors)
+- **D1 Database**: `sce-db` (14,417 chunks, 5,313 vectors)
 
 ### What's Working
 | Feature | Status | Notes |
@@ -20,7 +20,7 @@
 | Keyword Search | ✅ | ~55ms, case-insensitive word AND, stopwords stripped |
 | Semantic Search | ✅ | Demo: lexical candidates → embed → cosine rerank. Local: full corpus |
 | Hybrid Search | ✅ | RRF fusion (k=60) of keyword + demo semantic leg |
-| AST Search | ✅ | 287 symbols (own-repo corpora) |
+| AST Search | ✅ | 3 symbols (only `pso.js` remains; the SCE purge removed its 290) |
 | Ranking Boosts | ✅ | Filename (up to +8) > heading (up to +7) > snippet (+ up to 4) |
 | Deduplication | ✅ | Max 2 hits per file |
 | Frontend UI | ✅ | RetroUI theme + search-mode glossary, live hints, ranking explainer |
@@ -31,12 +31,13 @@
 ## 📊 D1 Database State
 
 ```
-Chunks:  17,321
-Vectors: 5,943 (2048-dim embeddings)
-Symbols: 290 (own-repo corpora + 3 from pso.js)
+Chunks:  14,417
+Vectors: 5,313 (2048-dim embeddings)
+Symbols:  3
 Topics:  ~219 knowledge + 4 own-repo corpora + 2 GitHub sources, plus game-design-method, gem-td-poe1-typed-damage, the curated design-agent topics, and ork-framework
-Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free
-Size:    ~272 MB (approximate)
+Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free (existing vectors)
+         nvidia/nemotron-3-embed-1b:free (target — local rebuild in progress)
+Size:    ~240 MB (approximate)
 ```
 
 ### Topics Indexed (~229)
@@ -83,7 +84,61 @@ Size:    ~272 MB (approximate)
 - **Design-agent skills and browser graphics**: `design-agent-candidates` (8), `design-md` (7), `ui-ux-pro-max` (6), `taste-skill` (6), `open-design` (6), `emilkowalski-skills` (5), `gsap-skills` (6), `magic-ui` (5), `react-bits` (5), `canvas-ui` (5), `dimensional-drawing` (8), `threejs-web` (5), `webgpu` (5), and `react-native-motion` (4) — all keyword-only, curated notes with source/license boundaries. `impeccable` and `scroll-world` were already indexed and not duplicated.
 - **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
-- Own-repo corpora: SCE packages (290), word-guess (423), web-portfolio (155), unity-gem-td docs (2,362)
+- Own-repo corpora: SCE packages (317 after cleanup — was 290, then 3,221 with junk), word-guess (423), web-portfolio (155), unity-gem-td docs (2,362)
+
+---
+
+## 🧹 Index Hygiene & Embedding Migration (2026-11-07)
+
+### Root cause of the runaway index
+
+`defaultIgnorePatterns` used root-anchored patterns (`node_modules/**`), which only match at the repo root. Because `FileDiscovery` also walked everything and filtered *afterwards*, monorepos silently indexed every nested `packages/*/node_modules/**`.
+
+Measured effect on the SCE repo's own index: **2,778 of 3,221 chunks (86%) were noise** — `acorn/CHANGELOG.md` alone contributed 218 chunks, plus 1,102 chunks of `.pi-subagents` agent transcripts.
+
+On a Unity project the effect was worse: `**/*.cs` discovered **8,575** files, of which **8,117** were `Library/PackageCache/` (a 5.1 GB, 61,603-file folder). Walking that with Defender active is the likely cause of a reported laptop crash.
+
+### Fixes
+
+| File | Change |
+|---|---|
+| `packages/core/src/config/defaults.ts` | Every pattern `**/`-prefixed (recursive). Added `.next`, `.turbo`, `.wrangler`, `.superpowers`, `.worktrees`, `.gradle`, `PackageCache`, `Logs`, `UserSettings`, `Build`, `Builds`, `MemoryCaptures`, `Recordings`, `.vs` |
+| `packages/indexing/src/FileDiscovery.ts` | Pass `ignore` to `fast-glob` → prunes during traversal. Unity `**/*.cs`: 8,575 → 458 files, 115ms → 39ms |
+| `packages/storage/src/SqliteStorage.ts` | `migrateSchema()` adds `part_index`/`total_parts` to legacy DBs (`CREATE TABLE IF NOT EXISTS` never adds columns). Four DBs were silently un-reindexable |
+| `packages/indexing/src/Indexer.ts` | **Roll back the `files` record when embedding fails.** `saveFile()` ran *before* `embed()`, so a 429 left the file marked "unchanged" with zero vectors — skipped forever, invisible to semantic search |
+
+The `Indexer` bug is the likely explanation for stale-vector gaps previously noted here (e.g. `cpp`/`unreal-engine` having file records but 0 chunks).
+
+### D1 cleanup
+
+Purged and re-imported the SCE repo corpus (`5ebbc9b9d0a0e258`): 3,221 → 317 chunks, 776 → 146 vectors. D1 totals went **17,321 → 14,417 chunks**, **5,943 → 5,313 vectors**. Verified by live search: `acorn AggregateType walker` now returns 0 results.
+
+Side effect: D1 symbols dropped **290 → 3**. Only `pso.js` symbols remain; AST search is effectively dormant until own-repo code is re-indexed.
+
+### Embedding model change
+
+`nvidia/llama-nemotron-embed-vl-1b-v2:free` → **`nvidia/nemotron-3-embed-1b:free`**.
+
+| | Old | New |
+|---|---|---|
+| Dimensions | 2048 | **2048** (compatible) |
+| Parameters | ~1.7B | ~1.14B |
+| Modality | text + image | text only |
+| RTEB 16 (NDCG@10) | 61.98 | **72.38** |
+| MMTEB Retrieval | 59.71 | **71.05** |
+| Availability | being retired | 100% |
+
+**Dimension match does not make old vectors reusable** — `SqliteVectorStore` filters on exact model name, so a model change is always a full re-embed. Added `assertVectorModelMatches()` in the worker: `scoreVectorsForIds` only compares array *lengths*, so a mismatch would have silently produced meaningless scores instead of failing.
+
+### Quota reality
+
+OpenRouter free tier is **50 requests/day, account-wide across all free models** (verified identical on both models — reverting gains nothing). Resets 08:00 UTC+8.
+
+Batching is per-file, not global: `Indexer` calls `embed()` once per file and the provider batches inside that call. Real cost is `Σ ceil(fileChunks / batchSize)`, not `ceil(total / batchSize)`.
+
+A full D1 re-embed (5,313 vectors) needs ≈ **1,063 requests ≈ 21 days** on the free tier. Local migration to date: **239 chunks / 187 vectors**; 14 files / 200 chunks outstanding.
+
+**Resume instructions:** `docs/RESUME-embedding-migration.md` (delete once complete).
 
 ---
 
@@ -209,7 +264,7 @@ Ranking (keyword & semantic legs): filename boosts strongest, then heading, then
 3. **hybrid**: RRF fusion of keyword + semantic (k=60)
 4. **ast**: Symbol table lookup — exact match then prefix fallback
 
-> **Note**: AST search is API/MCP only (not in frontend UI). With 287 symbols indexed, it's more useful for AI agents than human users.
+> **Note**: AST search is API/MCP only (not in frontend UI). After the SCE corpus purge only 3 symbols remain (`pso.js`), so AST search is effectively dormant until more own-repo code is re-indexed.
 
 ### Multi-Part Document Expansion
 When chunks exceed ~7500 chars, the indexer splits them into linked parts. The search API automatically expands multi-part results: when a search hits any part of a split document, all sibling parts are returned together.

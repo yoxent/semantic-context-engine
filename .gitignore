@@ -7,6 +7,7 @@ coverage/
 .DS_Store
 .pi-subagents/
 sce-export/
+sce-export-*/
 .dev.vars
 .wrangler/
 knowledge/

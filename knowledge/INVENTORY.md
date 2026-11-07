@@ -1,7 +1,7 @@
 # D1 Knowledgebase Inventory
 
 **Last Updated**: 2026-11-07
-**D1 Live Total**: **17,321 chunks, 5,943 vectors** (~272 MB), verified after syncing `context7-ui-toolkit-deep.md` to the 6000.3 binding text. Prior total 17,320 chunks / 5,968 vectors the same day.
+**D1 Live Total**: **14,417 chunks, 5,313 vectors** (~240 MB), after purging the SCE repo's own corpus of 2,904 junk chunks (`node_modules`/`.pi-subagents`) and re-importing it cleaned (317 chunks / 146 vectors). Prior total 17,321 chunks / 5,943 vectors the same day.
 **Live**: https://sce-web.pasttime.xyz/ · **API**: https://sce-api.pasttime.xyz
 
 ## Unity UI Toolkit (`unity-ui-toolkit`) — refreshed (2026-11-07)
@@ -528,7 +528,7 @@ Counts from local `.sce/metadata.sqlite` per topic (keyword search works even wh
 | Topic | Chunks | Vectors | Scope |
 |-------|--------|---------|-------|
 | **Own-repo corpora** | | | |
-| SCE packages | 290 | 290 | `packages/` |
+| SCE packages | 317 | 317 | `E:\Projects\Indie\semantic-context-engine` (root repo, cleaned 2026-11-07) |
 | word-guess | 423 | 423 | `E:\Projects\Indie\word-guess` |
 | web-portfolio | 155 | 155 | `E:\Projects\Web\web-portfolio` |
 | unity-gem-td | 2362 | 0 | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` (GDD/ARCHITECTURE/UI-SPEC/planning/wiki; excludes `sources/`) |
@@ -1432,7 +1432,7 @@ Local index stats (chunks / vectors exported):
 
 | Corpus | Path | Chunks | Vectors | Symbols |
 |--------|------|--------|---------|---------|
-| SCE packages | `packages/` | 290 | 290 | 265 |
+| SCE packages | `E:\Projects\Indie\semantic-context-engine` | 317 | 146 | 0 |
 | word-guess | `E:\Projects\Indie\word-guess` | 423 | 423 | 287 |
 | web-portfolio | `E:\Projects\Web\web-portfolio` | 155 | 155 | 61 |
 | unity-gem-td | `E:\Projects\Docs\project-docs\Unity\unity-gem-td` | 2362 | 0 | 0 |
