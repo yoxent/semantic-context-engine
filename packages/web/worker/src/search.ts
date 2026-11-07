@@ -10,7 +10,7 @@
  */
 
 import type { D1Database } from "@cloudflare/workers-types";
-import { embedQuery, type EmbeddingEnv } from "./embedding";
+import { embedQuery, VECTOR_MODEL, type EmbeddingEnv } from "./embedding";
 import {
   type SearchFilters,
   buildFilterClause,
@@ -113,6 +113,28 @@ async function keywordSearch(
 // Semantic search
 // ---------------------------------------------------------------------------
 
+/**
+ * Fail loudly when D1's stored vectors were built with a different model than
+ * the one we are about to embed the query with.
+ *
+ * `scoreVectorsForIds` only compares array lengths, so a model mismatch does
+ * not throw — it returns meaningless cosine scores. Guarding here turns a
+ * silent quality regression into an explicit, actionable error.
+ */
+async function assertVectorModelMatches(db: D1Database): Promise<void> {
+  const row = await db
+    .prepare("SELECT value FROM embedding_config WHERE key = 'model'")
+    .first();
+  const stored = row?.value as string | undefined;
+  if (stored && stored !== VECTOR_MODEL) {
+    throw new Error(
+      `Embedding model mismatch: D1 vectors were built with "${stored}" ` +
+        `but the worker is configured for "${VECTOR_MODEL}". ` +
+        `Re-index and re-import vectors, or revert the worker model.`
+    );
+  }
+}
+
 async function semanticSearch(
   db: D1Database,
   env: EmbeddingEnv,
@@ -124,6 +146,8 @@ async function semanticSearch(
   if (candidateIds.length === 0) {
     return [];
   }
+
+  await assertVectorModelMatches(db);
 
   const queryEmbedding = await embedQuery(env, query);
   const similarities = await scoreVectorsForIds(db, queryEmbedding, candidateIds);

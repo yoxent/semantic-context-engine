@@ -17,7 +17,7 @@
 import { resolve, join } from "node:path";
 import { createHash } from "node:crypto";
 
-const EMBEDDING_MODEL = "nvidia/llama-nemotron-embed-vl-1b-v2:free";
+const EMBEDDING_MODEL = "nvidia/nemotron-3-embed-1b:free";
 const EMBEDDING_DIMS = 2048;
 const API_BASE = "https://openrouter.ai/api/v1";
 const MAX_CHARS_PER_PART = 7500;

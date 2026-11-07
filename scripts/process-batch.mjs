@@ -597,7 +597,7 @@ function stepCreateConfig(topic) {
     embedding: {
       provider: "openai-compatible",
       baseUrl: "https://openrouter.ai/api/v1",
-      model: "nvidia/llama-nemotron-embed-vl-1b-v2:free",
+      model: "nvidia/nemotron-3-embed-1b:free",
       dimensions: 2048,
       batchSize: 1,
       apiKeyEnv: "OPENROUTER_API_KEY",
