@@ -4,7 +4,7 @@
     "baseUrl": "https://openrouter.ai/api/v1",
     "model": "nvidia/nemotron-3-embed-1b:free",
     "dimensions": 2048,
-    "batchSize": 5,
+    "batchSize": 10,
     "apiKeyEnv": "OPENROUTER_API_KEY"
   },
   "indexing": {

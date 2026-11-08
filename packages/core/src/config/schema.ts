@@ -12,7 +12,9 @@ export const embeddingConfigSchema = z.object({
   model: z.string().min(1),
   dimensions: z.number().int().positive(),
   batchSize: z.number().int().positive().default(32),
-  apiKeyEnv: z.string().optional()
+  apiKeyEnv: z.string().optional(),
+  maxRetries: z.number().int().min(0).optional(),
+  retryDelayMs: z.number().int().min(0).optional()
 });
 
 export type EmbeddingConfig = z.infer<typeof embeddingConfigSchema>;

@@ -136,9 +136,13 @@ OpenRouter free tier is **50 requests/day, account-wide across all free models**
 
 Batching is per-file, not global: `Indexer` calls `embed()` once per file and the provider batches inside that call. Real cost is `Σ ceil(fileChunks / batchSize)`, not `ceil(total / batchSize)`.
 
-A full D1 re-embed (5,313 vectors) needs ≈ **1,063 requests ≈ 21 days** on the free tier. Local migration to date: **239 chunks / 187 vectors**; 14 files / 200 chunks outstanding.
+Because cost rounds up per file, a large `batchSize` pays off. Root `sce.config.json` uses `batchSize: 10` — measured 37 requests for the repo instead of 63 at `batchSize: 5` (which would not have fit the 50/day budget). Worst-case real payload at `batchSize: 10` is 11,670 tokens, against the model's 32,768 limit.
 
-**Resume instructions:** `docs/RESUME-embedding-migration.md` (delete once complete).
+A full D1 re-embed (5,313 vectors) still needs ≈ **1,063 requests ≈ 21 days** on the free tier at `batchSize: 5`, and the same per-file rounding applies.
+
+**Local migration: COMPLETE (2026-11-08).** 24 files / 393 chunks / 393 vectors, all on `nvidia/nemotron-3-embed-1b:free`, no gaps, FTS in sync, integrity ok. Keyword, semantic, and hybrid all verified.
+
+Still outstanding: **D1** (holds the old model) and the **other local databases** (`packages/.sce`, `word-guess/.sce`, `web-portfolio/.sce`, `knowledge/*/.sce`). Details in `docs/RESUME-embedding-migration.md`.
 
 ---
 

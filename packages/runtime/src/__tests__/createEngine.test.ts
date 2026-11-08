@@ -104,7 +104,9 @@ describe("createEngine semantic wiring", () => {
             provider: "openai-compatible",
             baseUrl: "http://localhost:11434/v1",
             model: "nomic-embed-text",
-            dimensions: 4
+            dimensions: 4,
+            // This test asserts routing, not retry/backoff behaviour.
+            maxRetries: 0
           }
         })
       );
@@ -149,7 +151,9 @@ describe("createEngine hybrid wiring", () => {
             provider: "openai-compatible",
             baseUrl: "http://localhost:11434/v1",
             model: "nomic-embed-text",
-            dimensions: 4
+            dimensions: 4,
+            // This test asserts routing, not retry/backoff behaviour.
+            maxRetries: 0
           }
         })
       );
