@@ -1,7 +1,7 @@
 # HANDOFF — Semantic Context Engine
 
-**Last Updated**: 2026-11-08 (local embedding migration completed)
-**Status**: D1 at **14,417 chunks, 5,313 vectors** after removing 2,904 junk chunks (`node_modules`/`.pi-subagents`) from the SCE repo corpus and re-importing it cleaned (317 chunks). **Embedding model changed** to `nvidia/nemotron-3-embed-1b:free` (2048-dim, ~12 points better on RTEB/MMTEB, 100% uptime vs the retiring `llama-nemotron-embed-vl-1b-v2`). **Local migration is COMPLETE** — 24 files / 393 chunks / 393 vectors, all on `nemotron-3-embed-1b`, no gaps. **D1 still holds old-model vectors** for the whole published corpus (14,417 chunks / 5,313 vectors on `llama-nemotron-embed-vl-1b-v2`); the SCE repo slice is 317 chunks / 146 vectors. The worker guard fails loudly on model mismatch instead of returning garbage scores. ⚠️ `embedding_config` in D1 is **global**, so importing one repo's export flips the model for every repository while old vectors remain — see the trap section in `docs/RESUME-embedding-migration.md` before any D1 run. `unity-ui-toolkit` is 86 chunks / 9 vectors (repository `f875ed6a8ea804b9`). **`ork-framework`** (4,550 chunks / 0 vectors, keyword only) imported 2026-11-03. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only) re-imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
+**Last Updated**: 2026-11-10 (web-portfolio embedding migration completed)
+**Status**: D1 at **14,417 chunks, 5,313 vectors** after removing 2,904 junk chunks (`node_modules`/`.pi-subagents`) from the SCE repo corpus and re-importing it cleaned (317 chunks). **Embedding model changed** to `nvidia/nemotron-3-embed-1b:free` (2048-dim, ~12 points better on RTEB/MMTEB, 100% uptime vs the retiring `llama-nemotron-embed-vl-1b-v2`). **Repo-root local migration is COMPLETE** — 24 files / 393 chunks / 393 vectors, all on `nemotron-3-embed-1b`, no gaps. **web-portfolio local index migrated 2026-11-10** — 35 files / 157 chunks / 157 vectors, same model, no gaps. `packages` (78 requests at batch 10; floor 68) and `word-guess` (118 requests) are still on the old model. **D1 still holds old-model vectors** for the whole published corpus (14,417 chunks / 5,313 vectors on `llama-nemotron-embed-vl-1b-v2`); the SCE repo slice is 317 chunks / 146 vectors. The worker guard fails loudly on model mismatch instead of returning garbage scores. ⚠️ `embedding_config` in D1 is **global**, so importing one repo's export flips the model for every repository while old vectors remain — see the trap section in `docs/RESUME-embedding-migration.md` before any D1 run. `unity-ui-toolkit` is 86 chunks / 9 vectors (repository `f875ed6a8ea804b9`). **`ork-framework`** (4,550 chunks / 0 vectors, keyword only) imported 2026-11-03. Prior batch 55–56 + swarm topics + **`unity-gem-td` own-repo docs** (2,362 chunks, keyword-only) re-imported 2026-10-08. **`game-design-method`** (20 chunks / 20 vectors) imported 2026-10-26. **`gem-td-poe1-typed-damage`** (42 chunks / 0 vectors, keyword only) imported 2026-10-27. **Design-agent batch** (81 chunks / 0 vectors) imported 2026-10-28.
 
 **⚠️ Known issues:** OpenRouter free tier is capped at **50 requests/day account-wide across all free models** (not per-model — verified on both models). Resets 08:00 UTC+8. This makes full-corpus re-embeds impractical (D1's 5,313 vectors ≈ 1,063 requests ≈ 21 days). Unity 6000.3 Manual pages failing to scrape (Scripting API works); Epic Games docs (dev.epicgames.com) entirely blocked for scraping. Import script has race conditions with `.sce-import-tmp` temp directory when parallelized; run sequentially. **Hosted demo semantic/hybrid** reranks a lexical candidate shortlist (~24 chunks) to stay within Cloudflare Workers Free CPU/D1 limits — full-corpus semantic runs locally via CLI/MCP.
 
@@ -36,7 +36,7 @@ Vectors: 5,313 (2048-dim embeddings)
 Symbols:  3
 Topics:  ~219 knowledge + 4 own-repo corpora + 2 GitHub sources, plus game-design-method, gem-td-poe1-typed-damage, the curated design-agent topics, and ork-framework
 Model:   nvidia/llama-nemotron-embed-vl-1b-v2:free (existing vectors)
-         nvidia/nemotron-3-embed-1b:free (target — local rebuild in progress)
+         nvidia/nemotron-3-embed-1b:free (target — repo root and web-portfolio done; packages, word-guess, knowledge still old)
 Size:    ~240 MB (approximate)
 ```
 
@@ -84,7 +84,7 @@ Size:    ~240 MB (approximate)
 - **Design-agent skills and browser graphics**: `design-agent-candidates` (8), `design-md` (7), `ui-ux-pro-max` (6), `taste-skill` (6), `open-design` (6), `emilkowalski-skills` (5), `gsap-skills` (6), `magic-ui` (5), `react-bits` (5), `canvas-ui` (5), `dimensional-drawing` (8), `threejs-web` (5), `webgpu` (5), and `react-native-motion` (4) — all keyword-only, curated notes with source/license boundaries. `impeccable` and `scroll-world` were already indexed and not duplicated.
 - **Random Number Algorithms**: MegaRandom, xoshiro256**, SplitMix64, pseudorandom, shuffle bag, weighted random, noise (52 chunks)
 - **AI Agent Skills**: scroll-world (46 chunks) — scroll-scrubbed 3D world landing pages
-- Own-repo corpora: SCE packages (317 after cleanup — was 290, then 3,221 with junk), word-guess (423), web-portfolio (155), unity-gem-td docs (2,362)
+- Own-repo corpora in D1 (these counts are the published database, not the local rebuild): SCE packages (317 after cleanup — was 290, then 3,221 with junk), word-guess (423), web-portfolio (155), unity-gem-td docs (2,362). Local `web-portfolio` was rebuilt 2026-11-10 to 157 chunks on nemotron-3 and has not been imported.
 
 ---
 
@@ -142,7 +142,7 @@ A full D1 re-embed (5,313 vectors) still needs ≈ **1,063 requests ≈ 21 days*
 
 **Local migration: COMPLETE (2026-11-08).** 24 files / 393 chunks / 393 vectors, all on `nvidia/nemotron-3-embed-1b:free`, no gaps, FTS in sync, integrity ok. Keyword, semantic, and hybrid all verified.
 
-Still outstanding: **D1** (holds the old model) and the **other local databases** (`packages/.sce`, `word-guess/.sce`, `web-portfolio/.sce`, `knowledge/*/.sce`). Details in `docs/RESUME-embedding-migration.md`.
+Still outstanding: **D1** (holds the old model; do not import until the user picks an option in `docs/RESUME-embedding-migration.md`) and the remaining local databases (`packages/.sce`, `word-guess/.sce`, `knowledge/*/.sce`). `web-portfolio/.sce` is migrated. Next action is `packages`, on or after 2026-11-11 08:00 UTC+8 — the 2026-11-10 quota was spent on web-portfolio. Continue with `continue docs\RESUME-embedding-migration.md`; that file's Next session section is the procedure.
 
 ---
 

@@ -112,6 +112,9 @@ for (const topic of topics) {
     console.log(`SKIP ${topic} (no sce.config.json)`);
     continue;
   }
+  // Forces batchSize 1. That spends one request per chunk and will not fit the
+  // 50/day free tier during the nemotron migration. Do not run this script for
+  // that migration — see docs/RESUME-embedding-migration.md.
   // Prefer batchSize 1 for free embedding models
   try {
     const cfgObj = JSON.parse(readFileSync(cfg, "utf8"));
