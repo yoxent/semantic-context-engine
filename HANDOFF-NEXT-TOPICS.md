@@ -12,9 +12,9 @@ Add hand-written knowledge topics to the Semantic Context Engine in the same vei
 - `HANDOFF.md` — live state & conventions
 - `knowledge/boids/` — the reference topic just added (3 files, 35 chunks): copy its config and structure
 
-## Current state (2026-08-14)
+## Current state (2026-11-13)
 
-- **D1**: 14,417 chunks / 5,313 vectors — SCE repo re-imported cleaned 2026-11-07 (317 chunks). Vectors are still `nvidia/llama-nemotron-embed-vl-1b-v2:free`. Do not import a nemotron-3 export until the user picks an option. Local repo root and `web-portfolio` are already on `nvidia/nemotron-3-embed-1b:free`. Next local rebuild is `packages`, not before 2026-11-11 08:00 UTC+8. Procedure: `docs/RESUME-embedding-migration.md` (prompt: `continue docs\RESUME-embedding-migration.md`).
+- **D1**: 14,417 chunks / 5,313 vectors — SCE repo re-imported cleaned 2026-11-07 (317 chunks). Vectors are still `nvidia/llama-nemotron-embed-vl-1b-v2:free`. Do not import a nemotron-3 export until the user picks an option. Local repo root and `web-portfolio` are on `nvidia/nemotron-3-embed-1b:free`. `packages` is partial (20 files / 61 chunks / 59 vectors, same model; keep DB). Resume `packages` not before **2026-11-14 08:00 UTC+8**. Procedure: `docs/RESUME-embedding-migration.md` (prompt: `continue docs\RESUME-embedding-migration.md`).
 - **Live**: frontend https://sce-web.pasttime.xyz/ · API https://sce-api.pasttime.xyz
 - **Done recently**: Batch 55 (71c) + batch 56 content topics (28c) + `cpp`/`unreal-engine` stragglers (5c) + `boids` (35c) + **`steering-behaviors` (35c) + `three-steer` (7c)** + **`swarm-intelligence` (32c) + `pso.js` (4c, +3 symbols)** + **`crowd-simulation` (29c)** + **`flow-field-pathfinding` (43c)** + **`cellular-automata` (38c)**
 - **GitHub source convention (established this session)**: vetted GitHub repos are first-class sources — clone to `knowledge/github/<repo>/`, require MIT/Apache-2.0 license, index only TS/JS/MD (`include: ["**/*.js", "**/*.md"]`); C#/C++/Java/Python repos are knowledge-only (parser can't read them). Added so far: `three-steer`, `pso.js`. See HANDOFF.md Notes.
