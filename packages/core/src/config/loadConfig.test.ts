@@ -25,7 +25,7 @@ describe("loadConfig", () => {
         JSON.stringify({ search: { defaultLimit: 3 }, logging: { level: "debug" } })
       );
       const config = await loadConfig(dir);
-      expect(config.indexing.ignore).toContain(".git/**");
+      expect(config.indexing.ignore).toContain("**/.git/**");
       expect(config.search.defaultLimit).toBe(3);
       expect(config.logging.level).toBe("debug");
     } finally {
@@ -66,6 +66,43 @@ describe("embedding config", () => {
     });
     expect(parsed.embedding?.batchSize).toBe(32);
     expect(parsed.embedding?.apiKeyEnv).toBe("OPENAI_API_KEY");
+  });
+
+  it("accepts optional retry tuning and rejects negative values", () => {
+    const parsed = sceConfigSchema.parse({
+      embedding: {
+        provider: "openai-compatible",
+        baseUrl: "http://localhost:11434/v1",
+        model: "nomic-embed-text",
+        dimensions: 768,
+        maxRetries: 5,
+        retryDelayMs: 250
+      }
+    });
+    expect(parsed.embedding?.maxRetries).toBe(5);
+    expect(parsed.embedding?.retryDelayMs).toBe(250);
+    // Omitted by default so the provider's own defaults apply.
+    expect(
+      sceConfigSchema.parse({
+        embedding: {
+          provider: "openai-compatible",
+          baseUrl: "http://localhost:11434/v1",
+          model: "m",
+          dimensions: 768
+        }
+      }).embedding?.maxRetries
+    ).toBeUndefined();
+    expect(() =>
+      sceConfigSchema.parse({
+        embedding: {
+          provider: "openai-compatible",
+          baseUrl: "http://localhost:11434/v1",
+          model: "m",
+          dimensions: 768,
+          maxRetries: -1
+        }
+      })
+    ).toThrow();
   });
 
   it("rejects unknown provider values", () => {

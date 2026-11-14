@@ -1,4 +1,4 @@
-import { mkdtemp } from "node:fs/promises";
+import { mkdtemp, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import Database from "better-sqlite3";
@@ -290,6 +290,72 @@ describe("SqliteStorage.getChunks", () => {
       const chunks = await storage.getChunks(["chunk-1", "chunk-2", "missing"]);
       expect(chunks.map((c) => c.id).sort()).toEqual(["chunk-1", "chunk-2"]);
       expect(chunks.length).toBe(2);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+});
+
+describe("SqliteStorage schema migration", () => {
+  // Regression: databases created before multi-part chunking lack part_index /
+  // total_parts. `CREATE TABLE IF NOT EXISTS` never adds them, so re-indexing
+  // failed with "table chunks has no column named part_index".
+  it("adds part_index and total_parts to a legacy database on open", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-migrate-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      // Build a legacy chunks table without the multi-part columns.
+      await mkdir(join(dir, ".sce"), { recursive: true });
+      const legacy = openRawDb(dir);
+      legacy.exec(`
+        CREATE TABLE chunks (
+          id TEXT PRIMARY KEY,
+          repository_id TEXT NOT NULL,
+          relative_path TEXT NOT NULL,
+          language TEXT NOT NULL,
+          start_line INTEGER NOT NULL,
+          end_line INTEGER NOT NULL,
+          text TEXT NOT NULL,
+          file_hash TEXT NOT NULL,
+          timestamp TEXT NOT NULL,
+          heading_path_json TEXT NOT NULL,
+          wiki_links_json TEXT NOT NULL
+        );
+      `);
+      legacy.close();
+
+      storage = await SqliteStorage.open(dir);
+      const db = storage.getDatabase();
+      const cols = (db.prepare("SELECT name FROM pragma_table_info('chunks')").all() as { name: string }[]).map((r) => r.name);
+      expect(cols).toContain("part_index");
+      expect(cols).toContain("total_parts");
+
+      // The migrated table must accept a normal write.
+      await expect(
+        storage.saveChunks([makeChunk({ id: "c-migrated", partIndex: 0, totalParts: 2 })])
+      ).resolves.toBeUndefined();
+      const stored = await storage.getChunk("c-migrated");
+      expect(stored.partIndex).toBe(0);
+      expect(stored.totalParts).toBe(2);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+
+  it("is a no-op when the columns already exist", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-migrate-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      storage = await SqliteStorage.open(dir);
+      storage.close();
+      // Re-open the already-current database; must not throw "duplicate column".
+      const reopened = await SqliteStorage.open(dir);
+      storage = reopened;
+      const cols = (reopened.getDatabase().prepare("SELECT name FROM pragma_table_info('chunks')").all() as { name: string }[]).map((r) => r.name);
+      expect(cols).toContain("part_index");
+      expect(cols).toContain("total_parts");
     } finally {
       storage?.close();
       await rmWithRetry(dir);

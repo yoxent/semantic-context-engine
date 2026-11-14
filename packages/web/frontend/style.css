@@ -235,6 +235,204 @@ header h1 {
 
 .mode-icon {
   font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.mode-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.mode-name {
+  font-size: 0.85rem;
+}
+
+.mode-tagline {
+  font-size: 0.65rem;
+  font-weight: 500;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mode.active .mode-tagline {
+  opacity: 0.85;
+}
+
+.mode-hint {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--muted);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-xs);
+  font-size: 0.82rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+
+.mode-hint-title {
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.35rem;
+}
+
+.mode-hint-body {
+  margin-bottom: 0.25rem;
+}
+
+.mode-hint-body strong,
+.mode-hint-example strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.mode-hint-example {
+  margin-top: 0.35rem;
+}
+
+.mode-hint-example code {
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  font-size: 0.78rem;
+  background: var(--card);
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--border);
+}
+
+.mode-glossary {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--muted-foreground);
+}
+
+.mode-glossary summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--foreground);
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0;
+}
+
+.mode-glossary summary::-webkit-details-marker {
+  display: none;
+}
+
+.mode-glossary summary::before {
+  content: '▸';
+  font-size: 0.75rem;
+  transition: transform 0.15s ease;
+}
+
+.mode-glossary[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.mode-glossary summary:hover {
+  color: var(--primary);
+}
+
+.glossary-list {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.glossary-item dt {
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+}
+
+.glossary-item dt em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.glossary-item dd {
+  margin-left: 0;
+  line-height: 1.5;
+}
+
+.glossary-example {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+}
+
+.glossary-ranking-inline {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.glossary-ranking-inline em {
+  font-style: normal;
+}
+
+.glossary-ranking {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 2px solid var(--border);
+}
+
+.glossary-ranking h3 {
+  font-family: var(--font-head);
+  font-size: 0.9rem;
+  color: var(--foreground);
+  margin-bottom: 0.35rem;
+}
+
+.glossary-ranking-intro {
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.ranking-steps {
+  margin-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  line-height: 1.5;
+}
+
+.ranking-steps strong {
+  color: var(--foreground);
+}
+
+.ranking-steps ul {
+  margin: 0.35rem 0 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ranking-steps code {
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  font-size: 0.75rem;
+  background: var(--card);
+  padding: 0.05rem 0.3rem;
+  border: 1px solid var(--border);
+}
+
+.glossary-example code {
+  font-family: ui-monospace, 'Cascadia Code', monospace;
+  background: var(--card);
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--border);
+}
+
+.glossary-note {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
 }
 
 .search-meta {

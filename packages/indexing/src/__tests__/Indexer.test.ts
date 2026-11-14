@@ -249,6 +249,63 @@ describe("IndexingService semantic embedding", () => {
     }
   });
 
+  // Regression: saveFile() recorded the new hash before embedding ran, so a
+  // 429/quota failure mid-file left that file marked "unchanged" forever while
+  // having zero vectors — invisible to semantic search and never retried.
+  it("retries a file whose embedding failed instead of skipping it as unchanged", async () => {
+    const dir = await mkdtemp(join(tmpdir(), "sce-index-retry-"));
+    let storage: SqliteStorage | undefined;
+    try {
+      await cp("fixtures/sample-vault", dir, { recursive: true });
+      storage = await SqliteStorage.open(dir);
+      const vectors = SqliteVectorStore.attach(storage.getDatabase());
+
+      let fail = true;
+      const embedder = {
+        embed: vi.fn(async (texts: string[]) => {
+          if (fail) throw new Error("Embedding provider request failed: HTTP 429");
+          return texts.map(() => [1, 0, 0]);
+        })
+      } as unknown as IEmbeddingProvider & { embed: ReturnType<typeof vi.fn> };
+
+      const service = new IndexingService({
+        chunker: new MarkdownChunker(),
+        metadataStore: storage,
+        keywordIndex: storage,
+        embeddingProvider: embedder,
+        vectorStore: vectors,
+        embeddingConfig: { model: "m", dimensions: 3 }
+      });
+
+      await expect(service.indexRepository({ rootPath: dir, type: "vault" })).rejects.toThrow(/429/);
+
+      // Nothing should be recorded as successfully processed.
+      const afterFailure = await storage.getFile(
+        (await storage.listFiles("")).at(0)?.repositoryId ?? "",
+        "Architecture.md"
+      );
+      expect(afterFailure).toBeUndefined();
+
+      // Second run must actually retry (not treat files as unchanged).
+      fail = false;
+      embedder.embed.mockClear();
+      const result = await service.indexRepository({ rootPath: dir, type: "vault" });
+      expect(embedder.embed.mock.calls.length).toBeGreaterThan(0);
+      expect(result.chunksIndexed).toBeGreaterThan(0);
+
+      const hits = await vectors.search({
+        vector: [1, 0, 0],
+        limit: 100,
+        model: "m",
+        dimensions: 3
+      });
+      expect(hits.length).toBeGreaterThan(0);
+    } finally {
+      storage?.close();
+      await rmWithRetry(dir);
+    }
+  });
+
   it("fails with a rebuild boundary when model/dimensions changed since last index", async () => {
     const dir = await mkdtemp(join(tmpdir(), "sce-index-sem-"));
     let storage: SqliteStorage | undefined;

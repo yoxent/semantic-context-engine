@@ -32,6 +32,7 @@ const topics = [
   "openrouter",
   "mcp",
   "sqlite",
+  "content-directories",
 ];
 
 const only = new Set(

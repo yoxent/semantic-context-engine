@@ -49,7 +49,7 @@ async function embedText(text: string): Promise<number[]> {
     },
     body: JSON.stringify({
       input: text,
-      model: "nvidia/llama-nemotron-embed-vl-1b-v2:free",
+      model: "nvidia/nemotron-3-embed-1b:free",
     }),
   });
 
