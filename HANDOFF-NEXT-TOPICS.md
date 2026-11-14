@@ -12,13 +12,13 @@ Add hand-written knowledge topics to the Semantic Context Engine in the same vei
 - `HANDOFF.md` — live state & conventions
 - `knowledge/boids/` — the reference topic just added (3 files, 35 chunks): copy its config and structure
 
-## Current state (2026-11-13)
+## Current state (2026-11-14)
 
-- **D1**: 14,417 chunks / 5,313 vectors — SCE repo re-imported cleaned 2026-11-07 (317 chunks). Vectors are still `nvidia/llama-nemotron-embed-vl-1b-v2:free`. Do not import a nemotron-3 export until the user picks an option. Local repo root and `web-portfolio` are on `nvidia/nemotron-3-embed-1b:free`. `packages` is partial (20 files / 61 chunks / 59 vectors, same model; keep DB). Resume `packages` not before **2026-11-14 08:00 UTC+8**. Procedure: `docs/RESUME-embedding-migration.md` (prompt: `continue docs\RESUME-embedding-migration.md`).
+- **D1**: 14,417 chunks / 5,313 vectors — SCE repo re-imported cleaned 2026-11-07 (317 chunks). Vectors are still `nvidia/llama-nemotron-embed-vl-1b-v2:free`. Do not import a nemotron-3 export until the user picks an option. Local repo root, `web-portfolio`, and `packages` are on `nvidia/nemotron-3-embed-1b:free` (`packages`: 68 files / 320 chunks / 320 vectors, no gaps). `word-guess` is still the old model. Do not start it before **2026-11-15 08:00 UTC+8**. Procedure: `docs/RESUME-embedding-migration.md` (prompt: `continue docs\RESUME-embedding-migration.md`).
 - **Live**: frontend https://sce-web.pasttime.xyz/ · API https://sce-api.pasttime.xyz
 - **Done recently**: Batch 55 (71c) + batch 56 content topics (28c) + `cpp`/`unreal-engine` stragglers (5c) + `boids` (35c) + **`steering-behaviors` (35c) + `three-steer` (7c)** + **`swarm-intelligence` (32c) + `pso.js` (4c, +3 symbols)** + **`crowd-simulation` (29c)** + **`flow-field-pathfinding` (43c)** + **`cellular-automata` (38c)**
 - **GitHub source convention (established this session)**: vetted GitHub repos are first-class sources — clone to `knowledge/github/<repo>/`, require MIT/Apache-2.0 license, index only TS/JS/MD (`include: ["**/*.js", "**/*.md"]`); C#/C++/Java/Python repos are knowledge-only (parser can't read them). Added so far: `three-steer`, `pso.js`. See HANDOFF.md Notes.
-- **Gotcha (embedding 502)**: transient OpenRouter 502 can leave chunks without vectors (export shows chunks ≠ vectors) — wipe `.sce` and re-index.
+- **Gotcha (embedding 502)**: transient OpenRouter 502 can leave chunks without vectors (export shows chunks ≠ vectors) — wipe `.sce` and re-index. Do not apply that wipe to `packages` (done) or to a `word-guess` DB that already has `nemotron-3` vectors. The migration procedure is `docs/RESUME-embedding-migration.md`.
 - **Still pending** (do NOT touch unless user asks): `spire-codex` (3.6 GB codebase clone — needs include-config decision), `unity-ebooks-scraped` (staging only, no config)
 
 ## Task pattern (proven by `boids`)
@@ -48,7 +48,9 @@ Hand-write comprehensive `.md` files — do **not** scrape (same as the PRNG top
 mkdir knowledge/<topic>        # write <topic>-*.md files + sce.config.json
 #   config template: copy knowledge/boids/sce.config.json verbatim
 #   (embedding: openai-compatible, OpenRouter, nvidia/nemotron-3-embed-1b:free,
-#    2048 dims, batchSize=1; indexing.include ["**/*.md"])
+#    2048 dims, batchSize=10; indexing.include ["**/*.md"])
+#    Do not import (step 3) until a D1 option is chosen in
+#    docs/RESUME-embedding-migration.md. Import rewrites the global model.
 
 # 1. index (from the topic dir)
 cd knowledge/<topic>
@@ -93,7 +95,7 @@ Commit style: `feat(knowledge): add <topic> — <short desc>` (+ `docs:` for pur
    `node -e "const c=require('./knowledge/<topic>-export/chunks.json');const m={};c.forEach(x=>m[x.relativePath]=(m[x.relativePath]||0)+1);console.log(m)"`
 3. **`knowledge/` is gitignored** (`.gitignore` line 12). Content, `.sce`, and `-export` dirs are never committed. Doc updates inside `knowledge/` need `git add -f` (they're already tracked).
 4. **Import sequentially** — the import script has race conditions with `.sce-import-tmp` when parallelized (noted in HANDOFF.md).
-5. **Config `batchSize=1`** — free embedding model rate-limits; keep it at 1. All recent topic configs already use this.
+5. **Config `batchSize=10`** for new embedding work. A request holds many chunks, and the indexer rounds up per file, so `batchSize=1` spends the daily budget on a handful of chunks. Do not use `scripts/index-knowledge-batch.mjs`; it rewrites every topic back to 1. Check `node scripts/embedding-quota.mjs` before embedding. Older topic configs may still say 1.
 6. **D1 queries**: `repository_id` is a 16-hex hash, not the topic name — always compute it via the `node -e` snippet above.
 7. **OpenRouter key**: lives in `packages/web/.dev.vars` as `OPENROUTER_API_KEY="..."` — never print it.
 
