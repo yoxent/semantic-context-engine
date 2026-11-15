@@ -13,6 +13,7 @@ export class SqliteStorage implements IMetadataStore, IKeywordIndex {
     await mkdir(sceDir, { recursive: true });
     const db = new Database(join(sceDir, "metadata.sqlite"));
     db.exec(createSchemaSql);
+    migrateSchema(db);
     return new SqliteStorage(db);
   }
 
@@ -265,6 +266,22 @@ function buildFtsQuery(text: string): string | null {
   const terms = text.match(/[\p{L}\p{N}_]+/gu);
   if (!terms || terms.length === 0) return null;
   return terms.map((term) => `"${term.replace(/"/g, '""')}"`).join(" ");
+}
+
+/**
+ * Bring databases created by older builds up to the current schema.
+ *
+ * `CREATE TABLE IF NOT EXISTS` in `createSchemaSql` is a no-op once a table
+ * exists, so columns added later (multi-part chunking) are missing from any
+ * database indexed before that feature landed. Without this, re-indexing such
+ * a database fails with "table chunks has no column named part_index".
+ */
+function migrateSchema(db: Database.Database): void {
+  const columns = new Set(
+    (db.prepare("SELECT name FROM pragma_table_info('chunks')").all() as { name: string }[]).map((r) => r.name)
+  );
+  if (!columns.has("part_index")) db.exec("ALTER TABLE chunks ADD COLUMN part_index INTEGER");
+  if (!columns.has("total_parts")) db.exec("ALTER TABLE chunks ADD COLUMN total_parts INTEGER");
 }
 
 function parseHeadingPath(json?: string): string[] | undefined {

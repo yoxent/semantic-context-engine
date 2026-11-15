@@ -1,6 +1,10 @@
 /**
  * Index + export + D1-append own project corpora.
  * Usage: node scripts/index-own-corpora.mjs
+ *
+ * During the nemotron migration, do not use this script. D1 import is skipped
+ * unless SCE_ALLOW_D1_IMPORT=1, and a local rebuild should go through
+ * scripts/reindex-one.mjs instead. See docs/RESUME-embedding-migration.md.
  */
 import { readFileSync, existsSync, mkdirSync, appendFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
@@ -103,6 +107,16 @@ for (const corp of corpora) {
   }
 
   run(process.execPath, [cli, "stats", corp.path], { cwd: root });
+
+  if (process.env.SCE_ALLOW_D1_IMPORT !== "1") {
+    log(
+      `SKIP export+import ${corp.id}: D1 embedding_config is global. ` +
+        `Importing one corpus relabels every other repository's vectors. ` +
+        `Set SCE_ALLOW_D1_IMPORT=1 only after the whole published corpus is on one model. ` +
+        `See docs/RESUME-embedding-migration.md`,
+    );
+    continue;
+  }
 
   mkdirSync(corp.exportDir, { recursive: true });
   log(`==== EXPORT ${corp.id} ====`);

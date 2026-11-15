@@ -47,15 +47,27 @@
         </div>
 
         <div class="controls">
-          <div class="mode-selector">
-            <button class="mode active" data-mode="keyword" aria-pressed="true" title="SQL LIKE search — fast, exact matches">
-              <span class="mode-icon" aria-hidden="true">🔤</span> Keyword
+          <div class="mode-selector" role="group" aria-label="Search mode">
+            <button class="mode active" data-mode="keyword" aria-pressed="true" aria-describedby="mode-hint">
+              <span class="mode-icon" aria-hidden="true">🔤</span>
+              <span class="mode-label">
+                <span class="mode-name">Keyword</span>
+                <span class="mode-tagline">Exact terms</span>
+              </span>
             </button>
-            <button class="mode" data-mode="semantic" aria-pressed="false" title="Vector similarity — conceptual matches">
-              <span class="mode-icon" aria-hidden="true">🧠</span> Semantic
+            <button class="mode" data-mode="semantic" aria-pressed="false" aria-describedby="mode-hint">
+              <span class="mode-icon" aria-hidden="true">🧠</span>
+              <span class="mode-label">
+                <span class="mode-name">Semantic</span>
+                <span class="mode-tagline">By meaning</span>
+              </span>
             </button>
-            <button class="mode" data-mode="hybrid" aria-pressed="false" title="Reciprocal Rank Fusion of keyword + semantic">
-              <span class="mode-icon" aria-hidden="true">⚡</span> Hybrid
+            <button class="mode" data-mode="hybrid" aria-pressed="false" aria-describedby="mode-hint">
+              <span class="mode-icon" aria-hidden="true">⚡</span>
+              <span class="mode-label">
+                <span class="mode-name">Hybrid</span>
+                <span class="mode-tagline">Recommended</span>
+              </span>
             </button>
           </div>
 
@@ -64,6 +76,60 @@
             <span id="search-time"></span>
           </div>
         </div>
+
+        <div id="mode-hint" class="mode-hint" role="status" aria-live="polite"></div>
+
+        <details class="mode-glossary" id="mode-glossary">
+          <summary>What do search modes mean?</summary>
+          <dl class="glossary-list">
+            <div class="glossary-item">
+              <dt><span aria-hidden="true">🔤</span> Keyword <em>· Exact terms</em></dt>
+              <dd>Finds chunks whose text, file path, or heading contains your query words. Fast and predictable when you know the terminology (API names, package names, error strings).</dd>
+              <dd class="glossary-ranking-inline"><strong>Ranking:</strong> Matches start equal, then boost filename &gt; heading &gt; body text matches. Up to 2 hits per file.</dd>
+              <dd class="glossary-example"><strong>Try:</strong> <code>Unity Addressables</code>, <code>D1 binding</code></dd>
+            </div>
+            <div class="glossary-item">
+              <dt><span aria-hidden="true">🧠</span> Semantic <em>· By meaning</em></dt>
+              <dd>Embeds your question and ranks docs by conceptual similarity — not just shared keywords. Good for natural-language questions when docs mention related ideas in different words.</dd>
+              <dd class="glossary-ranking-inline"><strong>Ranking:</strong> Cosine similarity (0–1) on embedding closeness, plus the same filename/heading boosts. Up to 2 hits per file.</dd>
+              <dd class="glossary-example"><strong>Try:</strong> <code>how do flocks move without a leader</code></dd>
+            </div>
+            <div class="glossary-item">
+              <dt><span aria-hidden="true">⚡</span> Hybrid <em>· Recommended</em></dt>
+              <dd>Runs keyword and semantic, then merges both ranked lists. You get exact-term hits plus meaning-based matches in one result set — best default for exploratory search.</dd>
+              <dd class="glossary-ranking-inline"><strong>Ranking:</strong> Reciprocal Rank Fusion — top ranks from both lists add together; docs strong in <em>both</em> rise highest. Up to 2 hits per file.</dd>
+              <dd class="glossary-example"><strong>Try:</strong> <code>React form validation patterns</code></dd>
+            </div>
+          </dl>
+
+          <section class="glossary-ranking" aria-labelledby="ranking-heading">
+            <h3 id="ranking-heading">How ranking works</h3>
+            <p class="glossary-ranking-intro">Every mode applies the same tie-breakers after its primary score. Higher scores appear first.</p>
+            <ol class="ranking-steps">
+              <li>
+                <strong>Primary score</strong>
+                <ul>
+                  <li><strong>Keyword</strong> — all query words must match (AND). Base score 1.0 for every match.</li>
+                  <li><strong>Semantic</strong> — cosine similarity between your query embedding and each candidate chunk.</li>
+                  <li><strong>Hybrid</strong> — RRF fusion: each result earns <code>1 ÷ (60 + rank)</code> from the keyword list and again from the semantic list; scores are summed.</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Relevance boosts</strong> (keyword &amp; semantic)
+                <ul>
+                  <li>Filename match — strongest (+ up to 8)</li>
+                  <li>Heading match — next (+ up to 7)</li>
+                  <li>Exact phrase or all terms in snippet (+ up to 4)</li>
+                  <li>Longer, structured chunks get a small bonus (+1–2)</li>
+                </ul>
+              </li>
+              <li>
+                <strong>Diversity</strong> — at most <strong>2 results per file</strong> so one document does not dominate the page.</li>
+            </ol>
+          </section>
+
+          <p class="glossary-note">This demo searches a hosted knowledge index. Full SCE runs locally and can semantic-search your entire codebase without shortlist limits.</p>
+        </details>
       </div>
 
       <div id="results" class="results" role="region" aria-live="polite" aria-label="Search results"></div>

@@ -6,7 +6,7 @@ import { SqliteStorage, SqliteVectorStore, SqliteSymbolIndex } from "@sce/storag
 export const exportCommand = new Command("export")
   .description("Export index to JSON for D1 import")
   .option("-o, --output <dir>", "Output directory", "./sce-export")
-  .option("-m, --model <model>", "Embedding model ID", "nvidia/llama-nemotron-embed-vl-1b-v2:free")
+  .option("-m, --model <model>", "Embedding model ID", "nvidia/nemotron-3-embed-1b:free")
   .option("-d, --dimensions <n>", "Embedding dimensions", "2048")
   .option("--path <path>", "Root path containing .sce directory", ".")
   .action(async (options) => {

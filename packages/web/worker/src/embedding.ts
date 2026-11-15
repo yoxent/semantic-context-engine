@@ -3,7 +3,18 @@
  * Calls the OpenRouter API at query time to embed search queries.
  */
 
-const EMBEDDING_MODEL = "nvidia/llama-nemotron-embed-vl-1b-v2:free";
+const EMBEDDING_MODEL = "nvidia/nemotron-3-embed-1b:free";
+
+/**
+ * Model + dimension the vectors in D1 were built with.
+ *
+ * Query-time embeddings MUST come from the same model that produced the stored
+ * vectors. Vectors are compared by cosine similarity, which only checks array
+ * length — a mismatch would silently return meaningless scores instead of
+ * failing, so the caller compares this against `embedding_config`.
+ */
+export const VECTOR_MODEL = EMBEDDING_MODEL;
+export const VECTOR_DIMENSIONS = 2048;
 
 export interface EmbeddingEnv {
   OPENROUTER_API_KEY: string;
@@ -11,7 +22,7 @@ export interface EmbeddingEnv {
 
 /**
  * Embed a single query string via OpenRouter.
- * Returns a float array (2048 dimensions for the default model).
+ * Returns a 2048-dim float array (VECTOR_DIMENSIONS).
  */
 export async function embedQuery(
   env: EmbeddingEnv,

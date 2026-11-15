@@ -67,8 +67,48 @@ describe("OpenAICompatibleEmbeddingProvider", () => {
 
   it("throws a clear error on non-2xx response", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({ error: "boom" }, 503));
-    const provider = new OpenAICompatibleEmbeddingProvider(baseConfig);
+    const provider = new OpenAICompatibleEmbeddingProvider({ ...baseConfig, maxRetries: 0 });
     await expect(provider.embed(["x"])).rejects.toThrow(/503/);
+  });
+
+  it("does not retry a client error such as 400", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({ error: "bad" }, 400));
+    const provider = new OpenAICompatibleEmbeddingProvider({ ...baseConfig, retryDelayMs: 0 });
+    await expect(provider.embed(["x"])).rejects.toThrow(/400/);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries a 429 and succeeds on a later attempt", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(mockResponse({ error: "rate limited" }, 429))
+      .mockResolvedValueOnce(mockResponse({ data: [{ embedding: [1, 2, 3] }] }));
+    const provider = new OpenAICompatibleEmbeddingProvider({ ...baseConfig, retryDelayMs: 0 });
+    const result = await provider.embed(["x"]);
+    expect(result).toEqual([[1, 2, 3]]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("retries a 500 and gives up after maxRetries", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(mockResponse({ error: "boom" }, 500));
+    const provider = new OpenAICompatibleEmbeddingProvider({ ...baseConfig, maxRetries: 2, retryDelayMs: 0 });
+    await expect(provider.embed(["x"])).rejects.toThrow(/500/);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("honours a Retry-After header in seconds when retrying", async () => {
+    const headers = new Map([["retry-after", "2"]]);
+    const limited = {
+      ...mockResponse({ error: "rate limited" }, 429),
+      headers: { get: (name: string) => headers.get(name.toLowerCase()) ?? null }
+    } as unknown as Response;
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(limited)
+      .mockResolvedValueOnce(mockResponse({ data: [{ embedding: [1, 2, 3] }] }));
+    const provider = new OpenAICompatibleEmbeddingProvider({ ...baseConfig, retryDelayMs: 0 });
+    await provider.embed(["x"]);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
   it("throws on malformed response payload", async () => {

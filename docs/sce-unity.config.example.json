@@ -1,0 +1,20 @@
+{
+  "indexing": {
+    "include": ["Assets/**/*.cs", "Assets/**/*.md"],
+    "ignore": [
+      "**/Library/**",
+      "**/PackageCache/**",
+      "**/Temp/**",
+      "**/obj/**",
+      "**/bin/**",
+      "**/Logs/**",
+      "**/UserSettings/**",
+      "**/Build/**",
+      "**/Builds/**",
+      "**/MemoryCaptures/**",
+      "**/Recordings/**",
+      "**/Plugins/**/package/**",
+      "**/*.meta"
+    ]
+  }
+}

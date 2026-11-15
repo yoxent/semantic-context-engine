@@ -202,7 +202,22 @@ export class IndexingService {
       }
       if (this.deps.embeddingProvider && this.deps.vectorStore && this.deps.embeddingConfig) {
         const texts = finalChunks.map((c) => c.text);
-        const vectors = await this.deps.embeddingProvider.embed(texts);
+        // saveFile() above already recorded the NEW file hash. If embedding then
+        // throws (HTTP 429, quota, network), the next run would see a matching
+        // hash, treat the file as unchanged, and skip it — leaving it permanently
+        // unvectorized and invisible to semantic search. Roll the file record
+        // back on failure so the file is retried.
+        let vectors: number[][];
+        try {
+          vectors = await this.deps.embeddingProvider.embed(texts);
+        } catch (error) {
+          if (existing) {
+            await this.deps.metadataStore.saveFile(existing);
+          } else {
+            await this.deps.metadataStore.deleteFile(repositoryId, relativePath);
+          }
+          throw error;
+        }
         if (vectors.length !== finalChunks.length) {
           throw new Error(
             `Embedding provider returned ${vectors.length} vectors for ${finalChunks.length} chunks (${relativePath})`
