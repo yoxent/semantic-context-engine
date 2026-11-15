@@ -12,13 +12,13 @@ Add hand-written knowledge topics to the Semantic Context Engine in the same vei
 - `HANDOFF.md` — live state & conventions
 - `knowledge/boids/` — the reference topic just added (3 files, 35 chunks): copy its config and structure
 
-## Current state (2026-11-14)
+## Current state (2026-11-15)
 
-- **D1**: 14,417 chunks / 5,313 vectors — SCE repo re-imported cleaned 2026-11-07 (317 chunks). Vectors are still `nvidia/llama-nemotron-embed-vl-1b-v2:free`. Do not import a nemotron-3 export until the user picks an option. Local repo root, `web-portfolio`, and `packages` are on `nvidia/nemotron-3-embed-1b:free` (`packages`: 68 files / 320 chunks / 320 vectors, no gaps). `word-guess` is still the old model. Do not start it before **2026-11-15 08:00 UTC+8**. Procedure: `docs/RESUME-embedding-migration.md` (prompt: `continue docs\RESUME-embedding-migration.md`).
+- **D1**: 14,417 chunks / 5,313 vectors — SCE repo re-imported cleaned 2026-11-07 (317 chunks). Vectors are still `nvidia/llama-nemotron-embed-vl-1b-v2:free`. Do not import a nemotron-3 export until the user picks an option. Local repo root, `web-portfolio`, and `packages` are on `nvidia/nemotron-3-embed-1b:free` (`packages`: 68 files / 320 chunks / 320 vectors, no gaps; semantic search verified 2026-11-15). `word-guess` is a partial nemotron-3 rebuild (60 files / 165 chunks / 155 vectors, gap `src/services/firestoreService.ts`, 47 files / 55 requests left). Keep that database. Resume on or after **2026-11-16 08:00 UTC+8**. Knowledge topics were counted locally the same day (none on nemotron-3, none at `batchSize` 10) and are not started. Procedure: `docs/RESUME-embedding-migration.md` (prompt: `continue docs\RESUME-embedding-migration.md`).
 - **Live**: frontend https://sce-web.pasttime.xyz/ · API https://sce-api.pasttime.xyz
 - **Done recently**: Batch 55 (71c) + batch 56 content topics (28c) + `cpp`/`unreal-engine` stragglers (5c) + `boids` (35c) + **`steering-behaviors` (35c) + `three-steer` (7c)** + **`swarm-intelligence` (32c) + `pso.js` (4c, +3 symbols)** + **`crowd-simulation` (29c)** + **`flow-field-pathfinding` (43c)** + **`cellular-automata` (38c)**
 - **GitHub source convention (established this session)**: vetted GitHub repos are first-class sources — clone to `knowledge/github/<repo>/`, require MIT/Apache-2.0 license, index only TS/JS/MD (`include: ["**/*.js", "**/*.md"]`); C#/C++/Java/Python repos are knowledge-only (parser can't read them). Added so far: `three-steer`, `pso.js`. See HANDOFF.md Notes.
-- **Gotcha (embedding 502)**: transient OpenRouter 502 can leave chunks without vectors (export shows chunks ≠ vectors) — wipe `.sce` and re-index. Do not apply that wipe to `packages` (done) or to a `word-guess` DB that already has `nemotron-3` vectors. The migration procedure is `docs/RESUME-embedding-migration.md`.
+- **Gotcha (embedding 502)**: transient OpenRouter 502 can leave chunks without vectors (export shows chunks ≠ vectors) — wipe `.sce` and re-index. Do not apply that wipe to `packages` (done) or to `word-guess` (partial nemotron-3, 155 vectors). The migration procedure is `docs/RESUME-embedding-migration.md`.
 - **Still pending** (do NOT touch unless user asks): `spire-codex` (3.6 GB codebase clone — needs include-config decision), `unity-ebooks-scraped` (staging only, no config)
 
 ## Task pattern (proven by `boids`)

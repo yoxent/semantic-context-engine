@@ -1,22 +1,59 @@
 # RESUME — Embedding Model Migration
 
-**Last updated**: 2026-11-14 (UTC+8)
+**Last updated**: 2026-11-15 (UTC+8)
 **Repo root**: ✅ **COMPLETE** (2026-11-08) — do not re-index
 **web-portfolio**: ✅ **COMPLETE** (2026-11-10) — do not re-index
-**packages**: ✅ **COMPLETE** (2026-11-14) — do not re-index
-**word-guess**: ⏳ **NOT STARTED** — still `llama-nemotron-embed-vl-1b-v2`. Backup, then delete, in the same session as the config change
-**Still outstanding**: `word-guess` + `knowledge/*` + D1 (needs a decision)
-**Next action**: one owed semantic search on `packages`, then start `word-guess`, on or after **2026-11-15 08:00 UTC+8**. This file is ready for that session. Do not call the embedding API on 2026-11-14. The free-model counter finished at **used 58 / limit 50 / remaining 0**.
+**packages**: ✅ **COMPLETE** (2026-11-14) — do not re-index. Owed semantic search ran 2026-11-15. Do not repeat it.
+**word-guess**: ⏳ **PARTIAL** — `nvidia/nemotron-3-embed-1b:free`. **Keep the live database.** Do not delete it. Do not restore the backup over it.
+**Still outstanding**: finish `word-guess`, then `knowledge/*`, then D1 (needs a decision)
+**Next action**: resume `word-guess` on or after **2026-11-16 08:00 UTC+8**. This file is ready for that session. Do not call the embedding API on 2026-11-15. The free-model counter finished at **used 66 / limit 50 / remaining 0**.
 
 ---
 
 ## Next session
 
-When the user says `continue docs\RESUME-embedding-migration.md`, this section is the assignment. Do the work from this file. Do not re-derive the plan from `HANDOFF.md`.
+When the user says `continue docs\RESUME-embedding-migration.md` or `continue E:\Projects\Indie\semantic-context-engine\docs\RESUME-embedding-migration.md`, this section is the assignment. Do the work from this file. Do not re-derive the plan from `HANDOFF.md`.
 
-### Snapshot left by 2026-11-14
+### Snapshot left by 2026-11-15
 
-`packages` finished on the second run of the day. Do not re-index it.
+`packages` is done, including the semantic search that was owed from 2026-11-14. Do not re-index it and do not search it again.
+
+```
+packages semantic search 2026-11-15 (1 request, exit 0)
+  query = "where embedding failure rolls back the file record"
+  mode  = semantic, limit 2
+  hits  = embedding/src/OpenAICompatibleEmbeddingProvider.ts:17-19
+          embedding/src/OpenAICompatibleEmbeddingProvider.ts:26-26
+```
+
+`word-guess` is a partial nemotron-3 rebuild. Keep it.
+
+```
+word-guess/.sce/metadata.sqlite
+  files     = 60
+  chunks    = 165
+  vectors   = 155
+  model     = nvidia/nemotron-3-embed-1b:free x155   (no old-model rows)
+  dims      = 2048
+  integrity = ok
+  FTS       = 165 == chunks 165
+  gaps      = src/services/firestoreService.ts (10 chunks, 0 vectors, no files row)
+  config    = nvidia/nemotron-3-embed-1b:free, dimensions 2048, batchSize 10
+  backup    = word-guess/.sce/metadata.pre-migration.sqlite
+              (old model, 99 files / 423 chunks / 423 vectors — do not restore over the live DB)
+```
+
+The 2026-11-15 dry-run (zero extra API calls after the index) was still **107 files / 399 chunks / 118 requests** at batch 10. Completed `files` rows are skipped, so the resume is not another 118. A second free pass the same day compared file hashes: **0** of the 60 stored files changed, **47** files are still pending, and those 47 cost **55** requests. That is more than one 50-request day. The largest pending files are `src/services/storage.ts` (34 chunks, 4 requests), then `adStore.ts`, `tutorialScript.ts`, `iapService.ts`, `mergePlayerStats.ts`, and `sound.ts` (2 requests each). `firestoreService.ts` is the gap and costs 1. Peak unchanged: ~4,311 tokens (`StatsScreen.tsx` is already stored, 3 chunks). Model limit 32,768. Do not raise `batchSize` past 10.
+
+Day shape, so the next 429 is not misread:
+
+1. Quota at session start was **used 0 / limit 50 / remaining 50**. The owed `packages` semantic search succeeded (the hits above).
+2. `word-guess` was still `llama-nemotron-embed-vl-1b-v2` (99 / 423 / 423). Config was switched to nemotron-3 and `batchSize` 10, the live DB was checkpointed, copied to `metadata.pre-migration.sqlite`, and deleted, then `reindex-one` started.
+3. The first `reindex-one` exited 1 with HTTP 429 after **28 files / 64 chunks / 53 vectors**. Gap left behind: `src/components/ui/SettingsRow.tsx` (11 chunks, 0 vectors). `embedding-quota.mjs` then showed **used 24 / remaining 26**. That 429 was a short rate limit. The provider's three short retries do not cover it.
+4. After about 60 seconds the same `reindex-one` was run again. It exited 1 with HTTP 429. The counter then read **used 66 / limit 50 / remaining 0**. Stored state: **60 files / 165 chunks / 155 vectors**. `SettingsRow.tsx` was completed on this retry (11 chunks, 11 vectors). New gap: `src/services/firestoreService.ts` (10 chunks, 0 vectors, no `files` row).
+5. An in-flight run can land past the stated 50. Do not start another embedding call on 2026-11-15.
+
+`packages` finished on 2026-11-14. Do not re-index it.
 
 ```
 packages/.sce/metadata.sqlite
@@ -31,27 +68,7 @@ packages/.sce/metadata.sqlite
   backup    = packages/.sce/metadata.pre-migration.sqlite  (old model; safe to delete once satisfied)
 ```
 
-Day shape, so the next 429 is not misread:
-
-1. Resumed the partial DB (20 files / 61 chunks / 59 vectors). First `reindex-one` exited 429 after landing **38 files / 154 chunks / 135 vectors**. Gap left behind: `parsing/src/TreeSitterCodeChunker.ts` (19 chunks, 0 vectors, no `files` row).
-2. `node scripts/embedding-quota.mjs` then showed **used 21 / limit 50 / remaining 29**. That 429 was a short rate limit, not the daily cap. The provider's three short retries do not cover it.
-3. The same `reindex-one` was run again and exited 0 at 68 / 320 / 320, no gaps.
-4. The counter then read **used 58 / limit 50 / remaining 0**. An in-flight run can land past the stated 50. The owed semantic search 429'd. Do not start another embedding call on 2026-11-14.
-
-```
-word-guess/.sce/metadata.sqlite   (priced 2026-11-14, zero API calls)
-  files    = 99
-  chunks   = 423
-  vectors  = 423
-  model    = nvidia/llama-nemotron-embed-vl-1b-v2:free x423
-  dims     = 2048
-  config   = same old model, batchSize 1
-  dry-run  = 107 files / 399 chunks / 118 requests at batch 10
-  peak     = ~4,311 tokens (StatsScreen.tsx). Model limit 32,768. Do not raise batchSize past 10.
-  backup   = none yet
-```
-
-The stored word-guess counts (99 / 423) are the stale index. The dry-run (107 / 399) is the rebuild target. Re-run the dry-run before spending; if it moved, trust the script. Full rebuild is 118 requests, about three quota days. There is no backup until the wipe below.
+That 2026-11-14 `packages` run is finished. Its first resume 429'd with quota still left (used 21 / remaining 29) and the retry exited 0. The counter ended that day at used 58 / remaining 0. Do not treat it as unfinished work.
 
 ### Do not
 
@@ -59,8 +76,11 @@ The stored word-guess counts (99 / 423) are the stale index. The dry-run (107 / 
 - Touch D1, run `packages/web/import.ts`, or set `SCE_ALLOW_D1_IMPORT=1`. Nobody has chosen option A, B, or C. Continuing this doc is not that choice.
 - Run `scripts/index-own-corpora.mjs`. It is the D1 import path.
 - Run `scripts/index-knowledge-batch.mjs`. It rewrites every topic's `batchSize` to 1.
-- Call the embeddings API on 2026-11-14, or before 08:00 UTC+8 on any later day. Run `node scripts/embedding-quota.mjs` first on every session from 2026-11-15 on. It does not embed. If it prints `remaining: 0` (exit 2), stop.
-- Delete `word-guess/.sce/metadata.sqlite` before its `sce.config.json` edit, or on a day whose counter is already 0. The wipe and the config edit happen in the same session, and only while the vectors are still the old model.
+- Call the embeddings API on 2026-11-15, or before 08:00 UTC+8 on any later day. Run `node scripts/embedding-quota.mjs` first. It does not embed. If it prints `remaining: 0` (exit 2), stop.
+- Repeat the `packages` semantic search. It already ran on 2026-11-15.
+- Delete `word-guess/.sce/metadata.sqlite`, its `-wal`, or its `-shm`. The live vectors are already `nvidia/nemotron-3-embed-1b:free`. Deleting them throws away the partial rebuild.
+- Restore `word-guess/.sce/metadata.pre-migration.sqlite` over the live DB. That backup is the old model (99 / 423 / 423). Copying it back mixes the migration in reverse.
+- Edit `word-guess/sce.config.json` unless `model` is not `nvidia/nemotron-3-embed-1b:free` or `batchSize` is not `10`. Both are already set. Leave `dimensions` at 2048.
 - Start `knowledge/*` until `word-guess` is fully done (exit 0 + the verification below).
 
 ### Which database
@@ -70,87 +90,76 @@ Order is fixed: `word-guess`, then `knowledge/*` one topic per day. D1 stays las
 | Corpus | Root | Config | Delete the DB first? |
 |---|---|---|---|
 | `packages` | `E:\Projects\Indie\semantic-context-engine\packages` | Done. `nvidia/nemotron-3-embed-1b:free`, `batchSize` 10 | Never |
-| `word-guess` | `E:\Projects\Indie\word-guess` | Still old model, `batchSize` 1. Change both in the same session as the delete | Yes, only while vectors are still `llama-nemotron-embed-vl-1b-v2` |
+| `word-guess` | `E:\Projects\Indie\word-guess` | Already `nvidia/nemotron-3-embed-1b:free`, `batchSize` 10. Do not edit unless those drifted | **No.** Partial nemotron-3 DB. Keep it |
 | `web-portfolio` | `E:\Projects\Web\web-portfolio` | Done | Never |
 
-Full-corpus dry-run. `packages` and `web-portfolio` were re-checked by outcome on 2026-11-14 and 2026-11-10. `word-guess` was re-priced 2026-11-14 (zero API calls). Re-run `word-guess` before spending; if counts moved, trust the script. The dry-run totals the **whole** corpus. Once `word-guess` is on nemotron-3, completed `files` rows are skipped, so a resume costs less than 118.
+Full-corpus dry-run. `packages` and `web-portfolio` were re-checked by outcome on 2026-11-14 and 2026-11-10. `word-guess` was re-priced 2026-11-15 (the plan script does not call the embeddings API). Re-run it before spending; if counts moved, trust the script. The dry-run totals the **whole** corpus. Completed `files` rows are skipped, so a resume costs less than 118. On 2026-11-15 the 60 complete files accounted for 63 of those 118. A hash compare the same day found 47 pending files and 55 requests, with no stored file changed.
 
 | Corpus | Full files / chunks | Full requests @ batch 10 | Remaining |
 |---|---|---|---|
 | `packages` | 68 / 320 | 78 | done |
-| `word-guess` | 107 / 399 | 118 | full rebuild; ~3 quota days |
+| `word-guess` | 107 / 399 | 118 | partial: 60 files stored, 47 files / 55 requests left |
 | `web-portfolio` | 35 / 157 | 41 | done |
 
 `word-guess` at batch 10 peaks around 4,300 estimated tokens (`src/screens/StatsScreen.tsx`). Model limit is 32,768. Do not raise `batchSize` past 10.
 
 ### Steps for `word-guess` (current corpus)
 
-Run from `E:\Projects\Indie\semantic-context-engine`.
+Run from `E:\Projects\Indie\semantic-context-engine`. There is no wipe in this procedure. The config change and the backup already happened on 2026-11-15.
 
-1. **Quota gate.** If local time is before **2026-11-15 08:00 UTC+8**, stop. Say when the reset is. Do not edit `word-guess`, do not delete its database, do not call the embeddings API.
+1. **Quota gate.** If local time is before **2026-11-16 08:00 UTC+8**, stop. Say when the reset is. Do not edit `word-guess`, do not delete its database, do not call the embeddings API.
 
-   At or after that time, including the 2026-11-15 session, run this before any embeddings call. It does not embed. Exit 2 means `remaining` is 0 — stop the same way. A fresh day should show `remaining` near 50. If it shows 0, that day's budget is already spent; wait until the next 08:00 UTC+8.
+   At or after that time, including the 2026-11-16 session, run this before any embeddings call. It does not embed. Exit 2 means `remaining` is 0 — stop the same way. A fresh day should show `remaining` near 50. If it shows 0, that day's budget is already spent; wait until the next 08:00 UTC+8.
 
 ```powershell
 node scripts/embedding-quota.mjs
 ```
 
-2. **Owed `packages` semantic search** — one request, only when step 1 shows `remaining` > 0. Keyword already hit `storage/src/SqliteStorage.ts` for `"sqlite vector store"`. This call was skipped on 2026-11-14 because the counter was already at remaining 0.
+2. **Do not repeat the `packages` semantic search.** It ran on 2026-11-15 (see the snapshot). Keyword already hit `storage/src/SqliteStorage.ts` for `"sqlite vector store"`.
 
-```powershell
-node scripts/search-one.mjs "where embedding failure rolls back the file record" --path E:\Projects\Indie\semantic-context-engine\packages --mode semantic --limit 2
-```
+3. **Confirm config** (free). Read `E:\Projects\Indie\word-guess\sce.config.json`. Expect `embedding.model` = `nvidia/nemotron-3-embed-1b:free`, `dimensions` = 2048, `batchSize` = 10. If those already match, leave the file alone. If they drifted, set them back to those three values and do not touch the database.
 
-   A sensible hit mentions the indexer rollback (expect `indexing/src/Indexer.ts` or the embedding provider). If this 429s, run `embedding-quota.mjs` again. Remaining 0 → stop, and do not touch `word-guess`. Remaining > 0 → wait about 60 seconds and retry this search once. Do not wipe anything because a search failed.
-
-3. **Price `word-guess`** (free, no embeddings API):
+4. **Price `word-guess`** (free, no embeddings API). The printed request count is the **whole** corpus. Actual spend is only files without a matching `files` row. 2026-11-15: 107 / 399 / 118 at batch 10, of which 47 files / 55 requests remain and no stored file hash changed. If the script moved, trust the script.
 
 ```powershell
 node scripts/plan-index-quota.mjs E:\Projects\Indie\word-guess
 ```
 
-4. **Read the database** (free). Expect the old model until the first successful wipe-and-index:
+5. **Read the database** (free). Expect the partial new model, at least the snapshot above. If files or vectors moved forward, trust the database.
 
 ```powershell
-node -e "const d=require('better-sqlite3')('E:/Projects/Indie/word-guess/.sce/metadata.sqlite',{readonly:true}); console.log(d.prepare('select model, count(*) n from vectors group by model').all()); console.log('files', d.prepare('select count(*) n from files').get()); console.log('chunks', d.prepare('select count(*) n from chunks').get()); console.log('vectors', d.prepare('select count(*) n from vectors').get()); d.close()"
+node -e "const d=require('better-sqlite3')('E:/Projects/Indie/word-guess/.sce/metadata.sqlite',{readonly:true}); console.log(d.prepare('select model, count(*) n from vectors group by model').all()); console.log('files', d.prepare('select count(*) n from files').get()); console.log('chunks', d.prepare('select count(*) n from chunks').get()); console.log('vectors', d.prepare('select count(*) n from vectors').get()); const g=d.prepare('select c.relative_path p, count(distinct c.id) ch, count(distinct v.chunk_id) v from chunks c left join vectors v on v.chunk_id=c.id group by c.relative_path having v=0 or v<>ch').all(); console.log(g.length?g:'NO GAPS'); d.close()"
 ```
 
-5. **Branch:**
+6. **Branch:**
 
-- **Old model** (`llama-nemotron-embed-vl-1b-v2`) — current state. Edit `E:\Projects\Indie\word-guess\sce.config.json` in this same session: `embedding.model` → `nvidia/nemotron-3-embed-1b:free`, `embedding.batchSize` → `10`. Leave `dimensions` at 2048. Then checkpoint, copy the backup, delete the live DB, and go to step 6.
-- **New model, files short of the dry-run, or any gap**: a previous day already started the rebuild. **Do not delete.** Do not restore the backup. Go to step 6.
-- **New model, files match the dry-run, chunks = vectors, NO GAPS**: corpus done. Skip to step 8.
-- **File missing**: do not restore a backup you do not have. Index, after the config names the new model and `batchSize` 10.
+- **New model, files short of the dry-run, or any gap** — current state (`firestoreService.ts` is the known gap). **Do not delete.** Do not restore the backup. Go to step 7.
+- **New model, files match the dry-run, chunks = vectors, NO GAPS**: corpus done. Skip to step 9.
+- **Old model** (`llama-nemotron-embed-vl-1b-v2`): stop. The live DB was rebuilt on nemotron-3. Old-model rows mean the pre-migration backup was copied over the live file. Do not index. Do not delete. Report the counts.
+- **File missing**: stop. Do not restore `metadata.pre-migration.sqlite` and do not start a fresh index. That backup is the old model and is not a resume point. Report that the partial nemotron-3 DB is gone.
 
-```powershell
-# ONLY if vectors are still the OLD model. Never run this against a nemotron-3 DB.
-node -e "const d=require('better-sqlite3')('E:/Projects/Indie/word-guess/.sce/metadata.sqlite'); d.pragma('wal_checkpoint(TRUNCATE)'); d.close()"
-Copy-Item E:\Projects\Indie\word-guess\.sce\metadata.sqlite E:\Projects\Indie\word-guess\.sce\metadata.pre-migration.sqlite -Force
-Remove-Item E:\Projects\Indie\word-guess\.sce\metadata.sqlite, E:\Projects\Indie\word-guess\.sce\metadata.sqlite-wal, E:\Projects\Indie\word-guess\.sce\metadata.sqlite-shm -ErrorAction SilentlyContinue
-```
-
-6. **Index** — the command that calls the embeddings API. Cursor auto-review may block reading `packages/web/.dev.vars`; approve the retry. The script does not print the key and does not import. This will not finish in one 50-request day.
+7. **Index** — the command that calls the embeddings API. Cursor auto-review may block reading `packages/web/.dev.vars`; approve the retry. The script does not print the key and does not import. 55 requests remain, so this can still run past one 50-request day. `Indexer` skips completed `files` rows and will retry the gap file.
 
 ```powershell
 node scripts/reindex-one.mjs E:\Projects\Indie\word-guess
 ```
 
-7. **Verify** after exit 0, or after a 429, before deciding whether to resume:
+8. **Verify** after exit 0, or after a 429, before deciding whether to resume:
 
 ```powershell
 node -e "const d=require('better-sqlite3')('E:/Projects/Indie/word-guess/.sce/metadata.sqlite',{readonly:true}); console.log(d.prepare('select model, count(*) n from vectors group by model').all()); console.log('files', d.prepare('select count(*) n from files').get()); console.log('chunks', d.prepare('select count(*) n from chunks').get()); console.log('vectors', d.prepare('select count(*) n from vectors').get()); const g=d.prepare('select c.relative_path p, count(distinct c.id) ch, count(distinct v.chunk_id) v from chunks c left join vectors v on v.chunk_id=c.id group by c.relative_path having v=0 or v<>ch').all(); console.log(g.length?g:'NO GAPS'); d.close()"
 node scripts/embedding-quota.mjs
 ```
 
-`word-guess` is done only when `files`, `chunks`, and `vectors` match the dry-run just printed (2026-11-14 target: files=107, chunks=vectors=399), the only model is `nvidia/nemotron-3-embed-1b:free`, and the gap check prints `NO GAPS`. Then one keyword search (free). One semantic search only when that is true and `embedding-quota.mjs` still shows `remaining` > 0.
+`word-guess` is done only when `files`, `chunks`, and `vectors` match the dry-run just printed (2026-11-15 target: files=107, chunks=vectors=399), the only model is `nvidia/nemotron-3-embed-1b:free`, and the gap check prints `NO GAPS`. Then one keyword search (free). One semantic search only when that is true and `embedding-quota.mjs` still shows `remaining` > 0.
 
 **429 handling:** run `embedding-quota.mjs` before deciding.
 
-- `remaining` > 0 → short rate limit, same as the first `packages` 429 on 2026-11-14. Wait about 60 seconds, then run `reindex-one` again. Do not wipe. Do not restore the backup.
-- `remaining` = 0 → daily budget is spent, even if `used` is a bit over 50 (the `packages` finish landed at 58). Stop. Keep whatever nemotron-3 rows were stored. The in-flight file may be a gap (chunks, 0 vectors, no `files` row). Resume the next day after 08:00 UTC+8. **Do not wipe a nemotron-3 database.**
-- 429 on the first request of a day, with no new rows → budget already gone. Stop. If the old DB was already deleted and the new DB has zero vectors, restore `metadata.pre-migration.sqlite` over `metadata.sqlite`. If any nemotron-3 vectors exist, keep the new DB.
+- `remaining` > 0 → short rate limit, same as the first `word-guess` 429 on 2026-11-15 (used 24 / remaining 26). Wait about 60 seconds, then run `reindex-one` again. Do not wipe. Do not restore the backup.
+- `remaining` = 0 → daily budget is spent, even if `used` is past 50 (this corpus landed at 66 on 2026-11-15; `packages` finished at 58 on 2026-11-14). Stop. Keep whatever nemotron-3 rows were stored. The in-flight file may be a gap (chunks, 0 vectors, no `files` row). Resume the next day after 08:00 UTC+8. **Do not wipe a nemotron-3 database.**
+- 429 on the first request of a day, with no new rows → budget already gone, or a short limit that the provider's three retries did not cover. Check `remaining`. If it is 0, stop and keep the DB (it already has nemotron-3 vectors). If it is above 0, wait about 60 seconds and run `reindex-one` once more. Do not restore the backup.
 
-8. **Write the outcome** into: the status block at the top of this file, the `word-guess` row under Still outstanding, and the embedding sentences in `HANDOFF.md` + `HANDOFF-NEXT-TOPICS.md`. Record files, chunks, vectors, model, gaps, quota `used`/`remaining`, and whether the next run must keep the database. The same prompt must work with no other context.
+9. **Write the outcome** into: the status block at the top of this file, the `word-guess` row under Still outstanding, and the embedding sentences in `HANDOFF.md` + `HANDOFF-NEXT-TOPICS.md`. Record files, chunks, vectors, model, gaps, quota `used`/`remaining`, and whether the next run must keep the database. The same prompt must work with no other context.
 
 ### After `word-guess`
 
@@ -163,7 +172,7 @@ node scripts/embedding-quota.mjs
 ## TL;DR
 
 Repo root, `web-portfolio`, and `packages` are on `nvidia/nemotron-3-embed-1b:free`.
-`word-guess` is the next corpus. Follow [Next session](#next-session).
+`word-guess` is a partial nemotron-3 rebuild (60 files / 165 chunks / 155 vectors, one gap). Keep that database. Follow [Next session](#next-session).
 
 Verified 2026-11-08:
 
@@ -212,15 +221,37 @@ FTS rows  = 320 == chunks 320
 gaps      = NONE
 ```
 
-Keyword `"sqlite vector store"` hit `storage/src/SqliteStorage.ts`. Semantic search was
-not verified: after the index exited 0, `scripts/embedding-quota.mjs` read **used 58 /
-limit 50 / remaining 0**, and the owed semantic query returned HTTP 429. One semantic
-search is still owed; it is step 2 of the next session and costs 1 request. Backup:
-`packages/.sce/metadata.pre-migration.sqlite` (old model). Safe to delete once satisfied.
+Keyword `"sqlite vector store"` hit `storage/src/SqliteStorage.ts`. Semantic search
+was verified 2026-11-15: `"where embedding failure rolls back the file record"` hit
+`embedding/src/OpenAICompatibleEmbeddingProvider.ts` (lines 17–19 and 26). Do not
+repeat it. Backup: `packages/.sce/metadata.pre-migration.sqlite` (old model). Safe
+to delete once satisfied.
 
 The first resume that day 429'd with quota still left (used 21 / remaining 29) after
 landing 38 files / 154 chunks / 135 vectors. Waiting and running `reindex-one` again
 finished the corpus. A 429 is the end of the day only when `remaining` is 0.
+
+**word-guess rebuild started 2026-11-15.** Config is `nvidia/nemotron-3-embed-1b:free`
+with `batchSize` 10. The old DB was backed up, then deleted, then re-indexed. The
+live DB is partial and must be kept:
+
+```
+files     = 60
+chunks    = 165
+vectors   = 155
+models    = nvidia/nemotron-3-embed-1b:free x155   (no mixing)
+dims      = 2048 x155
+integrity = ok
+FTS rows  = 165 == chunks 165
+gaps      = src/services/firestoreService.ts (10 chunks, 0 vectors, no files row)
+```
+
+Full dry-run is still 107 / 399 / 118. 47 files / 55 requests remain, and no stored file hash changed. The first run 429'd
+with quota left (used 24 / remaining 26) at 28 files / 53 vectors. The retry ran until
+the counter hit used 66 / remaining 0. Do not call the embeddings API again on
+2026-11-15. Resume on or after 2026-11-16 08:00 UTC+8. Backup:
+`E:\Projects\Indie\word-guess\.sce\metadata.pre-migration.sqlite` (old model). Do not
+restore it over the live DB.
 
 **The remaining work is not a "just run the resume command" job.** D1 needs a decision
 between a multi-day full re-embed, deferring, or moving off the free tier. Read
@@ -432,13 +463,25 @@ Measured 2026-11-10 with `node scripts/plan-index-quota.mjs <root>` (discover + 
 | Database | Rebuild files / chunks | Requests at batch 10 | Floor | Status |
 |---|---|---|---|---|
 | `web-portfolio/.sce` | 35 / 157 | 41 | 35 | ✅ done 2026-11-10 |
-| `packages/.sce` | 68 / 320 | **78** | 68 | ✅ done 2026-11-14: **68 files / 320 chunks / 320 vectors**, model `nvidia/nemotron-3-embed-1b:free` only, dims 2048, no gaps, FTS in sync, integrity ok. Keyword verified. Semantic search still owed (1 request) — daily counter was used 58 / remaining 0. Backup: `packages/.sce/metadata.pre-migration.sqlite` |
-| `word-guess/.sce` | 107 / 399 | **118** | 107 | old model. Stored DB is stale: **99 files / 423 chunks / 423 vectors** on `llama-nemotron-embed-vl-1b-v2`. Config still names that model, `batchSize` 1. Dry-run 2026-11-14: 107 / 399, worst batch ~4,300 tokens. Next corpus. Do not start before 2026-11-15 08:00 UTC+8 |
-| `knowledge/*/.sce` (265 DBs) | — | — | — | ~5,968 vectors, still old. Multi-week. One topic per day |
+| `packages/.sce` | 68 / 320 | **78** | 68 | ✅ done 2026-11-14: **68 files / 320 chunks / 320 vectors**, model `nvidia/nemotron-3-embed-1b:free` only, dims 2048, no gaps, FTS in sync, integrity ok. Keyword verified. Semantic search verified 2026-11-15 (embedding provider). Backup: `packages/.sce/metadata.pre-migration.sqlite` |
+| `word-guess/.sce` | 107 / 399 | **118** | 107 | partial 2026-11-15: **60 files / 165 chunks / 155 vectors** on `nvidia/nemotron-3-embed-1b:free`, dims 2048, integrity ok, FTS 165 = chunks 165. Gap: `src/services/firestoreService.ts` (10 chunks, 0 vectors, no files row). Config is already the new model, `batchSize` 10. **47 files / 55 requests left**; 0 stored hashes changed. **Do not delete.** Resume on or after 2026-11-16 08:00 UTC+8. Backup is the old model. Quota ended used 66 / remaining 0 |
+| `knowledge/*/.sce` | — | — | — | not started. Local inventory 2026-11-15, zero API calls. See the note below |
 
-`packages` finished on 2026-11-14 (the partial nemotron-3 DB was kept and resumed). A full `word-guess` rebuild cannot finish in one 50-request day (floor 107, priced at 118). The runnable procedure is in [Next session](#next-session). Use that section. Do not invent a second procedure from the notes below.
+`packages` finished on 2026-11-14 (the partial nemotron-3 DB was kept and resumed). `word-guess` was wiped once, on 2026-11-15, while its vectors were still the old model, and the rebuild is now partial nemotron-3. 55 requests remain, which is still more than one 50-request day. The runnable procedure is in [Next session](#next-session). Use that section. Do not invent a second procedure from the notes below. Do not delete `word-guess/.sce/metadata.sqlite`.
 
-**Deleting just the vectors does not work.** `Indexer` skips any file whose hash matches its `files` row. Delete the whole `metadata.sqlite`, and only when the vectors are still the old model.
+**Knowledge inventory, 2026-11-15, zero embedding calls.** 259 `sce.config.json` files. 258 have a local database; `spire-codex` has a config and no database. None are on nemotron-3. 188 still have `llama-nemotron-embed-vl-1b-v2` vectors. 70 have chunks and zero vectors. No config is at `batchSize` 10: 123 are at 1, and the rest are at 2. Configs were not edited.
+
+Request totals below use the chunks already stored, at `batchSize` 10. A fresh `plan-index-quota` pass can move a topic. At `batchSize` 1 the cost is one request per chunk, which is several times higher.
+
+| Set | Topics | Requests at batch 10 | Days at 50/day |
+|---|---:|---:|---:|
+| Old-model vectors | 188 | 1,413 | 29 |
+| Zero vectors | 70 | 805 | 17 |
+| Together | 258 | 2,218 | 45 |
+
+Topics over one day: `radix-ui` 97, `unity-scripting-api` 74, `google-cloud-thin` 67, `retroui` 65. `ork-framework` is in the zero-vector set and is 4,550 chunks / 539 requests. One topic per day is still the rule until `word-guess` is done and the user changes it. Packed to 50 requests, the old-vector set is about 29 days; one topic per day is about 188 days, because many topics cost one request. Do not start `knowledge/*` from this note. Do not run `scripts/index-knowledge-batch.mjs`.
+
+**Deleting just the vectors does not work.** `Indexer` skips any file whose hash matches its `files` row. Delete the whole `metadata.sqlite` only when the vectors are still the old model. `word-guess` is already on nemotron-3, so leave its live database in place.
 
 ---
 
@@ -462,7 +505,7 @@ Measured 2026-11-10 with `node scripts/plan-index-quota.mjs <root>` (discover + 
    `metadata.sqlite`.
 8. **Wrangler D1 commands must run from `packages/web/worker`** — the only directory
    whose config has the D1 binding. `packages/web/wrangler.jsonc` has none.
-9. **A mid-run HTTP 429 is not automatically the end of the day.** On 2026-11-14 the first `packages` resume 429'd after 38 files / 135 vectors while the counter was still used 21 / remaining 29. The provider only retries three short backoffs, which does not cover a one-minute window. Run `node scripts/embedding-quota.mjs`. Remaining > 0 means wait about 60 seconds and run `reindex-one` again. Do not wipe. Remaining 0 means stop. An in-flight run can also land past the stated cap of 50: `packages` finished at used 58 / remaining 0, and the next embedding call 429'd. Do not start another corpus after remaining hits 0.
+9. **A mid-run HTTP 429 is not automatically the end of the day.** On 2026-11-14 the first `packages` resume 429'd after 38 files / 135 vectors while the counter was still used 21 / remaining 29. On 2026-11-15 the first `word-guess` run 429'd at 28 files / 53 vectors while the counter was used 24 / remaining 26. The provider only retries three short backoffs, which does not cover a one-minute window. Run `node scripts/embedding-quota.mjs`. Remaining > 0 means wait about 60 seconds and run `reindex-one` again. Do not wipe. Remaining 0 means stop. An in-flight run can also land past the stated cap of 50: `packages` finished at used 58 / remaining 0, and `word-guess` stopped at used 66 / remaining 0. Do not start another corpus after remaining hits 0.
 
 ---
 
@@ -471,6 +514,7 @@ Measured 2026-11-10 with `node scripts/plan-index-quota.mjs <root>` (discover + 
 - `.sce/metadata.pre-migration.sqlite` — snapshot taken immediately before the
   successful repo-root run (187 vectors). Safe to delete once satisfied.
 - `packages/.sce/metadata.pre-migration.sqlite` — old-model snapshot taken 2026-11-13 before the packages rebuild (66 files / 290 chunks / 290 vectors on `llama-nemotron-embed-vl-1b-v2`). `packages` finished 2026-11-14. Safe to delete once satisfied.
+- `E:\Projects\Indie\word-guess\.sce\metadata.pre-migration.sqlite` — old-model snapshot taken 2026-11-15 before that rebuild (99 files / 423 chunks / 423 vectors on `llama-nemotron-embed-vl-1b-v2`). The live DB is the partial nemotron-3 rebuild. Do not copy this backup over the live DB.
 - `E:\Projects\Web\web-portfolio\.sce\metadata.pre-migration.sqlite` — old-model snapshot taken 2026-11-10 before that rebuild (155 chunks / 155 vectors). Safe to delete once satisfied.
 - `.sce/metadata.sqlite.bak` — 75.7 MB, **pre-cleanup** (contains 2,778 junk chunks).
 - `sce-export-clean/` — ⚠️ **STALE**. Verified 2026-11-08: it still holds the *old-model*
